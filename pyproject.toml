@@ -58,4 +58,4 @@ warn_unreachable = true
 
 # v2 development: the MIT rewrite, until it's published to PyPI as home-disconnect 2.0.0.
 [tool.uv.sources]
-home-disconnect = { git = "https://github.com/vemboy200/home-disconnect-rewrite", branch = "main" }
+home-disconnect = { git = "https://github.com/vemboy200/home-disconnect", branch = "main" }
