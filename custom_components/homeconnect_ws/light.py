@@ -5,8 +5,6 @@ from __future__ import annotations
 import asyncio
 from typing import TYPE_CHECKING, Any, cast
 
-from home_disconnect.message import Action
-from home_disconnect.message import Message as HC_Message
 from homeassistant.components.light import LightEntity
 from homeassistant.components.light.const import (
     ATTR_BRIGHTNESS,
@@ -265,8 +263,8 @@ class HCLight(HCEntity, LightEntity):
                 entity.unregister_callback(_on_update)
 
     async def _write(self, data: list[dict[str, Any]]) -> None:
-        await self._runtime_data.appliance.session.send_sync(
-            HC_Message(resource="/ro/values", action=Action.POST, data=data)
+        await self._runtime_data.appliance.set_values_raw(
+            {item["uid"]: item["value"] for item in data}
         )
 
     async def _turn_on_rgb(self, kwargs: dict[str, Any], *, powered_on_now: bool) -> None:
@@ -302,7 +300,9 @@ class HCLight(HCEntity, LightEntity):
             # A preset color is active and the custom color Setting is not
             # offered: switch to CustomColor first, then wait for it.
             mode_entity = cast("HcEntity", self._color_mode_entity)
-            color_mode_value = mode_entity._rev_enumeration["CustomColor"]  # noqa: SLF001
+            color_mode_value = next(
+                key for key, value in (mode_entity.enum or {}).items() if value == "CustomColor"
+            )
             await self._write([{"uid": mode_entity.uid, "value": color_mode_value}])
             await self._wait_until(lambda: self._rgb_usable)
         if not (self._rgb_usable and rgb is not None and brightness is not None):
@@ -316,7 +316,11 @@ class HCLight(HCEntity, LightEntity):
             }
         ]
         if self._color_mode_entity is not None and self._color_mode_entity.value != "CustomColor":
-            color_mode_value = self._color_mode_entity._rev_enumeration["CustomColor"]  # noqa: SLF001
+            color_mode_value = next(
+                key
+                for key, value in (self._color_mode_entity.enum or {}).items()
+                if value == "CustomColor"
+            )
             color_data.append({"uid": self._color_mode_entity.uid, "value": color_mode_value})
         await self._write(color_data)
 
