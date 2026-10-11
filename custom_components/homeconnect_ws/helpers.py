@@ -18,7 +18,6 @@ from homeassistant.helpers.service import async_extract_config_entry_ids
 from .const import DOMAIN
 
 if TYPE_CHECKING:
-    import re
     from collections.abc import Callable, Coroutine
 
     from home_disconnect import Access, Appliance
@@ -61,32 +60,6 @@ def merge_dicts[K, V](*args: dict[K, list[V]]) -> dict[K, list[V]]:
             else:
                 out_dict[key].extend(value)
     return out_dict
-
-
-@dataclass
-class EntityMatch:
-    """Returned by get_entities_from_regex."""
-
-    entity: str
-    groups: tuple[str, ...]
-
-
-def get_entities_from_regex(appliance: Appliance, pattern: re.Pattern[str]) -> list[EntityMatch]:
-    """Get all entities matching the pattern."""
-    return [
-        EntityMatch(entity=entity, groups=match.groups())
-        for entity in appliance.entities
-        if (match := pattern.match(entity))
-    ]
-
-
-def get_groups_from_regex(appliance: Appliance, pattern: re.Pattern[str]) -> set[tuple[str, ...]]:
-    """Get all regex groups matching the pattern."""
-    groups: set[tuple[str, ...]] = set()
-    for entity in appliance.entities:
-        if (match := pattern.match(entity)) and match.groups() not in groups:
-            groups.add(match.groups())
-    return groups
 
 
 async def get_config_entry_from_call(

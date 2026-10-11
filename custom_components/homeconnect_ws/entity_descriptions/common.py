@@ -2,7 +2,6 @@
 
 from __future__ import annotations
 
-import re
 from typing import TYPE_CHECKING
 
 from home_disconnect.entities import Execution
@@ -209,19 +208,22 @@ def generate_door_state(appliance: Appliance) -> HCSensorEntityDescription | Non
 
 def generate_program(appliance: Appliance) -> EntityDescriptions:
     """Get Door program select and sensor description."""
-    pattern = re.compile(r"^BSH\.Common\.Program\.Favorite\.(.*)$")
+    favorites = {
+        f"BSH.Common.Program.Favorite.{favorite}": favorite
+        for favorite in appliance.group_ids("BSH.Common.Program.Favorite")
+    }
 
     programs = {}
 
     for program in appliance.programs:
-        if match := pattern.match(program):
+        if (favorite := favorites.get(program)) is not None:
             favorite_name_entity = appliance.settings.get(
-                f"BSH.Common.Setting.Favorite.{match.groups()[0]}.Name"
+                f"BSH.Common.Setting.Favorite.{favorite}.Name"
             )
             if favorite_name_entity and favorite_name_entity.value:
                 program_name = favorite_name_entity.value
             else:
-                program_name = f"favorite_{match.groups()[0]}"
+                program_name = f"favorite_{favorite}"
         else:
             program_name = program.lower().replace(".", "_")
 
