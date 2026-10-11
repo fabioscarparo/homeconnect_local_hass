@@ -362,18 +362,17 @@ async def test_abort(
     )
 
 
-async def test_press_writes_value_from_press_value_fn(
+async def test_press_runs_press_fn(
     hass: HomeAssistant,
     mock_appliance: Appliance,
     monkeypatch: pytest.MonkeyPatch,
 ) -> None:
     """
-    A button backed by a Setting writes its own value instead of True.
+    A button backed by a Setting does its own write instead of writing True.
 
     Commands take a bare True, but a Setting-backed button (BSH.Common.Setting
-    .ApplianceDateTime, the appliance clock) has to send an actual value, and
-    one that is computed when the button is pressed rather than when the
-    entity description is built.
+    .ApplianceDateTime, the appliance clock) has to send an actual value,
+    computed when the button is pressed.
     """
     descriptions = {
         **ENTITY_DESCRIPTIONS,
@@ -382,7 +381,9 @@ async def test_press_writes_value_from_press_value_fn(
                 key="Test.Switch",
                 name="ValueButton",
                 entity="Test.Switch",
-                press_value_fn=lambda: "2026-09-24T10:36:09",
+                press_fn=lambda appliance: appliance.set_values_raw(
+                    {"Test.Switch": "2026-09-24T10:36:09"}
+                ),
             )
         ],
     }
@@ -426,7 +427,9 @@ async def test_read_only_button_is_unavailable(
                 key="Test.Switch",
                 name="ValueButton",
                 entity="Test.Switch",
-                press_value_fn=lambda: "2026-09-24T10:36:09",
+                press_fn=lambda appliance: appliance.set_values_raw(
+                    {"Test.Switch": "2026-09-24T10:36:09"}
+                ),
             )
         ],
     }

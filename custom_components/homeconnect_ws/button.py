@@ -52,9 +52,11 @@ class HCButton(HCEntity, ButtonEntity):
 
     @error_decorator
     async def async_press(self) -> None:
-        press_value_fn = self.entity_description.press_value_fn
-        value = True if press_value_fn is None else press_value_fn()
-        await self._entity.set_value(value)
+        press_fn = self.entity_description.press_fn
+        if press_fn is None:
+            await self._entity.set_value(True)
+        else:
+            await press_fn(self._runtime_data.appliance)
 
 
 class HCStartButton(HCEntity, ButtonEntity):

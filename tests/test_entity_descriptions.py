@@ -7,7 +7,7 @@ import re
 from datetime import datetime
 from pathlib import Path
 from typing import TYPE_CHECKING
-from unittest.mock import MagicMock, Mock, patch
+from unittest.mock import AsyncMock, MagicMock, Mock, patch
 from zoneinfo import ZoneInfo
 
 from custom_components.homeconnect_ws import HCData, entity_descriptions
@@ -699,13 +699,12 @@ def test_german_translation_complete() -> None:
     assert sorted(flatten(english) - flatten(german)) == []
 
 
-def test_sync_time_button_writes_naive_local_timestamp() -> None:
+async def test_sync_time_button_sets_the_clock_to_local_time() -> None:
     """
-    The clock button sends local time without a UTC offset.
+    The clock button sets the appliance clock to HA's local time.
 
-    A Siemens HB876G8B6 oven reports BSH.Common.Setting.ApplianceDateTime as
-    "2026-09-24T10:36:09" - no offset, local time. dt_util.now() is timezone
-    aware, so the offset has to be dropped rather than sent along.
+    The appliance wants a naive local timestamp; the library's set_datetime()
+    drops the offset that dt_util.now() carries.
     """
     description = next(
         entity_description
@@ -715,11 +714,13 @@ def test_sync_time_button_writes_naive_local_timestamp() -> None:
     # No isinstance() check here - HA clones these classes at runtime, see
     # _resolve_description in entity_descriptions/__init__.py.
     assert description.entity == "BSH.Common.Setting.ApplianceDateTime"
-    assert description.press_value_fn is not None
+    assert description.press_fn is not None
 
     local_now = datetime(2026, 9, 24, 10, 36, 9, 123456, tzinfo=ZoneInfo("Europe/Berlin"))
+    appliance = Mock(set_datetime=AsyncMock())
     with patch(
         "custom_components.homeconnect_ws.entity_descriptions.common.dt_util.now",
         return_value=local_now,
     ):
-        assert description.press_value_fn() == "2026-09-24T10:36:09"
+        await description.press_fn(appliance)
+    appliance.set_datetime.assert_awaited_once_with(local_now)
