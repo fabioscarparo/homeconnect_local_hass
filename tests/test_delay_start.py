@@ -17,7 +17,7 @@ from custom_components.homeconnect_ws.helpers import (
     apply_delay_start,
     delay_start_entity,
 )
-from home_disconnect.message import Action, Message
+from home_disconnect.messages import Action, Message
 from homeassistant.components.button import DOMAIN as BUTTON_DOMAIN
 from homeassistant.components.button import SERVICE_PRESS
 from homeassistant.components.select import ATTR_OPTION, SERVICE_SELECT_OPTION
@@ -27,11 +27,11 @@ from homeassistant.core import State
 from homeassistant.exceptions import HomeAssistantError
 from pytest_homeassistant_custom_component.common import mock_restore_cache
 
-from . import setup_config_entry
+from . import setup_config_entry, update_entity
 from .const import MOCK_CONFIG_DATA
 
 if TYPE_CHECKING:
-    from home_disconnect.testutils import MockAppliance
+    from home_disconnect import Appliance
     from homeassistant.core import HomeAssistant
 
 SELECT_ENTITY_ID = "select.fake_brand_homeappliance_delay_start"
@@ -143,7 +143,7 @@ def test_apply_delay_start_too_long() -> None:
 
 async def test_select_defaults_to_no_delay_and_stores_choice(
     hass: HomeAssistant,
-    mock_appliance: MockAppliance,
+    mock_appliance: Appliance,
     patch_entity_description: None,
 ) -> None:
     """The select starts at No delay and keeps the picked delay in HA only."""
@@ -162,12 +162,12 @@ async def test_select_defaults_to_no_delay_and_stores_choice(
     )
     assert hass.states.get(SELECT_ENTITY_ID).state == "2h"
     # Nothing is written to the appliance until Start is pressed.
-    mock_appliance.session.send_sync.assert_not_awaited()
+    mock_appliance.session.request.assert_not_awaited()
 
 
 async def test_select_restores_last_choice(
     hass: HomeAssistant,
-    mock_appliance: MockAppliance,
+    mock_appliance: Appliance,
     patch_entity_description: None,
 ) -> None:
     """A delay picked before a restart is still there afterwards."""
@@ -178,7 +178,7 @@ async def test_select_restores_last_choice(
 
 async def test_start_applies_delay_and_resets_it(
     hass: HomeAssistant,
-    mock_appliance: MockAppliance,
+    mock_appliance: Appliance,
     patch_entity_description: None,
 ) -> None:
     """
@@ -188,8 +188,10 @@ async def test_start_applies_delay_and_resets_it(
     program is selected (5100 s here); +2 h makes it 12300 s.
     """
     assert await setup_config_entry(hass, MOCK_CONFIG_DATA)
-    await mock_appliance.entities["Test.SelectedProgram"].update({"value": 500})
-    await mock_appliance.entities["BSH.Common.Option.FinishInRelative"].update({"value": 5100})
+    await update_entity(mock_appliance.entities["Test.SelectedProgram"], {"value": 500})
+    await update_entity(
+        mock_appliance.entities["BSH.Common.Option.FinishInRelative"], {"value": 5100}
+    )
     await hass.async_block_till_done()
 
     await hass.services.async_call(
@@ -202,11 +204,11 @@ async def test_start_applies_delay_and_resets_it(
         BUTTON_DOMAIN, SERVICE_PRESS, {ATTR_ENTITY_ID: START_ENTITY_ID}, blocking=True
     )
 
-    mock_appliance.session.send_sync.assert_awaited_once_with(
+    mock_appliance.session.request.assert_awaited_once_with(
         Message(
             resource="/ro/activeProgram",
             action=Action.POST,
-            data={"program": 500, "options": [{"uid": 405, "value": 12300}]},
+            data=[{"program": 500, "options": [{"uid": 405, "value": 12300}]}],
         )
     )
     assert hass.states.get(SELECT_ENTITY_ID).state == DELAY_START_NONE
@@ -214,13 +216,15 @@ async def test_start_applies_delay_and_resets_it(
 
 async def test_start_refuses_too_long_delay_and_keeps_it(
     hass: HomeAssistant,
-    mock_appliance: MockAppliance,
+    mock_appliance: Appliance,
     patch_entity_description: None,
 ) -> None:
     """A delay past the maximum is refused without starting, and stays selected."""
     assert await setup_config_entry(hass, MOCK_CONFIG_DATA)
-    await mock_appliance.entities["Test.SelectedProgram"].update({"value": 500})
-    await mock_appliance.entities["BSH.Common.Option.FinishInRelative"].update({"value": 5100})
+    await update_entity(mock_appliance.entities["Test.SelectedProgram"], {"value": 500})
+    await update_entity(
+        mock_appliance.entities["BSH.Common.Option.FinishInRelative"], {"value": 5100}
+    )
     await hass.async_block_till_done()
 
     await hass.services.async_call(
@@ -234,7 +238,7 @@ async def test_start_refuses_too_long_delay_and_keeps_it(
             BUTTON_DOMAIN, SERVICE_PRESS, {ATTR_ENTITY_ID: START_ENTITY_ID}, blocking=True
         )
 
-    mock_appliance.session.send_sync.assert_not_awaited()
+    mock_appliance.session.request.assert_not_awaited()
     assert hass.states.get(SELECT_ENTITY_ID).state == "24h"
 
 

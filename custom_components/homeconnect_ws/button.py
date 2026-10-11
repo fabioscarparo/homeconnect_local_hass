@@ -12,11 +12,8 @@ from .const import DOMAIN
 from .entity import HCEntity
 from .helpers import (
     apply_delay_start,
-    build_full_option_set,
-    build_known_option_set,
     create_entities,
     error_decorator,
-    needs_full_option_set,
 )
 
 if TYPE_CHECKING:
@@ -55,9 +52,11 @@ class HCButton(HCEntity, ButtonEntity):
 
     @error_decorator
     async def async_press(self) -> None:
-        press_value_fn = self.entity_description.press_value_fn
-        value = True if press_value_fn is None else press_value_fn()
-        await self._entity.set_value(value)
+        press_fn = self.entity_description.press_fn
+        if press_fn is None:
+            await self._entity.set_value(True)
+        else:
+            await press_fn(self._runtime_data.appliance)
 
 
 class HCStartButton(HCEntity, ButtonEntity):
@@ -79,7 +78,8 @@ class HCStartButton(HCEntity, ButtonEntity):
         # always available regardless of remote-control state.
         if not self._runtime_data.appliance.session.connected:
             return False
-        if not getattr(self._entity, "available", True):
+        # None means the appliance hasn't said; only an explicit False hides it.
+        if self._entity.available is False:
             return False
         selected_program = self._runtime_data.appliance.selected_program
         if selected_program is None:
@@ -112,27 +112,14 @@ class HCStartButton(HCEntity, ButtonEntity):
                 translation_key="remote_start_not_allowed",
                 translation_placeholders={"device_name": device_name},
             )
-        if needs_full_option_set(selected_program):
-            # This appliance validates a program write against the program's
-            # complete option set and rejects anything less with a 400
-            # (confirmed on a Siemens CoffeeMaker and a NEFF oven) - the
-            # default merge behaviour below blindly resends every option's
-            # raw shadow value, which can still be None for one the
-            # appliance hasn't reported yet. Mirrors HCProgram's own
-            # _select_with_full_option_set in select.py.
-            options = build_full_option_set(self._runtime_data.appliance, selected_program)
-        else:
-            # The library's default merge resends every READ_WRITE option's
-            # raw shadow value, and one the appliance never reported goes out
-            # as {"value": null}, which the appliance rejects with 400 for the
-            # whole write (seen on a Siemens EQ.9 CoffeeMaker with 1.7.1, where
-            # this branch ran). Send the known values only - a hood's Venting
-            # program still needs its real level (fork issue #14).
-            options = build_known_option_set(self._runtime_data.appliance, selected_program)
+        # The library picks the options: a full set on appliances that want
+        # one (a Siemens CoffeeMaker, a NEFF oven), otherwise only the values
+        # the appliance has reported - an option sent as null makes it reject
+        # the whole start with 400 (a hood still needs its real venting level,
+        # fork issue #14).
         # The "Delay start" select's choice goes in as StartInRelative or
         # FinishInRelative - the only form some appliances accept it in (#146).
-        options = apply_delay_start(
-            self._runtime_data.appliance, self._runtime_data.delay_start, options
-        )
-        await selected_program.start(options, override_options=True)
+        appliance = self._runtime_data.appliance
+        delay = apply_delay_start(appliance, self._runtime_data.delay_start, {})
+        await appliance.start_program(selected_program, delay)
         self._runtime_data.delay_start.reset()
