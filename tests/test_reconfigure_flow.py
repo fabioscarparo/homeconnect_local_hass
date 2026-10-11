@@ -18,8 +18,7 @@ from custom_components.homeconnect_ws.const import (
     CONF_PSK,
     DOMAIN,
 )
-from custom_components.homeconnect_ws.hc_legacy_oauth import LegacyOAuthToken
-from home_disconnect import ProfileError
+from home_disconnect import ProfileError, SignIn, Token
 from homeassistant.const import CONF_HOST
 from homeassistant.data_entry_flow import FlowResultType
 from homeassistant.util import dt as dt_util
@@ -305,11 +304,9 @@ async def test_reconfigure_profile_via_sign_in(
     appliance = MockAppliance(MOCK_AES_DEVICE_INFO)
     monkeypatch.setattr(config_flow, "Appliance", appliance)
     monkeypatch.setattr(
-        config_flow,
-        "legacy_async_exchange_code_for_token",
-        AsyncMock(
-            return_value=LegacyOAuthToken(access_token="fake_token", expires_in=3600)  # noqa: S106
-        ),
+        SignIn,
+        "exchange",
+        AsyncMock(return_value=Token(access_token="fake_token", expires_in=3600)),  # noqa: S106
     )
     monkeypatch.setattr(
         config_flow,
@@ -364,7 +361,7 @@ async def test_reconfigure_profile_sign_in_reuses_valid_cache(
     appliance = MockAppliance(MOCK_AES_DEVICE_INFO)
     monkeypatch.setattr(config_flow, "Appliance", appliance)
     exchange_mock = AsyncMock()
-    monkeypatch.setattr(config_flow, "legacy_async_exchange_code_for_token", exchange_mock)
+    monkeypatch.setattr(SignIn, "exchange", exchange_mock)
     monkeypatch.setattr(
         config_flow,
         "async_fetch_appliances",
@@ -472,17 +469,15 @@ async def test_reconfigure_profile_sign_in_unexpected_error(
     """
     A genuinely unexpected failure still surfaces a translated error, not "Unknown error".
 
-    The specific (HCLegacyOAuthError, HCCloudApiError) catch only covers
-    failures those two libraries themselves raise - anything else (a cloud
+    The specific AccountError catch only covers failures the library
+    itself raises - anything else (a cloud
     API response shape neither expects, a library bug) used to fall through
     uncaught to HA's generic "Unknown error" screen.
     """
     monkeypatch.setattr(
-        config_flow,
-        "legacy_async_exchange_code_for_token",
-        AsyncMock(
-            return_value=LegacyOAuthToken(access_token="fake_token", expires_in=3600)  # noqa: S106
-        ),
+        SignIn,
+        "exchange",
+        AsyncMock(return_value=Token(access_token="fake_token", expires_in=3600)),  # noqa: S106
     )
     monkeypatch.setattr(
         config_flow,

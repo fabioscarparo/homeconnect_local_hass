@@ -37,6 +37,7 @@ if TYPE_CHECKING:
     from datetime import datetime
 
     from home_disconnect import Appliance
+    from home_disconnect.account import Region
     from homeassistant.core import Event, HomeAssistant, ServiceCall, ServiceResponse
     from homeassistant.helpers.typing import ConfigType
 
@@ -71,7 +72,7 @@ class HCData:
 class LegacyOAuthCache:
     """A still-good legacy-OAuth token, so a second sign-in skips the browser round-trip."""
 
-    region: str
+    region: Region
     access_token: str
     expires_at: datetime
 

@@ -16,13 +16,20 @@ import homeassistant.helpers.config_validation as cv
 import voluptuous as vol
 from aiohttp import ClientConnectionError
 from home_disconnect import (
+    AccountError,
     Appliance,
     AuthenticationError,
     HomeDisconnectError,
     LoadedProfile,
     ProfileError,
+    SignIn,
+    build_profile_zip,
+    fetch_profiles,
     load_profiles_from_zip,
+    profile_filename_stub,
 )
+from home_disconnect.account import REGION_API_BASE
+from home_disconnect.profile_files import ConnectionDetails
 from homeassistant.components import zeroconf
 from homeassistant.components.file_upload import process_uploaded_file
 from homeassistant.config_entries import (
@@ -64,15 +71,7 @@ from .const import (
     DOMAIN,
     AppliancePayload,
 )
-from .export_profile import build_profile_zip, filename_stub
-from .hc_cloud_api import REGION_ASSET_BASE, HCCloudApiError, async_fetch_appliances
-from .hc_legacy_oauth import HCLegacyOAuthError
-from .hc_legacy_oauth import async_exchange_code_for_token as legacy_async_exchange_code_for_token
-from .hc_legacy_oauth import build_authorize_url as legacy_build_authorize_url
-from .hc_legacy_oauth import extract_code_from_redirect as legacy_extract_code_from_redirect
-from .hc_legacy_oauth import generate_code_verifier as legacy_generate_code_verifier
-from .hc_legacy_oauth import generate_state as legacy_generate_state
-from .profile_storage import profile_from_entry_data
+from .profile_storage import profile_from_entry_data, profile_xml_from_entry_data
 
 CONF_LEGACY_REDIRECT_URL = "legacy_redirect_url"
 HC_SERVICE_TYPE = "_homeconnect._tcp.local."
@@ -83,6 +82,8 @@ MDNS_LOOKUP_TIMEOUT_MS = 3000
 _LEGACY_OAUTH_CACHE_FALLBACK_SECONDS = 300
 
 if TYPE_CHECKING:
+    from aiohttp import ClientSession
+    from home_disconnect.account import Region
     from homeassistant.config_entries import ConfigFlowResult
     from homeassistant.helpers.service_info.zeroconf import ZeroconfServiceInfo
 
@@ -111,7 +112,7 @@ CONFIG_REGION_SCHEMA = vol.Schema(
         # there, so the values are lowercased and turned back into region codes below.
         vol.Required(CONF_REGION, default="eu"): SelectSelector(
             SelectSelectorConfig(
-                options=[region.lower() for region in REGION_ASSET_BASE],
+                options=[region.lower() for region in REGION_API_BASE],
                 translation_key=CONF_REGION,
             )
         ),
@@ -138,6 +139,44 @@ def appliance_payload(loaded: LoadedProfile) -> AppliancePayload:
         "description_xml": loaded.description_xml.decode(),
         "feature_mapping_xml": loaded.feature_mapping_xml.decode(),
     }
+
+
+async def async_fetch_appliances(
+    session: ClientSession, access_token: str, region: Region
+) -> dict[str, AppliancePayload]:
+    """Fetch every paired appliance's profile from the account, keyed by haId."""
+    profiles = await fetch_profiles(session, access_token, region)
+    return {
+        loaded.connection.ha_id: appliance_payload(loaded)
+        for loaded in profiles
+        if loaded.connection is not None
+    }
+
+
+def full_profile_zip(config_entry: HCConfigEntry) -> tuple[str, bytes]:
+    """
+    Build the Full profile export: both XML files and the key, as `{brand}_{model}`.
+
+    It's the Profile Downloader's shape, so it can be uploaded again during setup.
+    """
+    info = config_entry.data[CONF_DESCRIPTION]["info"]
+    stub = profile_filename_stub(
+        info.get("brand"), info.get("vib") or info.get("model") or info.get("type")
+    )
+    connection = ConnectionDetails(
+        ha_id=str(config_entry.unique_id),
+        connection_type=config_entry.data[CONF_MODE],
+        psk64=config_entry.data[CONF_PSK],
+        iv64=config_entry.data.get(CONF_AES_IV) or None,
+        raw={},
+    )
+    zip_bytes = build_profile_zip(
+        *profile_xml_from_entry_data(config_entry.data),
+        stub=stub,
+        connection=connection,
+        info=info,
+    )
+    return stub, zip_bytes
 
 
 def process_zip_file(config_path: Path) -> dict[str, AppliancePayload]:
@@ -176,9 +215,8 @@ class HomeConnectConfigFlow(ConfigFlow, domain=DOMAIN):
         self.appliances: dict[str, AppliancePayload] = {}
         self.reauth_entry: HCConfigEntry | None = None
         self.global_config: HCConfig | None = None
-        self._region: str = "EU"
-        self._legacy_code_verifier: str | None = None
-        self._legacy_state: str | None = None
+        self._region: Region = "EU"
+        self._sign_in: SignIn | None = None
 
     def _process_profile_file(self, uploaded_file_id: str) -> dict[str, AppliancePayload]:
         with process_uploaded_file(self.hass, uploaded_file_id) as config_path:
@@ -264,9 +302,8 @@ class HomeConnectConfigFlow(ConfigFlow, domain=DOMAIN):
                     return await self._async_step_appliances_fetched()
 
         if user_input is not None:
-            self._region = user_input[CONF_REGION].upper()
-            self._legacy_code_verifier = legacy_generate_code_verifier()
-            self._legacy_state = legacy_generate_state()
+            self._region = cast("Region", user_input[CONF_REGION].upper())
+            self._sign_in = SignIn.start(self._region)
             return await self.async_step_legacy_oauth_paste()
         return self.async_show_form(step_id="legacy_oauth_region", data_schema=CONFIG_REGION_SCHEMA)
 
@@ -274,24 +311,20 @@ class HomeConnectConfigFlow(ConfigFlow, domain=DOMAIN):
         self, user_input: dict[str, Any] | None = None
     ) -> ConfigFlowResult:
         """Show the authorize URL, then accept the pasted-back redirect."""
-        # Set together, one step earlier, by async_step_legacy_oauth_region -
-        # only None if this step is somehow reached without going through it.
-        if self._legacy_code_verifier is None or self._legacy_state is None:
+        # Set one step earlier by async_step_legacy_oauth_region - only None if
+        # this step is somehow reached without going through it.
+        if self._sign_in is None:
             return self.async_abort(reason="oauth_fetch_failed")
 
         if user_input is not None:
             session = async_get_clientsession(self.hass)
             try:
-                code = legacy_extract_code_from_redirect(
-                    user_input[CONF_LEGACY_REDIRECT_URL], self._legacy_state
-                )
-                token = await legacy_async_exchange_code_for_token(
-                    session, self._region, code, self._legacy_code_verifier
-                )
+                code = self._sign_in.code_from_redirect(user_input[CONF_LEGACY_REDIRECT_URL])
+                token = await self._sign_in.exchange(session, code)
                 self.appliances = await async_fetch_appliances(
                     session, token.access_token, self._region
                 )
-            except (HCLegacyOAuthError, HCCloudApiError) as err:
+            except AccountError as err:
                 _LOGGER.debug("Legacy OAuth flow failed: %s", err)
                 return self.async_abort(
                     reason="oauth_fetch_failed", description_placeholders={"error": str(err)}
@@ -314,9 +347,7 @@ class HomeConnectConfigFlow(ConfigFlow, domain=DOMAIN):
                 )
             return await self._async_step_appliances_fetched()
 
-        authorize_url = legacy_build_authorize_url(
-            self._region, self._legacy_code_verifier, self._legacy_state
-        )
+        authorize_url = self._sign_in.authorize_url
         schema = vol.Schema({vol.Required(CONF_LEGACY_REDIRECT_URL): cv.string})
         return self.async_show_form(
             step_id="legacy_oauth_paste",
@@ -696,13 +727,12 @@ class HCOptionsFlowHandler(OptionsFlow):
             # silently write it to disk. Requires an explicit Submit click,
             # same deliberateness the old Safe/Full mode choice provided.
             return self.async_show_form(step_id="init", data_schema=vol.Schema({}))
-        stub = filename_stub(self._config_entry)
+        stub, zip_bytes = full_profile_zip(self._config_entry)
         filename = f"{stub}_profile_full.zip"
         folder = Path(self.hass.config.path("homeconnect_ws_export"))
 
         def _write() -> None:
             folder.mkdir(exist_ok=True)
-            zip_bytes = build_profile_zip(self._config_entry, True)  # noqa: FBT003
             (folder / filename).write_bytes(zip_bytes)
 
         try:

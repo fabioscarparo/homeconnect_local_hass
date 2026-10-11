@@ -2,12 +2,14 @@
 
 from __future__ import annotations
 
+import json
 import zipfile
 from io import BytesIO
 from pathlib import Path
 from typing import TYPE_CHECKING
 from unittest.mock import AsyncMock, patch
 
+from home_disconnect import parse_profile
 from homeassistant.const import CONF_MODE
 from homeassistant.data_entry_flow import FlowResultType
 
@@ -68,7 +70,20 @@ async def test_options_flow_writes_full_profile_zip_after_confirmation(
         hass.config.path("homeconnect_ws_export", "fake_brand_Fake_vib_profile_full.zip")
     )
     with zipfile.ZipFile(BytesIO(written.read_bytes())) as zip_file:  # noqa: ASYNC240
-        assert any(name.endswith(".json") for name in zip_file.namelist())
+        assert sorted(zip_file.namelist()) == [
+            "fake_brand_Fake_vib.json",
+            "fake_brand_Fake_vib_DeviceDescription.xml",
+            "fake_brand_Fake_vib_FeatureMapping.xml",
+        ]
+        profile = json.loads(zip_file.read("fake_brand_Fake_vib.json"))
+        assert profile["haId"] == entry.unique_id
+        assert profile["key"] == "PSK_KEY"
+        assert profile["iv"] == "AES_IV"
+        parsed = parse_profile(
+            zip_file.read("fake_brand_Fake_vib_DeviceDescription.xml").decode(),
+            zip_file.read("fake_brand_Fake_vib_FeatureMapping.xml").decode(),
+        )
+        assert parsed.info.brand == "Fake_Brand"
 
 
 async def test_options_flow_notifies_on_write_failure(
