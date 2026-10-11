@@ -17,6 +17,7 @@ from custom_components.homeconnect_ws.entity_descriptions import (
     HCSwitchEntityDescription,
     _EntityDescriptionsType,
 )
+from custom_components.homeconnect_ws.helpers import DELAY_START_OPTIONS
 from home_disconnect import Access, Execution, serialize_legacy_description
 from homeassistant.components.sensor import SensorDeviceClass
 from homeassistant.const import CONF_DESCRIPTION, CONF_DEVICE_ID, CONF_HOST, CONF_MODE, CONF_NAME
@@ -99,6 +100,14 @@ ENTITY_DESCRIPTIONS: _EntityDescriptionsType = {
     "button": [
         HCButtonEntityDescription(
             key="Test.AbortProgram", name="AbortProgram", entity="Test.AbortProgram"
+        )
+    ],
+    "delay_start": [
+        HCSelectEntityDescription(
+            key="select_delay_start",
+            translation_key="select_delay_start",
+            entity="BSH.Common.Option.FinishInRelative",
+            options=DELAY_START_OPTIONS,
         )
     ],
     "active_program": [
@@ -233,6 +242,7 @@ ENTITY_DESCRIPTIONS: _EntityDescriptionsType = {
             key="Test.Light.4",
             name="Light.4",
             entity="Test.Lighting",
+            brightness_entity="Test.LightingBrightness",
             color_entity="Test.LightingCustomColor",
             color_mode_entity="Test.LightingColor",
         ),
@@ -456,6 +466,14 @@ DEVICE_DESCRIPTION = {
             "access": Access.READ_WRITE,
             "enumeration": {"0": "Off", "1": "Speed1", "2": "Speed1"},
             "default": 0,
+        },
+        {
+            "uid": 405,
+            "name": "BSH.Common.Option.FinishInRelative",
+            "available": True,
+            "access": Access.READ_WRITE,
+            "min": 0,
+            "max": 86400,
         },
         {
             "uid": 404,

@@ -11,6 +11,7 @@ from homeassistant.exceptions import HomeAssistantError
 from .const import DOMAIN
 from .entity import HCEntity
 from .helpers import (
+    apply_delay_start,
     create_entities,
     error_decorator,
 )
@@ -114,4 +115,9 @@ class HCStartButton(HCEntity, ButtonEntity):
         # the appliance has reported - an option sent as null makes it reject
         # the whole start with 400 (a hood still needs its real venting level,
         # fork issue #14).
-        await self._runtime_data.appliance.start_program(selected_program)
+        # The "Delay start" select's choice goes in as StartInRelative or
+        # FinishInRelative - the only form some appliances accept it in (#146).
+        appliance = self._runtime_data.appliance
+        delay = apply_delay_start(appliance, self._runtime_data.delay_start, {})
+        await appliance.start_program(selected_program, delay)
+        self._runtime_data.delay_start.reset()
