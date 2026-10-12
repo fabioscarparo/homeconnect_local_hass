@@ -7,7 +7,7 @@ from copy import deepcopy
 from ipaddress import ip_address
 from pathlib import Path
 from typing import TYPE_CHECKING
-from unittest.mock import ANY, AsyncMock, patch
+from unittest.mock import ANY, AsyncMock, PropertyMock, patch
 
 import pytest
 from custom_components.homeconnect_ws import coordinator
@@ -21,6 +21,7 @@ from home_disconnect import (
     AccessError,
     Appliance,
     ConnectionFailedError,
+    RemoteStartNotAllowedError,
     ResponseError,
     serialize_legacy_description,
 )
@@ -28,7 +29,7 @@ from home_disconnect.session import RECONNECT_MAX_DELAY
 from homeassistant.config_entries import SOURCE_ZEROCONF, ConfigEntryState
 from homeassistant.const import CONF_DESCRIPTION, CONF_HOST
 from homeassistant.data_entry_flow import FlowResultType
-from homeassistant.exceptions import ServiceValidationError
+from homeassistant.exceptions import HomeAssistantError, ServiceValidationError
 from homeassistant.helpers import device_registry as dr
 from homeassistant.helpers.service_info.zeroconf import ZeroconfServiceInfo
 from homeassistant.helpers.storage import STORAGE_DIR
@@ -668,3 +669,22 @@ async def test_set_finish_in_errors(
             blocking=True,
         )
     assert exc_info.value.translation_key == translation_key
+
+
+async def test_start_program_remote_start_not_allowed(
+    hass: HomeAssistant, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    """start_program says to allow remote start at the appliance when the library refuses."""
+    device_id = await _setup_with_finish_in(hass, monkeypatch)
+    with (
+        patch("home_disconnect.Appliance.selected_program", new_callable=PropertyMock),
+        patch(
+            "home_disconnect.Appliance.start_program",
+            AsyncMock(side_effect=RemoteStartNotAllowedError("off")),
+        ),
+        pytest.raises(HomeAssistantError) as exc_info,
+    ):
+        await hass.services.async_call(
+            DOMAIN, "start_program", {"device_id": device_id}, blocking=True
+        )
+    assert exc_info.value.translation_key == "remote_start_not_allowed"

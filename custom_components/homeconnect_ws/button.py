@@ -4,16 +4,16 @@ from __future__ import annotations
 
 from typing import TYPE_CHECKING
 
+from home_disconnect import RemoteStartNotAllowedError
 from home_disconnect.entities import Execution
 from homeassistant.components.button import ButtonEntity
-from homeassistant.exceptions import HomeAssistantError
 
-from .const import DOMAIN
 from .entity import HCEntity
 from .helpers import (
     apply_delay_start,
     create_entities,
     error_decorator,
+    remote_start_error,
 )
 
 if TYPE_CHECKING:
@@ -95,23 +95,6 @@ class HCStartButton(HCEntity, ButtonEntity):
         selected_program = self._runtime_data.appliance.selected_program
         if selected_program is None:
             return
-        # Check BSH.Common.Status.RemoteControlStartAllowed directly rather than
-        # ActiveProgram's own access field: ActiveProgram.access is "read" (not
-        # writable) whenever the appliance can't currently accept a start for
-        # *any* reason - remote start not confirmed, but equally an open door,
-        # no program selected on the appliance side, etc. Confusing those would
-        # tell a user to go press the physical confirmation button for a
-        # problem physically confirming can't fix (e.g. an open door).
-        remote_start_allowed = self._runtime_data.appliance.entities.get(
-            "BSH.Common.Status.RemoteControlStartAllowed"
-        )
-        if remote_start_allowed is not None and remote_start_allowed.value is False:
-            device_name = self._runtime_data.device_info.get("name") or "your appliance"
-            raise HomeAssistantError(
-                translation_domain=DOMAIN,
-                translation_key="remote_start_not_allowed",
-                translation_placeholders={"device_name": device_name},
-            )
         # The library picks the options: a full set on appliances that want
         # one (a Siemens CoffeeMaker, a NEFF oven), otherwise only the values
         # the appliance has reported - an option sent as null makes it reject
@@ -121,5 +104,11 @@ class HCStartButton(HCEntity, ButtonEntity):
         # FinishInRelative - the only form some appliances accept it in (#146).
         appliance = self._runtime_data.appliance
         delay = apply_delay_start(appliance, self._runtime_data.delay_start, {})
-        await appliance.start_program(selected_program, delay)
+        try:
+            await appliance.start_program(selected_program, delay)
+        except RemoteStartNotAllowedError:
+            # Only for BSH.Common.Status.RemoteControlStartAllowed, not ActiveProgram being
+            # read-only: that also happens for other reasons (an open door), which going to the
+            # appliance to allow remote start wouldn't fix.
+            raise remote_start_error(self._runtime_data) from None
         self._runtime_data.delay_start.reset()

@@ -121,6 +121,17 @@ def ensure_writable(entity: HcEntity | None) -> None:
         )
 
 
+def remote_start_error(runtime_data: HCData) -> HomeAssistantError:
+    """Return the error for a start the appliance refuses because remote start is off."""
+    return HomeAssistantError(
+        translation_domain=DOMAIN,
+        translation_key="remote_start_not_allowed",
+        translation_placeholders={
+            "device_name": runtime_data.device_info.get("name") or "your appliance"
+        },
+    )
+
+
 def error_decorator[T](
     func: Callable[..., Coroutine[Any, Any, T]],
 ) -> Callable[..., Coroutine[Any, Any, T]]:
