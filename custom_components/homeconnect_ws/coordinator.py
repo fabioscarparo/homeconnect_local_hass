@@ -14,12 +14,11 @@ from home_disconnect import (
     ConnectionState,
     HomeDisconnectError,
 )
+from home_disconnect.session import RECONNECT_MAX_DELAY
 from homeassistant.const import CONF_DESCRIPTION, CONF_DEVICE_ID, CONF_HOST
 from homeassistant.exceptions import ConfigEntryError
 from homeassistant.helpers.aiohttp_client import async_get_clientsession
-from homeassistant.helpers.event import async_track_time_interval
 from homeassistant.helpers.update_coordinator import DataUpdateCoordinator, UpdateFailed
-from homeassistant.util import dt as dt_util
 
 from .const import (
     CONF_AES_IV,
@@ -29,9 +28,6 @@ from .const import (
 from .profile_storage import profile_from_entry_data
 
 if TYPE_CHECKING:
-    from collections.abc import Callable
-    from datetime import datetime
-
     from homeassistant.core import HomeAssistant
 
     from . import HCConfigEntry
@@ -46,17 +42,14 @@ TROUBLESHOOTING_URL = (
     "#home-assistant-cannot-connect-to-my-appliance-what-should-i-do"
 )
 
-CONNECT_RETRY_INITIAL_DELAY = 5  # seconds
-CONNECT_RETRY_MAX_DELAY = 60  # seconds
-
 # A second quick attempt before failing setup: a reset mid-handshake failed a reachable
 # appliance's whole setup (fork issue #9). HA's ConfigEntryNotReady retries take over after.
 SETUP_CONNECT_ATTEMPTS = 2
 SETUP_CONNECT_RETRY_DELAY = 3  # seconds
 
-# Washers and dryers reconnect through this fixed poll instead of the library's backoff, so
-# they're picked up soon after they turn their Wi-Fi back on, even where mDNS doesn't work.
-LAUNDRY_RECONNECT_POLL_INTERVAL = timedelta(seconds=20)
+# Washers and dryers retry at least this often instead of backing off to 5 minutes, so they're
+# picked up soon after they turn their Wi-Fi back on, even where mDNS doesn't work.
+LAUNDRY_RECONNECT_MAX_DELAY = 20  # seconds
 
 # Washers and dryers turn their Wi-Fi off when switched off (fork issue #7), so being
 # unreachable is normal for them: setup doesn't wait for a connection and failures are only
@@ -74,12 +67,8 @@ class HomeConnectCoordinator(DataUpdateCoordinator[None]):
 
     config_entry: HCConfigEntry
     appliance: Appliance
-    _connecting: bool = True
     connected: bool = False
     _escalate_connectivity_logging: bool
-    _poll_unsub: Callable[[], None] | None = None
-    # Laundry connects from the first-connect loop, the poll and the mDNS nudge; one at a time.
-    _connect_lock: asyncio.Lock
     _network_info_lock: asyncio.Lock
     _network_info: list[dict[str, Any]] | None = None
     _network_info_fetched_at: float | None = None
@@ -116,12 +105,14 @@ class HomeConnectCoordinator(DataUpdateCoordinator[None]):
             app_name="Homeassistant",
             app_id=config_entry.data[CONF_DEVICE_ID],
             on_connection_state=self._connection_state_callback,
-            # Laundry uses LAUNDRY_RECONNECT_POLL_INTERVAL instead.
-            reconnect=self._escalate_connectivity_logging,
+            reconnect_max_delay=(
+                RECONNECT_MAX_DELAY
+                if self._escalate_connectivity_logging
+                else LAUNDRY_RECONNECT_MAX_DELAY
+            ),
             info=deepcopy(appliance_info),
         )
         self.disconnect_time = time.time()
-        self._connect_lock = asyncio.Lock()
         self._network_info_lock = asyncio.Lock()
 
     @property
@@ -141,24 +132,13 @@ class HomeConnectCoordinator(DataUpdateCoordinator[None]):
         return self.appliance.session.close_code in {None, 1000}
 
     async def close(self) -> None:
-        self._connecting = False
-        if self._poll_unsub is not None:
-            self._poll_unsub()
-            self._poll_unsub = None
         await self.appliance.close()
 
     async def _async_setup(self) -> None:
         if not self._escalate_connectivity_logging:
-            # Laundry connects in the background so a switched-off washer doesn't stop its
-            # entities being created. A background task, because a normal one holds up
-            # Home Assistant's startup (fork issue #16).
-            self.config_entry.async_create_background_task(
-                self.hass, self._connect(), "homeconnect_ws laundry connect"
-            )
-            # _connect() only covers the first connection; this poll handles later drops.
-            self._poll_unsub = async_track_time_interval(
-                self.hass, self._async_poll_reconnect, LAUNDRY_RECONNECT_POLL_INTERVAL
-            )
+            # Laundry connects in the background, retrying until it works, so a switched-off
+            # washer doesn't stop its entities being created.
+            await self.appliance.start()
             return
 
         self.logger.debug(
@@ -196,87 +176,16 @@ class HomeConnectCoordinator(DataUpdateCoordinator[None]):
             },
         ) from last_err
 
-    async def _connect(self) -> None:
-        self.logger.debug(
-            "Connecting to %s", self.config_entry.data[CONF_DESCRIPTION]["info"].get("vib")
-        )
-        first_failure = True
-        retry_delay = CONNECT_RETRY_INITIAL_DELAY
-        while self._connecting:
-            async with self._connect_lock:
-                if self.connected:
-                    return
-                try:
-                    await self.appliance.connect()
-                    if self.appliance.connected:
-                        self.connected = True
-                        self.async_set_updated_data(None)
-                        return
-                except (HomeDisconnectError, TimeoutError):
-                    await self.appliance.close()
-                    self.connected = False
-                    msg = f"Can't connect to {self.config_entry.data[CONF_HOST]}, retrying"
-                    if first_failure and self._escalate_connectivity_logging:
-                        self.logger.error(msg)  # noqa: TRY400
-                        first_failure = False  # first_failure_fix
-                    else:
-                        self.logger.debug(msg)
-                except Exception:
-                    await self.appliance.close()
-                    msg = f"Can't connect to {self.config_entry.data[CONF_HOST]}"
-                    self.logger.exception(msg)
-
-            if not self._connecting:
-                # close() may have run during the awaits above.
-                return  # type: ignore[unreachable]
-            await asyncio.sleep(retry_delay)
-            retry_delay = min(retry_delay * 2, CONNECT_RETRY_MAX_DELAY)
-
-    async def _async_poll_reconnect(self, _now: datetime) -> None:
-        """Reconnect washers and dryers; see LAUNDRY_RECONNECT_POLL_INTERVAL."""
-        if self.connected:
-            return
-        async with self._connect_lock:
-            # Another caller may have connected while this one waited for the lock.
-            if self.connected:
-                return  # type: ignore[unreachable]
-            try:
-                await self.appliance.connect()
-            except (HomeDisconnectError, TimeoutError):
-                self.logger.debug(
-                    "Reconnect poll: still can't reach %s", self.config_entry.data[CONF_HOST]
-                )
-                await self.appliance.close()
-            except Exception:
-                self.logger.exception(
-                    "Reconnect poll: unexpected error connecting to %s",
-                    self.config_entry.data[CONF_HOST],
-                )
-                await self.appliance.close()
-            else:
-                if self.appliance.connected:
-                    self.connected = True
-                    self.async_set_updated_data(None)
-                else:
-                    await self.appliance.close()
-
     def async_nudge_reconnect(self) -> None:
         """
         Retry now; called when the appliance announces itself over mDNS again.
 
+        Does nothing unless the library is waiting to reconnect.
+
         Sleeping appliances can refuse connections for hours (fork issue #119), so the backoff
         is at 5 minutes by the time they wake and announce themselves.
         """
-        if self.connected:
-            return
-        if self._escalate_connectivity_logging:
-            self.appliance.retry_now()
-            return
-        self.config_entry.async_create_background_task(
-            self.hass,
-            self._async_poll_reconnect(dt_util.utcnow()),
-            "homeconnect_ws nudge reconnect",
-        )
+        self.appliance.retry_now()
 
     async def async_get_network_info(self) -> list[dict[str, Any]] | None:
         """Get the appliance's /ni/info data, shared by the Wi-Fi and IP address sensors."""
@@ -313,7 +222,6 @@ class HomeConnectCoordinator(DataUpdateCoordinator[None]):
             self.connected = True
 
         elif event in (ConnectionState.RECONNECTING, ConnectionState.DISCONNECTED):
-            # DISCONNECTED: a laundry drop (no library reconnect) or a failed first connect.
             if self.connected and self._escalate_connectivity_logging:
                 self.logger.warning(
                     "Connection to %s lost",
