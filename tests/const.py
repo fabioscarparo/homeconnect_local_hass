@@ -122,7 +122,7 @@ ENTITY_DESCRIPTIONS: _EntityDescriptionsType = {
                 "BSH.Common.Program.Favorite.002": "favorite_002",
                 "Test.Program.Program1": "test_program_program1",
                 "Test.Program.Program2": "test_program_program2",
-                "Test.Program.Fan1": "test_program_fan1",
+                "Cooking.Common.Program.Hood.Venting": "test_program_fan1",
                 "Test.Program.Fan2": "test_program_fan2",
             },
         )
@@ -215,8 +215,10 @@ ENTITY_DESCRIPTIONS: _EntityDescriptionsType = {
         HCFanEntityDescription(
             key="Test.Fan",
             name="Fan",
-            entities=["Test.FanSpeed1", "Test.FanSpeed2"],
-            default_program="Test.Program.Fan1",
+            entities=[
+                "Cooking.Common.Option.Hood.VentingLevel",
+                "Cooking.Common.Option.Hood.IntensiveLevel",
+            ],
         )
     ],
     "light": [
@@ -461,7 +463,7 @@ DEVICE_DESCRIPTION = {
         },
         {
             "uid": 403,
-            "name": "Test.FanSpeed1",
+            "name": "Cooking.Common.Option.Hood.VentingLevel",
             "available": True,
             "access": Access.READ_WRITE,
             "enumeration": {"0": "Off", "1": "Speed1", "2": "Speed1"},
@@ -477,7 +479,7 @@ DEVICE_DESCRIPTION = {
         },
         {
             "uid": 404,
-            "name": "Test.FanSpeed2",
+            "name": "Cooking.Common.Option.Hood.IntensiveLevel",
             "available": True,
             "access": Access.READ_WRITE,
             "enumeration": {"0": "Off", "1": "Speed1", "2": "Speed1"},
@@ -531,7 +533,7 @@ DEVICE_DESCRIPTION = {
         },
         {
             "uid": 504,
-            "name": "Test.Program.Fan1",
+            "name": "Cooking.Common.Program.Hood.Venting",
             "available": True,
             "options": [
                 {"access": Access.READ_WRITE, "available": True, "refUID": 401},

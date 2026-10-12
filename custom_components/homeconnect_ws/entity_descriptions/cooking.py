@@ -238,7 +238,6 @@ def generate_hood_fan(appliance: Appliance) -> HCFanEntityDescription | None:
     return HCFanEntityDescription(
         key="fan_hood",
         entities=available_entities,
-        default_program=_VENTING_PROGRAM,
     )
 
 
