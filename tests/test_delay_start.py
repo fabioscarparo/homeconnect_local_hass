@@ -1,4 +1,4 @@
-"""Tests for the "Delay start" select and how the Start button applies it."""
+"""Tests for the "Delay start" select and how the Start button passes it on."""
 
 from __future__ import annotations
 
@@ -10,11 +10,9 @@ from custom_components.homeconnect_ws.entity_descriptions.common import generate
 from custom_components.homeconnect_ws.helpers import (
     DELAY_START_NONE,
     DELAY_START_OPTIONS,
-    ESTIMATED_TOTAL_PROGRAM_TIME,
     FINISH_IN_RELATIVE,
     START_IN_RELATIVE,
     DelayStart,
-    apply_delay_start,
     delay_start_entity,
 )
 from home_disconnect.messages import Action, Message
@@ -90,55 +88,6 @@ def test_generate_delay_start() -> None:
     assert description is not None
     assert description.entity == FINISH_IN_RELATIVE
     assert description.options == DELAY_START_OPTIONS
-
-
-def test_apply_delay_start_without_delay_keeps_options() -> None:
-    """No delay leaves the start options untouched."""
-    appliance = _appliance(_option(FINISH_IN_RELATIVE, 551, 5100))
-    assert apply_delay_start(appliance, DelayStart(), {1: 2}) == {1: 2}
-
-
-def test_apply_delay_start_start_in() -> None:
-    """StartInRelative gets the delay itself."""
-    appliance = _appliance(_option(START_IN_RELATIVE, 550))
-    delay_start = DelayStart(option="2h")
-    assert apply_delay_start(appliance, delay_start, {1: 2}) == {1: 2, 550: 7200}
-
-
-def test_apply_delay_start_finish_in_from_options() -> None:
-    """
-    FinishInRelative gets the program duration plus the delay.
-
-    With a program selected, the appliance reports FinishInRelative as the
-    program's own duration (Siemens WM16XKH2EU washer, #146).
-    """
-    appliance = _appliance(_option(FINISH_IN_RELATIVE, 551, 9999))
-    delay_start = DelayStart(option="1h")
-    assert apply_delay_start(appliance, delay_start, {551: 5100}) == {551: 8700}
-
-
-def test_apply_delay_start_finish_in_from_entity_value() -> None:
-    """Without FinishInRelative in the start options, its reported value is the base."""
-    appliance = _appliance(_option(FINISH_IN_RELATIVE, 551, 5100))
-    delay_start = DelayStart(option="1h")
-    assert apply_delay_start(appliance, delay_start, {}) == {551: 8700}
-
-
-def test_apply_delay_start_finish_in_duration_unknown() -> None:
-    """Without a known duration the delay can't be applied."""
-    appliance = _appliance(_option(FINISH_IN_RELATIVE, 551, None))
-    with pytest.raises(HomeAssistantError) as err:
-        apply_delay_start(appliance, DelayStart(option="1h"), {})
-    assert err.value.translation_key == "delay_start_duration_unknown"
-
-
-def test_apply_delay_start_too_long() -> None:
-    """A delay past the appliance's maximum is refused with a clear error."""
-    appliance = _appliance(_option(FINISH_IN_RELATIVE, 551, 5100, max_value=86400))
-    with pytest.raises(HomeAssistantError) as err:
-        apply_delay_start(appliance, DelayStart(option="24h"), {})
-    assert err.value.translation_key == "delay_start_too_long"
-    assert err.value.translation_placeholders == {"max_hours": "24"}
 
 
 async def test_select_defaults_to_no_delay_and_stores_choice(
@@ -233,34 +182,37 @@ async def test_start_refuses_too_long_delay_and_keeps_it(
         {ATTR_ENTITY_ID: SELECT_ENTITY_ID, ATTR_OPTION: "24h"},
         blocking=True,
     )
-    with pytest.raises(HomeAssistantError):
+    with pytest.raises(HomeAssistantError) as err:
         await hass.services.async_call(
             BUTTON_DOMAIN, SERVICE_PRESS, {ATTR_ENTITY_ID: START_ENTITY_ID}, blocking=True
         )
 
+    assert err.value.translation_key == "delay_start_too_long"
+    assert err.value.translation_placeholders == {"max_hours": "24"}
     mock_appliance.session.request.assert_not_awaited()
     assert hass.states.get(SELECT_ENTITY_ID).state == "24h"
 
 
-def test_apply_delay_start_finish_in_prefers_estimated_total_program_time() -> None:
-    """
-    The base is the program duration, not a finish time already set by hand.
+async def test_start_refuses_delay_without_duration(
+    hass: HomeAssistant,
+    mock_appliance: Appliance,
+    patch_entity_description: None,
+) -> None:
+    """A FinishInRelative delay needs the program's duration; without it nothing starts."""
+    assert await setup_config_entry(hass, MOCK_CONFIG_DATA)
+    await update_entity(mock_appliance.entities["Test.SelectedProgram"], {"value": 500})
+    await hass.async_block_till_done()
 
-    If someone set FinishInRelative to 2 h through the number (on an appliance
-    that accepts that write), +1 h must give program duration + 1 h, not 3 h.
-    """
-    appliance = _appliance(
-        _option(FINISH_IN_RELATIVE, 551, 7200),
-        _option(ESTIMATED_TOTAL_PROGRAM_TIME, 552, 3600),
+    await hass.services.async_call(
+        SELECT_DOMAIN,
+        SERVICE_SELECT_OPTION,
+        {ATTR_ENTITY_ID: SELECT_ENTITY_ID, ATTR_OPTION: "1h"},
+        blocking=True,
     )
-    delay_start = DelayStart(option="1h")
-    assert apply_delay_start(appliance, delay_start, {551: 7200}) == {551: 7200}
+    with pytest.raises(HomeAssistantError) as err:
+        await hass.services.async_call(
+            BUTTON_DOMAIN, SERVICE_PRESS, {ATTR_ENTITY_ID: START_ENTITY_ID}, blocking=True
+        )
 
-
-def test_apply_delay_start_skips_unavailable_estimated_total_program_time() -> None:
-    """An unavailable EstimatedTotalProgramTime falls back to FinishInRelative."""
-    estimated = _option(ESTIMATED_TOTAL_PROGRAM_TIME, 552, 9999)
-    estimated.available = False
-    appliance = _appliance(_option(FINISH_IN_RELATIVE, 551, 5100), estimated)
-    delay_start = DelayStart(option="1h")
-    assert apply_delay_start(appliance, delay_start, {}) == {551: 8700}
+    assert err.value.translation_key == "delay_start_duration_unknown"
+    mock_appliance.session.request.assert_not_awaited()
