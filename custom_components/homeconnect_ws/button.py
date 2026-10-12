@@ -81,7 +81,7 @@ class HCStartButton(HCEntity, ButtonEntity):
         # instead of a silently-greyed-out button, mirroring how the official
         # Home Connect cloud integration keeps its active-program select
         # always available regardless of remote-control state.
-        if not self._runtime_data.appliance.session.connected:
+        if not self._runtime_data.appliance.connected:
             return False
         # None means the appliance hasn't said; only an explicit False hides it.
         if self._entity.available is False:
