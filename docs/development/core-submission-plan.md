@@ -291,18 +291,11 @@ The other attributes (`Is Estimated`, `Auto Counting`, the hob zone `Type`, `Las
 
 The hood's `fan` entity shows a just-requested boost for 8 seconds before the hood confirms it (`_OPTIMISTIC_PRESET_DURATION` in `fan.py`), because the hood is slow to report it. Core wants entities to follow the device whenever the device reports its own state, and optimistic state is meant for devices that don't. Replace it before the `fan` PR (ideally in v2.0.0): wait in the action until the hood confirms, with a timeout, the same way the light's `_wait_until` does.
 
-### Delay start select
+### Delay start number
 
-The "Delay start" select (#148) holds a delay that only exists in Home Assistant: the appliance has no such setting, and the Start button turns the choice into `StartInRelative` (the delay as-is) or `FinishInRelative` (the program's duration plus the delay) when the program starts. The value is restored after a restart and resets after a start. It exists because some appliances only accept a delay as part of the program start: the Siemens WM16XKH2EU washer rejects a direct write even though its device description says it's writable (#146).
+The "Delay start" number (v2.0.0, replacing 1.9.0's select from #148 and the Start in / Finish in numbers) holds a delay in minutes that only exists in Home Assistant: the appliance has no such setting, and the Start button turns it into `StartInRelative` (the delay as-is) or `FinishInRelative` (the program's duration plus the delay) when the program starts. The value is restored after a restart and resets after a start. It exists because some appliances only accept a delay as part of the program start: the Siemens WM16XKH2EU washer rejects a direct write even though its device description says it's writable (#146). Which appliances need that can't be read from the device description, only found out by trying the write, so it can't simply be created only where it's needed.
 
-Two problems for core:
-
-- **It duplicates the Start in / Finish in number** on appliances where the direct write works. A Thermador DWHD660WFP dishwasher, for example, gets both a "Start in" number and the select for the same `StartInRelative` option. Reviewers will ask why there are two controls for one thing.
-- **Its state lives only in Home Assistant**, not on the appliance, which reviewers usually push back on.
-
-Which appliances need it can't be read from the device description, only found out by trying the write, so it can't simply be created only where it's needed.
-
-**Plan: merge the two into one number for v2.0.0**, before the `number` PR. The Start in / Finish in number writes to the appliance right away like now, and if the appliance rejects the write, it holds the value and the Start button sends it with the program start, which is what the select does today. The select goes away, and every appliance gets the number's finer steps instead of the select's whole hours. 1.9.0 ships the select as it is.
+It's one entity per appliance, so there are no longer two controls for one option. The remaining problem for core: **its state lives only in Home Assistant**, not on the appliance, which reviewers usually push back on. The answer is #146: on some appliances the delay can't be stored anywhere else, and its value is always the delay itself, where `FinishInRelative` would be the program's duration plus the delay. A writable "Start in" number was considered (write right away, hold the value only when the appliance refuses), but on `FinishInRelative` appliances the shown value would have to be converted with a duration that changes with the program, and which path an appliance takes would only be known after a failed write.
 
 ### Corrections for stale values
 

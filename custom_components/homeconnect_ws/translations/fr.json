@@ -1973,9 +1973,6 @@
       "number_hood_sensor_sensitivity": {
         "name": "Auto Sensor Sensitivity"
       },
-      "number_start_in": {
-        "name": "Démarrer dans"
-      },
       "number_setting_alarm_clock": {
         "name": "Alarm Clock"
       }

@@ -203,7 +203,7 @@ class EntityDescriptions(TypedDict, total=False):
     select: list[HCSelectEntityDescription]
     sensor: list[HCSensorEntityDescription]
     start_button: list[HCButtonEntityDescription]
-    delay_start: list[HCSelectEntityDescription]
+    delay_start: list[HCNumberEntityDescription]
     switch: list[HCSwitchEntityDescription]
     wifi: list[HCSensorEntityDescription]
     ipv4: list[HCSensorEntityDescription]

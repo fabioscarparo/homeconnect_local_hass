@@ -2116,9 +2116,6 @@
       },
       "number_hood_sensor_sensitivity": {
         "name": "Sensorgevoeligheid"
-      },
-      "number_start_in": {
-        "name": "Start over"
       }
     },
     "light": {

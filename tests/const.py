@@ -17,10 +17,17 @@ from custom_components.homeconnect_ws.entity_descriptions import (
     HCSwitchEntityDescription,
     _EntityDescriptionsType,
 )
-from custom_components.homeconnect_ws.helpers import DELAY_START_OPTIONS
 from home_disconnect import Access, Execution, serialize_legacy_description
+from homeassistant.components.number import NumberDeviceClass, NumberMode
 from homeassistant.components.sensor import SensorDeviceClass
-from homeassistant.const import CONF_DESCRIPTION, CONF_DEVICE_ID, CONF_HOST, CONF_MODE, CONF_NAME
+from homeassistant.const import (
+    CONF_DESCRIPTION,
+    CONF_DEVICE_ID,
+    CONF_HOST,
+    CONF_MODE,
+    CONF_NAME,
+    UnitOfTime,
+)
 
 MOCK_APPLIANCE_INFO = {
     "brand": "Fake_Brand",
@@ -103,11 +110,14 @@ ENTITY_DESCRIPTIONS: _EntityDescriptionsType = {
         )
     ],
     "delay_start": [
-        HCSelectEntityDescription(
-            key="select_delay_start",
-            translation_key="select_delay_start",
+        HCNumberEntityDescription(
+            key="number_delay_start",
+            translation_key="number_delay_start",
             entity="BSH.Common.Option.FinishInRelative",
-            options=DELAY_START_OPTIONS,
+            device_class=NumberDeviceClass.DURATION,
+            native_unit_of_measurement=UnitOfTime.MINUTES,
+            native_min_value=0,
+            mode=NumberMode.BOX,
         )
     ],
     "active_program": [
