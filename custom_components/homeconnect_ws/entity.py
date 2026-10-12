@@ -78,7 +78,7 @@ class HCEntity(CoordinatorEntity[HomeConnectCoordinator], Entity):
     @property
     def available(self) -> bool:
         connected_or_expected_offline = (
-            self._runtime_data.appliance.session.connected
+            self._runtime_data.appliance.connected
             or self._runtime_data.coordinator.expected_offline
         )
         available_access = self.entity_description.available_access

@@ -87,11 +87,10 @@ class HCConnectionSensor(CoordinatorEntity[HomeConnectCoordinator], BinarySensor
 
     @property
     def is_on(self) -> bool:
-        return self._appliance.session.connected
+        return self._appliance.connected
 
     @property
     def extra_state_attributes(self) -> dict[str, Any]:
-        # Reflects the most recent close, regardless of current connectivity -
-        # not just "while currently disconnected" - so it stays checkable
-        # after the appliance reconnects, not only in the moment it's down.
-        return {"clean_disconnect": self._appliance.session.close_code == 1000}
+        # Whether the last connection ended with a normal close (code 1000), as washers and
+        # dryers do when switched off; False while connected.
+        return {"clean_disconnect": self._appliance.closed_cleanly is True}

@@ -121,15 +121,13 @@ class HomeConnectCoordinator(DataUpdateCoordinator[None]):
         Whether being disconnected right now is expected, not a fault.
 
         Only for laundry appliances, and only while disconnected after a clean close (code
-        1000) or before any connection since Home Assistant started (no code yet, fork issue
-        #7). A connected session also has no close code, hence the explicit check (fork issue
-        #21: Power stuck at Off on a washer that stays online).
+        1000) or before any connection since Home Assistant started (fork issue #7). A
+        connected appliance hasn't closed either, hence the explicit check (fork issue #21:
+        Power stuck at Off on a washer that stays online).
         """
-        if self._escalate_connectivity_logging:
+        if self._escalate_connectivity_logging or self.appliance.connected:
             return False
-        if self.appliance.session.connected:
-            return False
-        return self.appliance.session.close_code in {None, 1000}
+        return self.appliance.closed_cleanly is not False
 
     async def close(self) -> None:
         await self.appliance.close()
