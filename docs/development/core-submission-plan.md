@@ -2,31 +2,30 @@
 
 This is the plan for getting Home Connect Local into Home Assistant core. It has four phases: what has to be done in the library before the first PR, the initial submission itself, porting everything else afterwards, and what happens to this repository once everything is in core.
 
-Nothing here is scheduled yet. The first phase is blocked on a library rewrite (see [the license blocker](#1-license-the-library-blocker)), so treat this as the order of work, not a timeline.
+Nothing here is scheduled yet, so treat this as the order of work, not a timeline. Phase 1 is nearly done; see [Status](#status) for what's left.
 
 > [!NOTE]
 > Home Assistant's own rules this plan follows: the [review process](https://developers.home-assistant.io/docs/review-process/), the [integration quality scale](https://developers.home-assistant.io/docs/core/integration-quality-scale/) and the [documentation standards](https://developers.home-assistant.io/docs/documenting/standards/). Where this plan and those pages disagree, those pages win.
 
 ## Current size
 
-Entity descriptions in `entity_descriptions/`, counted on `dev` on 2026-09-27 (after #117). This number changes with almost every feature PR, so recount before relying on it.
+Entity descriptions in `entity_descriptions/`, counted on `dev` on 2026-10-12 (after #171). This number changes with almost every feature PR, so recount before relying on it.
 
 | Platform | Descriptions | Without repeats |
 | --- | --- | --- |
-| `sensor` | 73 | 71 |
-| `binary_sensor` | 74 | 64 |
+| `sensor` | 75 | 73 |
+| `binary_sensor` | 82 | 72 |
 | `switch` | 83 | 74 |
 | `select` | 97 | 97 |
-| `number` | 34 | 32 |
+| `number` | 33 | 31 |
 | `button` | 12 | 12 |
 | `light` | 13 | 7 |
 | `fan` | 1 | 1 |
 | `update` | 2 | 2 |
-| **Total** | **389** | **360** |
+| **Total** | **398** | **369** |
 
 - **Descriptions** is every `HC*EntityDescription(...)` in the code.
-- **Without repeats** counts each key once. Repeats are the same entity described twice: appliance variants (for example the hood lights), Celsius/Fahrenheit pairs, and the old and new names for the same fridge and washer features that v2.0.0's entity cleanup will merge.
-- After v2.0.0's entity cleanup merges the old and new names, drop the **Without repeats** column and keep one count.
+- **Without repeats** counts each key once. Repeats are the same entity described twice: appliance variants (for example the hood lights), Celsius/Fahrenheit pairs, and the old and new names for the same fridge and washer features. Those share a key so existing entities keep their IDs whichever name an appliance uses, and an appliance that reported both would get only the first (#169).
 - Neither is the number of entities one appliance gets. An appliance only gets the descriptions it reports, and a few descriptions (oven cavities, hob zones) create one entity per cavity or zone.
 
 <details>
@@ -61,6 +60,22 @@ for kind in ["Sensor", "BinarySensor", "Switch", "Select", "Number", "Button", "
 
 ## Phase 1: before the submission (the library)
 
+### Status
+
+As of 2026-10-12, with home-disconnect 2.0.0b3 and Home Connect Local 2.0.0b0 (b1 drafted):
+
+| Step | State |
+| --- | --- |
+| [1. License the library](#1-license-the-library-blocker) | **Done.** home-disconnect 2.0 is a new MIT-licensed library ([repository](https://github.com/vemboy200/home-disconnect)), with `PROVENANCE.md` and `THIRD_PARTY_NOTICES.md` (hcpy, code moved from this integration) and its own test suite. No code from `homeconnect_websocket` or home-disconnect 1.x. Home Connect Local 2.0.0b0 runs on it (#122). |
+| [2. Move protocol logic into the library](#2-move-protocol-logic-into-the-library) | **Done except the feature-name constants.** See the table below. |
+| [3. Library release pipeline](#3-library-release-pipeline) | **Done except a stable release.** CI (lint, tests on 3.13 and 3.14, mypy, build), PyPI Trusted Publishing from GitHub releases (`publish.yml`), MIT license metadata, Renovate only. Releases so far are 2.0.0b0 to 2.0.0b3. |
+
+What's left before Phase 2:
+
+- **Feature-name constants.** The entity descriptions still name about 440 features as strings (`"BSH.Common.Status.DoorState"`). Not started.
+- **A stable home-disconnect 2.0.0** for core to pin. It waits on the Home Connect Local 2.0 betas being tested on real appliances (hoods, washers and dryers, program starts and delays, setup), and on the heartbeat change (home-disconnect #20).
+- **The entity description layout** from [Decisions to make first](#decisions-to-make-first) (descriptions per platform file). Planned for v2.0.0's entity cleanup, not done yet.
+
 ### 1. License the library (blocker)
 
 Core only accepts dependencies with an [OSI-approved license](https://opensource.org/licenses). `home-disconnect` is a fork of chris-mc1's [homeconnect_websocket](https://github.com/chris-mc1/homeconnect_websocket), which has no license at all ([upstream issue #69](https://github.com/chris-mc1/homeconnect_websocket/issues/69), open and unanswered). Without a license that code is all rights reserved, and only its author can license it. About 90% of the library's source is still his code, so the fork can't add a license by itself.
@@ -79,15 +94,15 @@ If chris-mc1 licenses upstream before v2 lands, the rewrite becomes optional.
 
 Core requires code that talks to a device or service to live in the library, not the integration. v2.0.0 of both repositories moves these out of the integration:
 
-| In the integration today | Moves to |
-| --- | --- |
-| Hand-built messages: start with Finish-in (`__init__.py`), `fan.py` and `light.py` writes | Library methods (start a program with options, batch value writes) |
-| Program and option rules in `helpers.py`: locking, `ensure_writable`, full vs known option sets, unplugged probes | Library `select_program()` / `start_program()` that own these rules |
-| `hc_cloud_api.py` and `hc_legacy_oauth.py` (account sign-in and profile fetch) | One library module, something like `home_disconnect.account` (drop the "legacy" name, it's the app's own sign-in) |
-| Profile ZIP reading and writing (`config_flow.py`, `export_profile.py`, `hc_cloud_api.py`) | One library profile loader and writer (the simulator can use it too) |
-| Clock sync timestamp format | Something like `appliance.set_datetime()` |
-| Feature names written as strings in the entity descriptions (`"BSH.Common.Status.DoorState"`, about 380 of them) | Library constants the descriptions reference, the way core's `home_connect` uses `aiohomeconnect`'s `StatusKey` |
-| Finding oven cavities, hob zones and favorites in the profile (`get_groups_from_regex` and the regexes in `cooking.py` and `common.py`) | A library call that lists them, for example an oven's cavity IDs |
+| In the integration today | Moves to | Status |
+| --- | --- | --- |
+| Hand-built messages: start with Finish-in (`__init__.py`), `fan.py` and `light.py` writes | Library methods (start a program with options, batch value writes) | Done: `start_program(delay=)`, `set_finish_in()`, the hood fan helpers and `set_ambient_light()` (#122, #160, #163, #164). The integration sends no messages of its own. |
+| Program and option rules in `helpers.py`: locking, `ensure_writable`, full vs known option sets, unplugged probes | Library `select_program()` / `start_program()` that own these rules | Done: option sets, unplugged probes, read-only options per program (home-disconnect #25) and the remote start check (#162) are in the library, and locking is its `Entity.locked`. `ensure_writable` stays only to turn a lock into Home Assistant's error. |
+| `hc_cloud_api.py` and `hc_legacy_oauth.py` (account sign-in and profile fetch) | One library module, something like `home_disconnect.account` (drop the "legacy" name, it's the app's own sign-in) | Done: `home_disconnect.account` (#122). |
+| Profile ZIP reading and writing (`config_flow.py`, `export_profile.py`, `hc_cloud_api.py`) | One library profile loader and writer (the simulator can use it too) | Done: `home_disconnect.profile_files` (#122). |
+| Clock sync timestamp format | Something like `appliance.set_datetime()` | Done: `appliance.set_datetime()` (#122). |
+| Feature names written as strings in the entity descriptions (`"BSH.Common.Status.DoorState"`, about 440 of them) | Library constants the descriptions reference, the way core's `home_connect` uses `aiohomeconnect`'s `StatusKey` | Not started. |
+| Finding oven cavities, hob zones and favorites in the profile (`get_groups_from_regex` and the regexes in `cooking.py` and `common.py`) | A library call that lists them, for example an oven's cavity IDs | Done: `group_ids()` (#122). |
 
 Entities, entity descriptions, the config flow UI, storage paths, the error decorator and translations stay in the integration. The descriptions are Home Assistant code (they extend HA's `*EntityDescription` classes and use its device classes and units), and a library can't depend on Home Assistant. Core's `roborock` is the pattern: its descriptions live in the integration and point at the library for the value (`data.status.battery`), the options (`WaterLevelMapping`) and the command (`api.set_water_level`).
 
@@ -182,7 +197,7 @@ Start tracking this once the initial PR is merged, and update it with every foll
 | `update` | 2 | 0 | `░░░░░░░░░░` 0% |
 | **Total** | **389** | **0** | `░░░░░░░░░░` **0%** |
 
-Each `█` is 10%. Take the **Custom** column from [Current size](#current-size) at the time (after v2.0.0 that's the count without duplicates), since the custom integration keeps changing while the port runs.
+Each `█` is 10%. Take the **Without repeats** count from [Current size](#current-size) at the time, since the custom integration keeps changing while the port runs.
 
 Suggested order (description counts are how many entity descriptions each platform has; one appliance only gets the ones it reports):
 
@@ -289,7 +304,7 @@ The other attributes (`Is Estimated`, `Auto Counting`, the hob zone `Type`, `Las
 
 ### Optimistic hood boost
 
-The hood's `fan` entity shows a just-requested boost for 8 seconds before the hood confirms it (`_OPTIMISTIC_PRESET_DURATION` in `fan.py`), because the hood is slow to report it. Core wants entities to follow the device whenever the device reports its own state, and optimistic state is meant for devices that don't. Replace it before the `fan` PR (ideally in v2.0.0): wait in the action until the hood confirms, with a timeout, the same way the light's `_wait_until` does.
+The hood's `fan` entity shows a just-requested boost for 8 seconds before the hood confirms it (`_OPTIMISTIC_PRESET_DURATION` in `fan.py`), because the hood is slow to report it. Core wants entities to follow the device whenever the device reports its own state, and optimistic state is meant for devices that don't. Replace it before the `fan` PR (ideally in v2.0.0): wait in the action until the hood confirms, with a timeout, the way the library's `set_ambient_light()` waits for the hood's light settings.
 
 ### Delay start number
 
