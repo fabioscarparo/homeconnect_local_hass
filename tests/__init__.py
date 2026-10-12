@@ -2,11 +2,18 @@
 
 from __future__ import annotations
 
+import contextlib
 from typing import TYPE_CHECKING, Any, Self
 from unittest.mock import AsyncMock, MagicMock, Mock, patch
 
 from custom_components.homeconnect_ws.const import DOMAIN
-from home_disconnect import Appliance, ConnectionState, parse_profile, serialize_legacy_description
+from home_disconnect import (
+    Appliance,
+    ConnectionState,
+    HomeDisconnectError,
+    parse_profile,
+    serialize_legacy_description,
+)
 from pytest_homeassistant_custom_component.common import MockConfigEntry
 
 from .const import MOCK_TLS_DEVICE_INFO
@@ -86,6 +93,13 @@ def make_appliance(description: Mapping[str, Any], **kwargs: Any) -> Appliance:
         )
     # Nothing to read back from a mocked appliance; keeps session.request for writes only.
     appliance._refresh = AsyncMock()  # type: ignore[method-assign]
+
+    async def _start() -> None:
+        # The library keeps retrying in the background; here, one attempt is enough.
+        with contextlib.suppress(HomeDisconnectError, TimeoutError):
+            await appliance.connect()
+
+    appliance.start = AsyncMock(side_effect=_start)  # type: ignore[method-assign]
     return appliance
 
 
