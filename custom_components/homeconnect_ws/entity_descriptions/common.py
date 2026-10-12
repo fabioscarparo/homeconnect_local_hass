@@ -21,7 +21,7 @@ from homeassistant.const import (
 )
 from homeassistant.util import dt as dt_util
 
-from custom_components.homeconnect_ws.helpers import DELAY_START_OPTIONS, delay_start_entity
+from custom_components.homeconnect_ws.helpers import delay_start_entity
 
 from .descriptions_definitions import (
     EntityDescriptions,
@@ -105,23 +105,26 @@ def generate_start_button(appliance: Appliance) -> HCButtonEntityDescription | N
     return None
 
 
-def generate_delay_start(appliance: Appliance) -> HCSelectEntityDescription | None:
+def generate_delay_start(appliance: Appliance) -> HCNumberEntityDescription | None:
     """
-    Get the "Delay start" select description.
+    Get the "Delay start" number description.
 
     Offered whenever the appliance has StartInRelative or FinishInRelative.
-    Its value lives in HA, not on the appliance: some appliances accept the
-    delay only as an option of the program start (#146), so the Start button
-    applies it then.
+    Its value is the delay itself and lives in HA, not on the appliance: some
+    appliances accept the delay only as an option of the program start (#146),
+    so the Start button applies it then.
     """
     entity = delay_start_entity(appliance)
     if entity is None:
         return None
-    return HCSelectEntityDescription(
-        key="select_delay_start",
-        translation_key="select_delay_start",
+    return HCNumberEntityDescription(
+        key="number_delay_start",
+        translation_key="number_delay_start",
         entity=entity.name,
-        options=DELAY_START_OPTIONS,
+        device_class=NumberDeviceClass.DURATION,
+        native_unit_of_measurement=UnitOfTime.MINUTES,
+        native_min_value=0,
+        mode=NumberMode.BOX,
     )
 
 
@@ -405,6 +408,7 @@ COMMON_ENTITY_DESCRIPTIONS: _EntityDescriptionsDefinitionsType = {
             entity="BSH.Common.Event.ProgramAborted",
             entity_category=EntityCategory.DIAGNOSTIC,
             device_class=BinarySensorDeviceClass.PROBLEM,
+            entity_registry_enabled_default=False,
             value_on={"Present", "Confirmed"},
             value_off={"Off"},
         ),
@@ -630,22 +634,6 @@ COMMON_ENTITY_DESCRIPTIONS: _EntityDescriptionsDefinitionsType = {
             native_unit_of_measurement=UnitOfTime.SECONDS,
             mode=NumberMode.AUTO,
             clear_on_expected_offline=True,
-        ),
-        HCNumberEntityDescription(
-            key="number_start_in",
-            entity="BSH.Common.Option.StartInRelative",
-            device_class=NumberDeviceClass.DURATION,
-            native_unit_of_measurement=UnitOfTime.SECONDS,
-            mode=NumberMode.BOX,
-            entity_registry_enabled_default=False,
-        ),
-        HCNumberEntityDescription(
-            key="number_finish_in",
-            entity="BSH.Common.Option.FinishInRelative",
-            device_class=NumberDeviceClass.DURATION,
-            native_unit_of_measurement=UnitOfTime.SECONDS,
-            mode=NumberMode.AUTO,
-            entity_registry_enabled_default=False,
         ),
         HCNumberEntityDescription(
             key="number_setting_alarm_clock",

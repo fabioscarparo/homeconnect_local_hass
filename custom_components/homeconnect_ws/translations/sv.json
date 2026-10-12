@@ -1909,9 +1909,6 @@
       },
       "number_hood_sensor_sensitivity": {
         "name": "Autosensor – känslighet"
-      },
-      "number_start_in": {
-        "name": "Startar om"
       }
     },
     "light": {

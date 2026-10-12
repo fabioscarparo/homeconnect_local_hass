@@ -115,6 +115,23 @@ def test_get_available_entities(mock_appliance: Appliance, monkeypatch: pytest.M
     ]
 
 
+def test_get_available_entities_keeps_first_per_key(
+    mock_appliance: Appliance, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    """Test an appliance with both names behind one key gets only the first entity."""
+    old_name = HCBinarySensorEntityDescription(
+        key="binary_sensor_shared", entity="Test.BinarySensor"
+    )
+    new_name = HCBinarySensorEntityDescription(key="binary_sensor_shared", entity="Test.Event1")
+    monkeypatch.setattr(
+        entity_descriptions,
+        "get_all_entity_description",
+        Mock(return_value={"binary_sensor": [old_name, new_name]}),
+    )
+    entities = entity_descriptions.get_available_entities(mock_appliance)
+    assert entities["binary_sensor"] == [old_name]
+
+
 POWER_SWITCH = {
     "setting": [
         {

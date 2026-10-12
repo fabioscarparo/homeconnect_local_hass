@@ -1957,9 +1957,6 @@
       "number_hood_sensor_sensitivity": {
         "name": "自动传感器灵敏度"
       },
-      "number_start_in": {
-        "name": "延时启动"
-      },
       "number_setting_alarm_clock": {
         "name": "闹钟"
       },

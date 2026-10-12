@@ -178,30 +178,21 @@ def error_decorator[T](
 
 START_IN_RELATIVE = "BSH.Common.Option.StartInRelative"
 FINISH_IN_RELATIVE = "BSH.Common.Option.FinishInRelative"
-DELAY_START_NONE = "no_delay"
-DELAY_START_OPTIONS = [DELAY_START_NONE, *(f"{hours}h" for hours in range(1, 25))]
 
 
 @dataclass
 class DelayStart:
     """
-    The start delay picked in the "Delay start" select, held in HA.
+    The start delay set in the "Delay start" number, held in HA.
 
-    The appliance has no notion of this value on its own: it only accepts
-    StartInRelative/FinishInRelative as an option of the program start
-    (#146), so the select keeps the choice here and the Start button passes
-    it to Appliance.start_program(), which turns it into that option.
+    The appliance has no notion of this value on its own: some appliances only
+    accept StartInRelative/FinishInRelative as an option of the program start
+    (#146), so the number keeps the delay here and the Start button passes it
+    to Appliance.start_program(), which turns it into that option.
     """
 
-    option: str = DELAY_START_NONE
+    seconds: int = 0
     _listeners: list[Callable[[], None]] = field(default_factory=list)
-
-    @property
-    def seconds(self) -> int:
-        """Return the selected delay in seconds, 0 for no delay."""
-        if self.option == DELAY_START_NONE:
-            return 0
-        return int(self.option.removesuffix("h")) * 3600
 
     def add_listener(self, listener: Callable[[], None]) -> Callable[[], None]:
         """Call listener whenever the delay is reset; returns a remove function."""
@@ -210,7 +201,7 @@ class DelayStart:
 
     def reset(self) -> None:
         """Back to no delay after a successful start, like the official app."""
-        self.option = DELAY_START_NONE
+        self.seconds = 0
         for listener in list(self._listeners):
             listener()
 

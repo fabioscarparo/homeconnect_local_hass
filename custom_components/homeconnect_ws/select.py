@@ -2,15 +2,13 @@
 
 from __future__ import annotations
 
-from typing import TYPE_CHECKING, Any
+from typing import TYPE_CHECKING
 
 from home_disconnect.entities import Access, Execution
 from homeassistant.components.select import SelectEntity
-from homeassistant.helpers.restore_state import RestoreEntity
 
 from .entity import HCEntity
 from .helpers import (
-    DELAY_START_OPTIONS,
     create_entities,
     ensure_writable,
     entity_is_available,
@@ -18,8 +16,6 @@ from .helpers import (
 )
 
 if TYPE_CHECKING:
-    from collections.abc import Callable
-
     from home_disconnect.entities import Entity as HcEntity
     from home_disconnect.entities import SelectedProgram
     from homeassistant.core import HomeAssistant
@@ -44,7 +40,7 @@ async def async_setup_entry(
 ) -> None:
     """Set up select platform."""
     entities = create_entities(
-        {"select": HCSelect, "program": HCProgram, "delay_start": HCDelayStartSelect},
+        {"select": HCSelect, "program": HCProgram},
         config_entry.runtime_data,
     )
     async_add_entites(entities)
@@ -226,56 +222,3 @@ class HCProgram(HCSelect):
         # issues #9/#21), a full set where SelectedProgram asks for one, and
         # the known values for start-only programs.
         await self._runtime_data.appliance.select_program(program)
-
-
-class HCDelayStartSelect(HCEntity, SelectEntity, RestoreEntity):
-    """
-    "Delay start" select: No delay / +1 h ... +24 h, independent of the program.
-
-    The value is held in HA (and restored after a restart), not written to the
-    appliance: some appliances only accept StartInRelative/FinishInRelative as
-    an option of the program start (#146). The Start button applies it and
-    resets it to No delay after a successful start.
-    """
-
-    entity_description: HCSelectEntityDescription
-    _attr_options = DELAY_START_OPTIONS
-    _show_when_locked = False
-    _remove_reset_listener: Callable[[], None] | None = None
-
-    @property
-    def available(self) -> bool:
-        # Not tied to the backing option's own availability: StartIn/FinishIn
-        # is often withdrawn until a program is selected, but picking the
-        # delay first and the program second must work.
-        return (
-            self._runtime_data.appliance.connected
-            or self._runtime_data.coordinator.expected_offline
-        )
-
-    @property
-    def current_option(self) -> str:
-        return self._runtime_data.delay_start.option
-
-    @property
-    def extra_state_attributes(self) -> dict[str, Any]:
-        return {}
-
-    async def async_select_option(self, option: str) -> None:
-        self._runtime_data.delay_start.option = option
-        self.async_write_ha_state()
-
-    async def async_added_to_hass(self) -> None:
-        await super().async_added_to_hass()
-        last_state = await self.async_get_last_state()
-        if last_state is not None and last_state.state in DELAY_START_OPTIONS:
-            self._runtime_data.delay_start.option = last_state.state
-        self._remove_reset_listener = self._runtime_data.delay_start.add_listener(
-            self.async_write_ha_state
-        )
-
-    async def async_will_remove_from_hass(self) -> None:
-        if self._remove_reset_listener is not None:
-            self._remove_reset_listener()
-            self._remove_reset_listener = None
-        await super().async_will_remove_from_hass()
