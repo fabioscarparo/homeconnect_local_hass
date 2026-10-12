@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import logging
 from typing import TYPE_CHECKING, cast
 
 from custom_components.homeconnect_ws.helpers import merge_dicts
@@ -34,6 +35,8 @@ if TYPE_CHECKING:
 
     from home_disconnect import Appliance
 
+
+_LOGGER = logging.getLogger(__name__)
 
 ALL_ENTITY_DESCRIPTIONS: _EntityDescriptionsDefinitionsType | None = None
 
@@ -134,7 +137,27 @@ def get_available_entities(appliance: Appliance) -> _EntityDescriptionsType:
             )
             if available_description is not None:
                 available_entities[description_type].append(available_description)
+    for available_type, available in available_entities.items():
+        available_entities[available_type] = _first_per_key(available)
     return available_entities
+
+
+def _first_per_key(descriptions: list[HCEntityDescription]) -> list[HCEntityDescription]:
+    """
+    Keep only the first description for each key.
+
+    Some keys are shared by an old and a new name for the same thing (for example
+    Refrigeration.FridgeFreezer.Setting.EcoMode and Refrigeration.Common.Setting.EcoMode),
+    so existing entities keep their unique IDs whichever name the appliance uses. An
+    appliance reporting both would otherwise get two entities with one unique ID.
+    """
+    kept: dict[str, HCEntityDescription] = {}
+    for description in descriptions:
+        if description.key in kept:
+            _LOGGER.debug("Skipping a second entity for key %s", description.key)
+            continue
+        kept[description.key] = description
+    return list(kept.values())
 
 
 __all__ = [
