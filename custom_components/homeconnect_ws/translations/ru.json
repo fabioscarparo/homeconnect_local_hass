@@ -1775,9 +1775,6 @@
       "number_hood_sensor_sensitivity": {
         "name": "Чувствительность авто-сенсора"
       },
-      "number_start_in": {
-        "name": "Запуск через"
-      },
       "number_setting_alarm_clock": {
         "name": "Таймер"
       }

@@ -3902,9 +3902,6 @@
       "number_hood_sensor_sensitivity": {
         "name": "Czułość czujnika automatycznego"
       },
-      "number_start_in": {
-        "name": "Start za"
-      },
       "number_setting_alarm_clock": {
         "name": "Minutnik"
       }

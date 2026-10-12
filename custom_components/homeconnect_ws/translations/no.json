@@ -1927,9 +1927,6 @@
       "number_hood_sensor_sensitivity": {
         "name": "Auto sensorsensitivitet"
       },
-      "number_start_in": {
-        "name": "Start om"
-      },
       "number_setting_alarm_clock": {
         "name": "Vekkerklokke"
       }

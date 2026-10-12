@@ -105,7 +105,7 @@ class HCStartButton(HCEntity, ButtonEntity):
         # the appliance has reported - an option sent as null makes it reject
         # the whole start with 400 (a hood still needs its real venting level,
         # fork issue #14).
-        # The library also turns the "Delay start" select's choice into StartInRelative or
+        # The library also turns the "Delay start" number's delay into StartInRelative or
         # FinishInRelative, the only form some appliances accept it in (#146).
         try:
             await self._runtime_data.appliance.start_program(
