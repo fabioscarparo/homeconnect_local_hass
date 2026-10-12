@@ -211,7 +211,7 @@ Suggested order (description counts are how many entity descriptions each platfo
 
    This has to come after the initial PR is merged, because hassfest checks that referenced domains exist. It doesn't block anything else, so it's left for last.
 
-Features that are on the custom integration's own roadmap (for example the per-appliance option-value calibration from [discussion #104](https://github.com/vemboy200/homeconnect_local_hass/discussions/104), or a single summary problem entity) go into whichever side is current at the time. Where core's cloud `home_connect` integration has the same limitation, fixing it isn't a condition for the port.
+Features that are on the custom integration's own roadmap (for example the per-appliance option-value calibration from [discussion #104](https://github.com/vemboy200/homeconnect_local_hass/discussions/104)) go into whichever side is current at the time. Where core's cloud `home_connect` integration has the same limitation, fixing it isn't a condition for the port.
 
 Expect issues from people who remove the custom integration and switch to core before the port is finished: missing entities, and if the domain stayed `homeconnect_ws`, entries that don't load because the custom integration created them with a newer config entry version than core has. Handle those as they come in.
 

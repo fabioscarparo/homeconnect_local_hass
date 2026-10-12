@@ -2,7 +2,7 @@
 
 from __future__ import annotations
 
-from typing import TYPE_CHECKING, Any
+from typing import TYPE_CHECKING, Any, cast
 
 from homeassistant.components.binary_sensor import BinarySensorEntity
 from homeassistant.components.binary_sensor.const import BinarySensorDeviceClass
@@ -16,6 +16,7 @@ from .helpers import create_entities
 
 if TYPE_CHECKING:
     from home_disconnect import Appliance
+    from home_disconnect import Entity as HcEntity
     from homeassistant.core import HomeAssistant
     from homeassistant.helpers.device_registry import DeviceInfo
     from homeassistant.helpers.entity_platform import AddEntitiesCallback
@@ -30,6 +31,8 @@ CONNECTION_SENSOR_DESCRIPTIONS = HCBinarySensorEntityDescription(
     entity_category=EntityCategory.DIAGNOSTIC,
 )
 
+PROBLEM_SENSOR_KEY = "binary_sensor_problem"
+
 
 async def async_setup_entry(
     hass: HomeAssistant,  # noqa: ARG001
@@ -41,7 +44,32 @@ async def async_setup_entry(
         create_entities({"binary_sensor": HCBinarySensor}, config_entry.runtime_data)
     )
     entities.add(HCConnectionSensor(CONNECTION_SENSOR_DESCRIPTIONS, config_entry.runtime_data))
+    problem_descriptions = [
+        cast("HCBinarySensorEntityDescription", description)
+        for description in config_entry.runtime_data.available_entity_descriptions.get(
+            "binary_sensor", []
+        )
+        if description.device_class == BinarySensorDeviceClass.PROBLEM
+    ]
+    if problem_descriptions:
+        entities.add(HCProblemSensor(problem_descriptions, config_entry.runtime_data))
     async_add_entites(entities)
+
+
+def _is_on(description: HCBinarySensorEntityDescription, entity: HcEntity | None) -> bool | None:
+    """Whether the entity's value means on, or None if it's unknown."""
+    if entity is None:
+        return None
+    if description.value_on:
+        if entity.value in description.value_on:
+            return True
+        if description.value_off and entity.value in description.value_off:
+            return False
+        return None
+    if entity.value is None:
+        # Not reported by the appliance yet - "unknown", not "off".
+        return None
+    return bool(entity.value)
 
 
 class HCBinarySensor(HCEntity, BinarySensorEntity):
@@ -51,20 +79,48 @@ class HCBinarySensor(HCEntity, BinarySensorEntity):
 
     @property
     def is_on(self) -> bool | None:
-        if self._entity is None:
+        return _is_on(self.entity_description, self._entity)
+
+
+class HCProblemSensor(HCEntity, BinarySensorEntity):
+    """
+    On while any of the appliance's problem sensors is on.
+
+    Most per-problem sensors are disabled by default, so this is the one to watch; enable a
+    per-problem sensor to see or automate on that problem alone.
+    """
+
+    entity_description: HCBinarySensorEntityDescription
+
+    def __init__(
+        self, problem_descriptions: list[HCBinarySensorEntityDescription], runtime_data: HCData
+    ) -> None:
+        super().__init__(
+            HCBinarySensorEntityDescription(
+                key=PROBLEM_SENSOR_KEY,
+                entities=[
+                    description.entity for description in problem_descriptions if description.entity
+                ],
+                device_class=BinarySensorDeviceClass.PROBLEM,
+            ),
+            runtime_data,
+        )
+        self._problems = [
+            (description, runtime_data.appliance.entities[description.entity])
+            for description in problem_descriptions
+            if description.entity
+        ]
+
+    @property
+    def is_on(self) -> bool | None:
+        states = [_is_on(description, entity) for description, entity in self._problems]
+        if any(states):
+            return True
+        if all(state is None for state in states):
+            # None of them reported yet.
             return None
-        if self.entity_description.value_on:
-            if self._entity.value in self.entity_description.value_on:
-                return True
-            if self.entity_description.value_off and self._entity.value in (
-                self.entity_description.value_off
-            ):
-                return False
-            return None
-        if self._entity.value is None:
-            # Not reported by the appliance yet - "unknown", not "off".
-            return None
-        return bool(self._entity.value)
+        # A problem the appliance hasn't reported isn't active.
+        return False
 
 
 class HCConnectionSensor(CoordinatorEntity[HomeConnectCoordinator], BinarySensorEntity):
