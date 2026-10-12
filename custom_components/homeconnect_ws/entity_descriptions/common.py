@@ -405,6 +405,7 @@ COMMON_ENTITY_DESCRIPTIONS: _EntityDescriptionsDefinitionsType = {
             entity="BSH.Common.Event.ProgramAborted",
             entity_category=EntityCategory.DIAGNOSTIC,
             device_class=BinarySensorDeviceClass.PROBLEM,
+            entity_registry_enabled_default=False,
             value_on={"Present", "Confirmed"},
             value_off={"Off"},
         ),

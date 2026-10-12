@@ -54,6 +54,8 @@ Fields common to every entity type:
 - `value_on`: set of values for which the sensor should be `on`, e.g. `{"Open", "Ajar"}`
 - `value_off`: set of values for which the sensor should be `off`, e.g. `{"Closed", "Locked"}`
 
+Every binary sensor with `device_class=BinarySensorDeviceClass.PROBLEM` also feeds the appliance's "Problem" sensor (`binary_sensor_problem`), which is on while any of them is on, including disabled ones. Give a new problem sensor `entity_registry_enabled_default=False`, so the Problem sensor is the one people see. The exceptions are the refrigeration door and temperature alarms, which people act on right away.
+
 ## Number Entity (`HCNumberEntityDescription`)
 
 No HC-specific extra fields — use HA's own inherited `NumberEntityDescription` fields (`native_min_value`, `native_max_value`, `native_step`, etc.) directly, e.g. `native_max_value=99` to cap a value below what the appliance profile itself allows.
