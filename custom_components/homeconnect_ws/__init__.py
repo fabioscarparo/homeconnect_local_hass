@@ -7,7 +7,7 @@ from dataclasses import dataclass, field
 from typing import TYPE_CHECKING, Any, Never
 
 import probatio
-from home_disconnect import AccessError, Entity, ResponseError
+from home_disconnect import AccessError, Entity, RemoteStartNotAllowedError, ResponseError
 from homeassistant.config_entries import ConfigEntry
 from homeassistant.const import CONF_DESCRIPTION, EVENT_HOMEASSISTANT_STOP
 from homeassistant.exceptions import ConfigEntryError, ServiceValidationError
@@ -30,7 +30,12 @@ from .const import (
 )
 from .coordinator import HomeConnectCoordinator
 from .entity_descriptions import get_available_entities
-from .helpers import DelayStart, error_decorator, get_config_entry_from_call
+from .helpers import (
+    DelayStart,
+    error_decorator,
+    get_config_entry_from_call,
+    remote_start_error,
+)
 from .profile_storage import load_description_files, remove_description_files
 
 if TYPE_CHECKING:
@@ -160,6 +165,8 @@ async def async_setup(hass: HomeAssistant, config: ConfigType) -> bool:
                 # The library adds the program's known option values (or a
                 # full set, for appliances that want one) under these.
                 await appliance.start_program(options=options)
+            except RemoteStartNotAllowedError:
+                raise remote_start_error(config_entry.runtime_data) from None
             except ResponseError as exc:
                 _raise_start_error(exc)
         else:
