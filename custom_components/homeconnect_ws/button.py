@@ -4,13 +4,18 @@ from __future__ import annotations
 
 from typing import TYPE_CHECKING
 
-from home_disconnect import RemoteStartNotAllowedError
+from home_disconnect import (
+    DelayTooLongError,
+    ProgramDurationUnknownError,
+    RemoteStartNotAllowedError,
+)
 from home_disconnect.entities import Execution
 from homeassistant.components.button import ButtonEntity
+from homeassistant.exceptions import HomeAssistantError
 
+from .const import DOMAIN
 from .entity import HCEntity
 from .helpers import (
-    apply_delay_start,
     create_entities,
     error_decorator,
     remote_start_error,
@@ -100,12 +105,23 @@ class HCStartButton(HCEntity, ButtonEntity):
         # the appliance has reported - an option sent as null makes it reject
         # the whole start with 400 (a hood still needs its real venting level,
         # fork issue #14).
-        # The "Delay start" select's choice goes in as StartInRelative or
-        # FinishInRelative - the only form some appliances accept it in (#146).
-        appliance = self._runtime_data.appliance
-        delay = apply_delay_start(appliance, self._runtime_data.delay_start, {})
+        # The library also turns the "Delay start" select's choice into StartInRelative or
+        # FinishInRelative, the only form some appliances accept it in (#146).
         try:
-            await appliance.start_program(selected_program, delay)
+            await self._runtime_data.appliance.start_program(
+                selected_program, delay=self._runtime_data.delay_start.seconds
+            )
+        except DelayTooLongError as err:
+            raise HomeAssistantError(
+                translation_domain=DOMAIN,
+                translation_key="delay_start_too_long",
+                translation_placeholders={"max_hours": str(err.maximum // 3600)},
+            ) from None
+        except ProgramDurationUnknownError:
+            raise HomeAssistantError(
+                translation_domain=DOMAIN,
+                translation_key="delay_start_duration_unknown",
+            ) from None
         except RemoteStartNotAllowedError:
             # Only for BSH.Common.Status.RemoteControlStartAllowed, not ActiveProgram being
             # read-only: that also happens for other reasons (an open door), which going to the
