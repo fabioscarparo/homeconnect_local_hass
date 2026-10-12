@@ -23,6 +23,7 @@ from home_disconnect import (
     LoadedProfile,
     ProfileError,
     SignIn,
+    appliance_hostname,
     build_profile_zip,
     fetch_profiles,
     load_profiles_from_zip,
@@ -229,18 +230,16 @@ class HomeConnectConfigFlow(ConfigFlow, domain=DOMAIN):
 
     def _set_encryption_keys(self, appliance_info: dict[str, Any]) -> None:
         self.data[CONF_MODE] = appliance_info["connectionType"]
-        if self.data[CONF_MODE] == "TLS":
-            if CONF_HOST not in self.data:
-                self.data[CONF_HOST] = (
-                    f"{appliance_info['brand']}-{appliance_info['type']}-{appliance_info['haId']}"
-                )
-                _LOGGER.debug("Set Host to: %s", self.data[CONF_HOST])
-            self.data[CONF_PSK] = appliance_info["key"]
-        else:
-            if CONF_HOST not in self.data:
-                self.data[CONF_HOST] = appliance_info["haId"]
-                _LOGGER.debug("Set Host to: %s", self.data[CONF_HOST])
-            self.data[CONF_PSK] = appliance_info["key"]
+        if CONF_HOST not in self.data:
+            self.data[CONF_HOST] = appliance_hostname(
+                self.data[CONF_MODE],
+                appliance_info["haId"],
+                appliance_info["brand"],
+                appliance_info["type"],
+            )
+            _LOGGER.debug("Set Host to: %s", self.data[CONF_HOST])
+        self.data[CONF_PSK] = appliance_info["key"]
+        if self.data[CONF_MODE] != "TLS":
             self.data[CONF_AES_IV] = appliance_info["iv"]
         _LOGGER.debug("Set Keys for %s Appliance", self.data[CONF_MODE])
 
@@ -553,9 +552,9 @@ class HomeConnectConfigFlow(ConfigFlow, domain=DOMAIN):
     def _auto_host(self) -> str:
         """Derive this Appliance's mDNS-resolvable name, the same way initial setup does."""
         info = self.data[CONF_DESCRIPTION]["info"]
-        if self.data[CONF_MODE] == "TLS":
-            return f"{info['brand']}-{info['type']}-{info['deviceID']}"
-        return cast("str", info["deviceID"])
+        return appliance_hostname(
+            self.data[CONF_MODE], info["deviceID"], info["brand"], info["type"]
+        )
 
     async def _async_lookup_host(self) -> str | None:
         """
