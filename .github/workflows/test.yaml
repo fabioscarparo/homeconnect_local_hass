@@ -13,7 +13,7 @@ jobs:
       matrix:
         include:
           - ha-label: oldest
-            ha-version: "homeassistant==2026.4.0"
+            ha-version: "homeassistant==2026.10.0"
           - ha-label: latest
             # renovate: datasource=pypi depName=homeassistant
             ha-version: "homeassistant==2026.10.0"
