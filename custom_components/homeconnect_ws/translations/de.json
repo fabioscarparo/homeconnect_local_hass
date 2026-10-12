@@ -4772,9 +4772,6 @@
     "missing_unique_id": {
       "message": "Dieser Konfigurationseintrag hat keine eindeutige ID. Entfernen Sie das Gerät und fügen Sie es erneut hinzu."
     },
-    "fan_no_default_program": {
-      "message": "Für den Lüfter dieser Dunstabzugshaube ist kein Standard-Lüftungsprogramm festgelegt."
-    },
     "setup_cannot_connect": {
       "message": "Keine Verbindung zu {host}. Siehe {url}, falls sich das nicht von selbst behebt."
     },

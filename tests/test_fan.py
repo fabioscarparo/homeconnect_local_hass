@@ -72,30 +72,42 @@ async def test_update(
     assert state.state == STATE_OFF
 
     await update_entity(mock_appliance.entities["Test.ActiveProgram"], {"value": 504})
-    await update_entity(mock_appliance.entities["Test.FanSpeed1"], {"value": 1})
+    await update_entity(
+        mock_appliance.entities["Cooking.Common.Option.Hood.VentingLevel"], {"value": 1}
+    )
     await hass.async_block_till_done()
 
     state = hass.states.get("fan.fake_brand_homeappliance_fan")
     assert state.state == STATE_ON
     assert state.attributes[ATTR_PERCENTAGE] == 25
 
-    await update_entity(mock_appliance.entities["Test.FanSpeed1"], {"value": 2})
+    await update_entity(
+        mock_appliance.entities["Cooking.Common.Option.Hood.VentingLevel"], {"value": 2}
+    )
     await hass.async_block_till_done()
 
     state = hass.states.get("fan.fake_brand_homeappliance_fan")
     assert state.state == STATE_ON
     assert state.attributes[ATTR_PERCENTAGE] == 50
 
-    await update_entity(mock_appliance.entities["Test.FanSpeed1"], {"value": 0})
-    await update_entity(mock_appliance.entities["Test.FanSpeed2"], {"value": 1})
+    await update_entity(
+        mock_appliance.entities["Cooking.Common.Option.Hood.VentingLevel"], {"value": 0}
+    )
+    await update_entity(
+        mock_appliance.entities["Cooking.Common.Option.Hood.IntensiveLevel"], {"value": 1}
+    )
     await hass.async_block_till_done()
 
     state = hass.states.get("fan.fake_brand_homeappliance_fan")
     assert state.state == STATE_ON
     assert state.attributes[ATTR_PERCENTAGE] == 75
 
-    await update_entity(mock_appliance.entities["Test.FanSpeed1"], {"value": 0})
-    await update_entity(mock_appliance.entities["Test.FanSpeed2"], {"value": 2})
+    await update_entity(
+        mock_appliance.entities["Cooking.Common.Option.Hood.VentingLevel"], {"value": 0}
+    )
+    await update_entity(
+        mock_appliance.entities["Cooking.Common.Option.Hood.IntensiveLevel"], {"value": 2}
+    )
     await hass.async_block_till_done()
 
     state = hass.states.get("fan.fake_brand_homeappliance_fan")
@@ -117,7 +129,9 @@ async def test_is_on_false_when_operation_state_inactive(
     """
     assert await setup_config_entry(hass, MOCK_CONFIG_DATA)
     await update_entity(mock_appliance.entities["Test.ActiveProgram"], {"value": 504})
-    await update_entity(mock_appliance.entities["Test.FanSpeed1"], {"value": 1})
+    await update_entity(
+        mock_appliance.entities["Cooking.Common.Option.Hood.VentingLevel"], {"value": 1}
+    )
     await hass.async_block_till_done()
 
     state = hass.states.get("fan.fake_brand_homeappliance_fan")
@@ -128,7 +142,7 @@ async def test_is_on_false_when_operation_state_inactive(
     # reads it fresh on every evaluation - re-triggering an already
     # subscribed entity's callback (the fan only subscribes to its speed
     # entities, not ActiveProgram) is enough to force a re-render.
-    await mock_appliance.entities["Test.FanSpeed1"].run_callbacks()
+    await mock_appliance.entities["Cooking.Common.Option.Hood.VentingLevel"].run_callbacks()
     await hass.async_block_till_done()
 
     state = hass.states.get("fan.fake_brand_homeappliance_fan")
@@ -346,8 +360,12 @@ async def test_off_when_program_cleared_but_venting_stale(
     """Fan reports off when program ends even if venting level is stale."""
     assert await setup_config_entry(hass, MOCK_CONFIG_DATA)
     await update_entity(mock_appliance.entities["Test.ActiveProgram"], {"value": 504})
-    await update_entity(mock_appliance.entities["Test.FanSpeed1"], {"value": 0})
-    await update_entity(mock_appliance.entities["Test.FanSpeed2"], {"value": 2})
+    await update_entity(
+        mock_appliance.entities["Cooking.Common.Option.Hood.VentingLevel"], {"value": 0}
+    )
+    await update_entity(
+        mock_appliance.entities["Cooking.Common.Option.Hood.IntensiveLevel"], {"value": 2}
+    )
     await hass.async_block_till_done()
 
     state = hass.states.get("fan.fake_brand_homeappliance_fan")
@@ -357,7 +375,7 @@ async def test_off_when_program_cleared_but_venting_stale(
     await update_entity(mock_appliance.entities["Test.ActiveProgram"], {"value": 0})
     # The test fan only subscribes to its speed entities (the hood fan also
     # subscribes to ActiveProgram), so re-run one of their callbacks.
-    await mock_appliance.entities["Test.FanSpeed1"].run_callbacks()
+    await mock_appliance.entities["Cooking.Common.Option.Hood.VentingLevel"].run_callbacks()
     await hass.async_block_till_done()
 
     state = hass.states.get("fan.fake_brand_homeappliance_fan")
@@ -435,3 +453,29 @@ async def test_set_speed(
             ],
         )
     )
+
+
+async def test_set_speed_ignores_remote_start(
+    hass: HomeAssistant,
+    mock_appliance: Appliance,
+    patch_entity_description: None,
+) -> None:
+    """Test the fan still runs when the appliance reports remote start as off."""
+    assert await setup_config_entry(hass, MOCK_CONFIG_DATA)
+    await update_entity(mock_appliance.entities["Test.ActiveProgram"], {"value": 0})
+    await hass.async_block_till_done()
+    mock_appliance.entities.by_name["BSH.Common.Status.RemoteControlStartAllowed"] = Mock(
+        value=False
+    )
+
+    await hass.services.async_call(
+        FAN_DOMAIN,
+        SERVICE_SET_PERCENTAGE,
+        {
+            ATTR_ENTITY_ID: "fan.fake_brand_homeappliance_fan",
+            ATTR_PERCENTAGE: 25,
+        },
+        blocking=True,
+    )
+
+    mock_appliance.session.request.assert_awaited_once()
