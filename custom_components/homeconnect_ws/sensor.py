@@ -171,7 +171,7 @@ class HCSensor(HCEntity, SensorEntity):
             and self._entity is not None
             and self._entity.value is not None
         ):
-            return self._runtime_data.appliance.session.connected
+            return self._runtime_data.appliance.connected
         return super().available
 
 
@@ -195,7 +195,7 @@ class HCEventSensor(HCEntity, SensorEntity):
     @property
     def available(self) -> bool:
         return (
-            self._runtime_data.appliance.session.connected
+            self._runtime_data.appliance.connected
             or self._runtime_data.coordinator.expected_offline
         )
 
