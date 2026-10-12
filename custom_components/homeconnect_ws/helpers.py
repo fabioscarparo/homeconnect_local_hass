@@ -7,6 +7,7 @@ from dataclasses import dataclass, field
 from typing import TYPE_CHECKING, Any
 
 from home_disconnect import (
+    Access,
     AccessError,
     ConnectionClosedError,
     InvalidValueError,
@@ -20,7 +21,7 @@ from .const import DOMAIN
 if TYPE_CHECKING:
     from collections.abc import Callable, Coroutine
 
-    from home_disconnect import Access, Appliance
+    from home_disconnect import Appliance
     from home_disconnect import Entity as HcEntity
     from homeassistant.core import HomeAssistant, ServiceCall
 
@@ -84,13 +85,12 @@ def entity_is_available(
         available &= entity.available is not False
 
     if entity is not None and available_access is not None and hasattr(entity, "access"):
-        access = entity.access
-        # readStatic is read-only and fixed (e.g. an oven cavity's size): wherever
-        # READ counts as available, so does READ_STATIC.
-        if access is not None and access.value == "readstatic":
-            available &= any(a.value == "read" for a in available_access)
+        # READ_STATIC is read-only and fixed (e.g. an oven cavity's size): wherever READ
+        # counts as available, so does READ_STATIC.
+        if entity.access == Access.READ_STATIC:
+            available &= Access.READ in available_access
         else:
-            available &= access in available_access
+            available &= entity.access in available_access
     return available
 
 

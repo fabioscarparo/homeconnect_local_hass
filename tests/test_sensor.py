@@ -590,7 +590,7 @@ async def test_progress_unavailable_when_no_active_program_and_off() -> None:
     appliance = MagicMock()
     appliance.info = {"deviceID": "test_device_id"}
     appliance.active_program = None
-    appliance.session.connected = True
+    appliance.connected = True
     appliance.entities.get.return_value = MagicMock(value="Off")
     runtime_data = HCData(
         appliance=appliance,
@@ -610,7 +610,7 @@ async def test_progress_available_when_active_program_present() -> None:
     """The progress sensor stays available while a program is actually running."""
     appliance = MagicMock()
     appliance.info = {"deviceID": "test_device_id"}
-    appliance.session.connected = True
+    appliance.connected = True
     appliance.entities.get.return_value = MagicMock(value="Off")
     runtime_data = HCData(
         appliance=appliance,
@@ -691,7 +691,7 @@ async def test_progress_available_when_powered_on() -> None:
     appliance = MagicMock()
     appliance.info = {"deviceID": "test_device_id"}
     appliance.active_program = None
-    appliance.session.connected = True
+    appliance.connected = True
     appliance.entities.get.return_value = MagicMock(value="On")
     runtime_data = HCData(
         appliance=appliance,
@@ -714,7 +714,7 @@ def _elapsed_time_sensor(
     appliance = MagicMock()
     appliance.info = {"deviceID": "test_device_id"}
     appliance.active_program = active_program
-    appliance.session.connected = connected
+    appliance.connected = connected
     appliance.entities = {
         "Test.ElapsedProgramTime": MagicMock(value=value, enum=None, available=False),
         "BSH.Common.Setting.PowerState": MagicMock(value="On"),

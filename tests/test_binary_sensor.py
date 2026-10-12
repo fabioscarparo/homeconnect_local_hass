@@ -71,11 +71,13 @@ async def test_connection_sensor_clean_disconnect_attribute(
     mock_appliance: Appliance,
     patch_entity_description: None,
 ) -> None:
-    """clean_disconnect reflects the most recent close code, not current connectivity."""
+    """clean_disconnect says whether the connection ended with a normal close (code 1000)."""
     entity_id = "binary_sensor.fake_brand_homeappliance_connection"
     assert await setup_config_entry(hass, MOCK_CONFIG_DATA)
     entry = hass.config_entries.async_entries(DOMAIN)[0]
+    assert hass.states.get(entity_id).attributes["clean_disconnect"] is False
 
+    mock_appliance.session.connected = False
     mock_appliance.session.close_code = 1000
     entry.runtime_data.coordinator.async_set_updated_data(None)
     await hass.async_block_till_done()

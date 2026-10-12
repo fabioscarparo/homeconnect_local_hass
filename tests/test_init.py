@@ -21,6 +21,7 @@ from home_disconnect import (
     AccessError,
     Appliance,
     ConnectionFailedError,
+    ConnectionState,
     RemoteStartNotAllowedError,
     ResponseError,
     serialize_legacy_description,
@@ -353,13 +354,12 @@ async def test_washer_expected_offline_on_fresh_restart(
     appliance.session.close_code = 1006
     assert coord.expected_offline is False
 
-    # Actually connected must never read as expected_offline, regardless of
-    # last_close_code - confirmed live on fork issue #21: home_disconnect
-    # resets last_close_code back to None the moment a connection succeeds,
-    # so a fully-connected, always-online washer was getting force_off_*/
-    # clear_on_expected_offline entities (switch_power_state,
+    # Actually connected must never read as expected_offline - confirmed live on fork issue
+    # #21: a connection has no close code, so a fully-connected, always-online washer was
+    # getting force_off_*/clear_on_expected_offline entities (switch_power_state,
     # sensor_power_state, ...) stuck at their offline placeholder forever.
     appliance.session.connected = True
+    appliance.state = ConnectionState.CONNECTED
     appliance.session.close_code = None
     assert coord.expected_offline is False
     appliance.session.close_code = 1000
