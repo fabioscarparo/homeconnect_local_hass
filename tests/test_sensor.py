@@ -85,6 +85,22 @@ async def test_update(
     assert state.state == "5"
 
 
+async def test_update_value_fn(
+    hass: HomeAssistant,
+    mock_appliance: Appliance,
+    patch_entity_description: None,
+) -> None:
+    """Test that value_fn converts the appliance's value."""
+    entity_id = "sensor.fake_brand_homeappliance_sensor_scaled"
+    assert await setup_config_entry(hass, MOCK_CONFIG_DATA)
+
+    await update_entity(mock_appliance.entities["Test.Sensor"], {"value": 2500})
+    await hass.async_block_till_done()
+
+    state = hass.states.get(entity_id)
+    assert state.state == "2.5"
+
+
 async def test_callback_recovers_after_write_failure(
     hass: HomeAssistant,
     mock_appliance: Appliance,

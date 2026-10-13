@@ -4,6 +4,9 @@
             "switch_power_state": {
                 "default": "mdi:power"
             },
+            "switch_laundry_mini_load": {
+                "default": "mdi:tshirt-crew-outline"
+            },
             "switch_hygiene_plus": {
                 "default": "mdi:thermometer-plus"
             },
@@ -132,6 +135,36 @@
         "binary_sensor": {
             "connection": {},
             "binary_sensor_door_state": {},
+            "binary_sensor_confirm_permanent_remote_start": {
+                "default": "mdi:remote"
+            },
+            "binary_sensor_oven_insert_food_now": {
+                "default": "mdi:food"
+            },
+            "binary_sensor_oven_turn_food_now": {
+                "default": "mdi:rotate-3d-variant"
+            },
+            "binary_sensor_oven_regular_preheat_finished": {
+                "default": "mdi:thermometer-check"
+            },
+            "binary_sensor_oven_fast_preheat_finished": {
+                "default": "mdi:fast-forward"
+            },
+            "binary_sensor_oven_program_finished": {
+                "default": "mdi:check-circle-outline"
+            },
+            "binary_sensor_oven_program_aborted": {
+                "default": "mdi:cancel"
+            },
+            "binary_sensor_oven_open_door": {
+                "default": "mdi:door-open"
+            },
+            "binary_sensor_oven_close_door": {
+                "default": "mdi:door-closed"
+            },
+            "binary_sensor_oven_cavity_temperature_too_high": {
+                "default": "mdi:thermometer-alert"
+            },
             "binary_sensor_eco_dry_active": {},
             "binary_sensor_aqua_stop": {
                 "default": "mdi:water-check-outline",
@@ -302,6 +335,12 @@
             "sensor_water_forecast": {
                 "default": "mdi:water"
             },
+            "sensor_energy_consumed_last": {
+                "default": "mdi:lightning-bolt"
+            },
+            "sensor_water_consumed_last": {
+                "default": "mdi:water"
+            },
             "sensor_energy_forecast": {
                 "default": "mdi:lightning-bolt"
             },
@@ -459,6 +498,12 @@
             "select_hot_water": {
                 "default": "mdi:water-thermometer-outline"
             },
+            "select_laundry_pretreatment": {
+                "default": "mdi:hand-wash-outline"
+            },
+            "select_laundry_soak_temperature": {
+                "default": "mdi:thermometer-water"
+            },
             "select_rinse_aid": {
                 "default": "mdi:water-plus"
             },
@@ -543,6 +588,9 @@
             "select_oven_clock_display": {
                 "default": "mdi:clock-digital"
             },
+            "select_oven_meat_probe_temperature": {
+                "default": "mdi:thermometer-probe"
+            },
             "select_dishwasher_auto_power_off": {
                 "default": "mdi:power-sleep"
             },
@@ -587,6 +635,12 @@
             "button_pause_program": {
                 "default": "mdi:pause"
             },
+            "button_deactivate_remote_control": {
+                "default": "mdi:remote-off"
+            },
+            "button_deactivate_remote_control_start": {
+                "default": "mdi:remote-off"
+            },
             "button_resume_program": {
                 "default": "mdi:play"
             },
@@ -618,6 +672,12 @@
         "number": {
             "number_delay_start": {
                 "default": "mdi:timer-play-outline"
+            },
+            "number_laundry_soak_duration": {
+                "default": "mdi:timer-sand"
+            },
+            "number_oven_weight": {
+                "default": "mdi:weight-gram"
             },
             "number_fill_quantity": {},
             "number_coffee_display_brightness": {

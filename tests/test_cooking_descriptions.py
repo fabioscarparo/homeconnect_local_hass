@@ -4,8 +4,12 @@ from __future__ import annotations
 
 from typing import TYPE_CHECKING, Any
 
-from custom_components.homeconnect_ws.entity_descriptions.cooking import generate_oven_status
+from custom_components.homeconnect_ws.entity_descriptions.cooking import (
+    generate_oven_event,
+    generate_oven_status,
+)
 from home_disconnect import Access
+from homeassistant.components.binary_sensor import BinarySensorDeviceClass
 from homeassistant.const import UnitOfTemperature
 
 if TYPE_CHECKING:
@@ -153,3 +157,69 @@ async def test_generate_oven_status_water_tank_partial(
         "Cooking.Oven.Status.Cavity.001.WaterTankEmpty"
     ]
     assert descriptions["event_sensor"][0].options == ["empty", "ok"]
+
+
+def _cavity_event(uid: int, cavity: str, name: str) -> dict[str, Any]:
+    return {
+        "uid": uid,
+        "name": f"Cooking.Oven.Event.Cavity.{cavity}.{name}",
+        "contentType": "enumeration",
+        "enumeration": {"0": "Off", "1": "Present", "2": "Confirmed"},
+        "protocolType": "Integer",
+    }
+
+
+async def test_generate_oven_event_cooking_hints(
+    mock_homeconnect_appliance: MockApplianceFactory,
+) -> None:
+    """Cooking hints and the temperature alert become binary sensors per cavity."""
+    description = {
+        "event": [
+            _cavity_event(6131, "001", "AlarmClockElapsed"),
+            _cavity_event(6343, "001", "InsertFoodNow"),
+            _cavity_event(6340, "001", "TurnFoodNow"),
+            _cavity_event(6118, "001", "CavityTemperatureTooHigh"),
+        ]
+    }
+    appliance = await mock_homeconnect_appliance(description=description)
+    sensors = {
+        description.translation_key: description
+        for description in generate_oven_event(appliance)["binary_sensor"]
+    }
+
+    assert sorted(sensors) == [
+        "binary_sensor_oven_alarm_clock_elapsed",
+        "binary_sensor_oven_cavity_temperature_too_high",
+        "binary_sensor_oven_insert_food_now",
+        "binary_sensor_oven_turn_food_now",
+    ]
+    insert_food = sensors["binary_sensor_oven_insert_food_now"]
+    assert insert_food.key == "binary_sensor_oven_insert_food_now_001"
+    assert insert_food.entity == "Cooking.Oven.Event.Cavity.001.InsertFoodNow"
+    assert insert_food.translation_placeholders == {"group_name": ""}
+    assert insert_food.value_on == {"Present", "Confirmed"}
+    assert insert_food.entity_registry_enabled_default
+    # A problem sensor: disabled by default, it feeds the appliance's Problem sensor
+    too_hot = sensors["binary_sensor_oven_cavity_temperature_too_high"]
+    assert too_hot.device_class == BinarySensorDeviceClass.PROBLEM
+    assert not too_hot.entity_registry_enabled_default
+
+
+async def test_generate_oven_event_cooking_hints_per_cavity(
+    mock_homeconnect_appliance: MockApplianceFactory,
+) -> None:
+    """With two cavities, each gets its own hints, told apart by number."""
+    description = {
+        "event": [
+            _cavity_event(1, "001", "ProgramFinished"),
+            _cavity_event(2, "002", "ProgramFinished"),
+        ]
+    }
+    appliance = await mock_homeconnect_appliance(description=description)
+    sensors = generate_oven_event(appliance)["binary_sensor"]
+
+    assert [sensor.key for sensor in sensors] == [
+        "binary_sensor_oven_program_finished_001",
+        "binary_sensor_oven_program_finished_002",
+    ]
+    assert [sensor.translation_placeholders["group_name"] for sensor in sensors] == [" 1", " 2"]

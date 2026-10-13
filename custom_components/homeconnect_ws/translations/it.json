@@ -98,6 +98,9 @@
       "switch_laundry_speed_perfect": {
         "name": "Velocità perfetta"
       },
+      "switch_laundry_mini_load": {
+        "name": "Mini"
+      },
       "switch_laundry_gentle": {
         "name": "Delicato"
       },
@@ -196,6 +199,33 @@
       "binary_sensor_door_state": {
         "name": "Porta"
       },
+      "binary_sensor_oven_insert_food_now": {
+        "name": "Inserire il cibo ora{group_name}"
+      },
+      "binary_sensor_oven_turn_food_now": {
+        "name": "Girare il cibo ora{group_name}"
+      },
+      "binary_sensor_oven_regular_preheat_finished": {
+        "name": "Preriscaldamento terminato{group_name}"
+      },
+      "binary_sensor_oven_fast_preheat_finished": {
+        "name": "Riscaldamento rapido terminato{group_name}"
+      },
+      "binary_sensor_oven_program_finished": {
+        "name": "Programma completato{group_name}"
+      },
+      "binary_sensor_oven_program_aborted": {
+        "name": "Programma annullato{group_name}"
+      },
+      "binary_sensor_oven_open_door": {
+        "name": "Aprire la porta{group_name}"
+      },
+      "binary_sensor_oven_close_door": {
+        "name": "Chiudere la porta{group_name}"
+      },
+      "binary_sensor_oven_cavity_temperature_too_high": {
+        "name": "Temperatura del forno troppo alta{group_name}"
+      },
       "binary_sensor_eco_dry_active": {
         "name": "EcoDry Attivo"
       },
@@ -210,6 +240,9 @@
       },
       "binary_remote_start_allowed": {
         "name": "Avvio remoto consentito"
+      },
+      "binary_sensor_confirm_permanent_remote_start": {
+        "name": "Conferma l'avvio remoto permanente"
       },
       "binary_sensor_refresher_level": {
         "name": "Livello riempimento Refresher",
@@ -390,6 +423,12 @@
       "sensor_energy_forecast": {
         "name": "Previsione energia"
       },
+      "sensor_energy_consumed_last": {
+        "name": "Consumo energia ultimo programma"
+      },
+      "sensor_water_consumed_last": {
+        "name": "Consumo acqua ultimo programma"
+      },
       "sensor_operation_state": {
         "name": "Stato funzionamento",
         "state": {
@@ -565,7 +604,7 @@
         "name": "Spegnimento ritardato"
       },
       "sensor_power_state": {
-        "name": "Stato funzionamento",
+        "name": "Stato alimentazione",
         "state": {
           "mainsoff": "Alimentazione spenta",
           "off": "Spento",
@@ -1120,7 +1159,7 @@
         }
       },
       "select_laundry_sound_volume": {
-        "name": "Volume segnale tastiera",
+        "name": "Volume suoni",
         "state": {
           "off": "Spento",
           "volume1": "Volume 1",
@@ -1131,6 +1170,34 @@
       },
       "select_laundry_power_rating": {
         "name": "Potenza di alimentazione"
+      },
+      "select_laundry_pretreatment": {
+        "name": "Pretrattamento",
+        "state": {
+          "off": "Off",
+          "prewash": "Prelavaggio",
+          "handsoak": "Ammollo a mano"
+        }
+      },
+      "select_laundry_soak_temperature": {
+        "name": "Temperatura ammollo",
+        "state": {
+          "cold": "Freddo",
+          "gc20": "20°C",
+          "ulcold": "Ultra Freddo",
+          "ulwarm": "Ultra Tiepido",
+          "ulhot": "Ultra Caldo",
+          "ulextrahot": "Ultra Extra Caldo",
+          "gc30": "30°C",
+          "auto": "Auto",
+          "max": "Max",
+          "gc40": "40°C",
+          "gc50": "50°C",
+          "gc60": "60°C",
+          "gc70": "70°C",
+          "gc80": "80°C",
+          "gc90": "90°C"
+        }
       },
       "select_laundry_wrinkle_guard": {
         "name": "Protezione antipiega",
@@ -1473,6 +1540,12 @@
       },
       "button_start_program": {
         "name": "Avviare"
+      },
+      "button_deactivate_remote_control": {
+        "name": "Disattiva il controllo remoto"
+      },
+      "button_deactivate_remote_control_start": {
+        "name": "Disattiva l'avvio remoto"
       }
     },
     "number": {
@@ -1490,6 +1563,9 @@
       },
       "number_laundry_spin_class": {
         "name": "Classe rotazione"
+      },
+      "number_laundry_soak_duration": {
+        "name": "Durata ammollo"
       },
       "number_setpoint_freezer": {
         "name": "Temperatura congelatore"
@@ -1511,6 +1587,9 @@
       },
       "number_oven_display_brightness": {
         "name": "Luminosità display"
+      },
+      "number_oven_weight": {
+        "name": "Peso"
       },
       "number_oven_sound_volume": {
         "name": "Volume"

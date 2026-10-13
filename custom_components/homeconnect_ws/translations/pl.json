@@ -3351,7 +3351,7 @@
         }
       },
       "select_laundry_sound_volume": {
-        "name": "Głośność sygnału klawiszy",
+        "name": "Głośność dźwięku",
         "state": {
           "off": "wyłączone",
           "volume1": "głośność 1",
@@ -3429,7 +3429,7 @@
         }
       },
       "select_laundry_refresher": {
-        "name": "Cel suszenia",
+        "name": "Odświeżanie",
         "state": {
           "shirt1": "koszula 1",
           "shirt5": "koszula 5",

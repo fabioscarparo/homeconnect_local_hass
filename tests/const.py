@@ -200,6 +200,12 @@ ENTITY_DESCRIPTIONS: _EntityDescriptionsType = {
             entity="Test.Sensor.Enum",
             device_class=SensorDeviceClass.ENUM,
         ),
+        HCSensorEntityDescription(
+            key="Test.Sensor.Scaled",
+            name="Sensor.Scaled",
+            entity="Test.Sensor",
+            value_fn=lambda value: value / 1000 if isinstance(value, int | float) else None,
+        ),
     ],
     "start_button": [
         HCButtonEntityDescription(

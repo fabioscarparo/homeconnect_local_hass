@@ -187,6 +187,9 @@
       "switch_laundry_intensive_plus": {
         "name": "Intensive Plus"
       },
+      "switch_laundry_mini_load": {
+        "name": "Mini load"
+      },
       "switch_laundry_less_ironing": {
         "name": "Less Ironing"
       },
@@ -365,6 +368,9 @@
       },
       "binary_remote_start_allowed": {
         "name": "Remote start allowed"
+      },
+      "binary_sensor_confirm_permanent_remote_start": {
+        "name": "Confirm permanent remote start"
       },
       "binary_sensor_refresher_level": {
         "name": "Refresher fill level",
@@ -570,6 +576,33 @@
       },
       "binary_sensor_oven_alarm_clock_elapsed": {
         "name": "Alarm Clock Elapsed{group_name}"
+      },
+      "binary_sensor_oven_insert_food_now": {
+        "name": "Insert food now{group_name}"
+      },
+      "binary_sensor_oven_turn_food_now": {
+        "name": "Turn food now{group_name}"
+      },
+      "binary_sensor_oven_regular_preheat_finished": {
+        "name": "Preheating finished{group_name}"
+      },
+      "binary_sensor_oven_fast_preheat_finished": {
+        "name": "Fast preheating finished{group_name}"
+      },
+      "binary_sensor_oven_program_finished": {
+        "name": "Program finished{group_name}"
+      },
+      "binary_sensor_oven_program_aborted": {
+        "name": "Program aborted{group_name}"
+      },
+      "binary_sensor_oven_open_door": {
+        "name": "Open the door{group_name}"
+      },
+      "binary_sensor_oven_close_door": {
+        "name": "Close the door{group_name}"
+      },
+      "binary_sensor_oven_cavity_temperature_too_high": {
+        "name": "Cavity temperature too high{group_name}"
       },
       "binary_sensor_alarm_clock_elapsed": {
         "name": "Alarm Clock Elapsed"
@@ -1845,6 +1878,27 @@
           "soakfinished": "Soak finished",
           "anyphase": "Any Phase"
         }
+      },
+      "sensor_energy_consumed": {
+        "name": "Energy consumed"
+      },
+      "sensor_water_consumed": {
+        "name": "Water consumed"
+      },
+      "sensor_energy_consumed_last": {
+        "name": "Last program energy"
+      },
+      "sensor_water_consumed_last": {
+        "name": "Last program water"
+      },
+      "sensor_laundry_load": {
+        "name": "Laundry load"
+      },
+      "sensor_laundry_detergent_consumed": {
+        "name": "Detergent consumed"
+      },
+      "sensor_laundry_softener_consumed": {
+        "name": "Softener consumed"
       },
       "sensor_count_completed": {
         "name": "Completed count"
@@ -3603,7 +3657,7 @@
         }
       },
       "select_laundry_sound_volume": {
-        "name": "Key Signal volume",
+        "name": "Sound volume",
         "state": {
           "off": "Off",
           "volume1": "Volume 1",
@@ -3680,8 +3734,16 @@
           "extradry": "Extra dry"
         }
       },
+      "select_laundry_program_mode": {
+        "name": "Program mode",
+        "state": {
+          "washing": "Washing",
+          "washinganddrying": "Washing and drying",
+          "drying": "Drying"
+        }
+      },
       "select_laundry_refresher": {
-        "name": "Drying target",
+        "name": "Refresher",
         "state": {
           "shirt1": "Shirt 1",
           "shirt5": "Shirt 5",
@@ -3735,6 +3797,34 @@
           "plus1": "Plus 1",
           "plus2": "Plus 2",
           "plus3": "Plus 3"
+        }
+      },
+      "select_laundry_pretreatment": {
+        "name": "Pre-treatment",
+        "state": {
+          "off": "Off",
+          "prewash": "Prewash",
+          "handsoak": "Hand soak"
+        }
+      },
+      "select_laundry_soak_temperature": {
+        "name": "Soak temperature",
+        "state": {
+          "cold": "Cold",
+          "gc20": "20°C",
+          "ulcold": "Ultra Cold",
+          "ulwarm": "Ultra Warm",
+          "ulhot": "Ultra Hot",
+          "ulextrahot": "Ultra Extra Hot",
+          "gc30": "30°C",
+          "auto": "Auto",
+          "max": "Max",
+          "gc40": "40°C",
+          "gc50": "50°C",
+          "gc60": "60°C",
+          "gc70": "70°C",
+          "gc80": "80°C",
+          "gc90": "90°C"
         }
       },
       "select_laundry_rinseplus": {
@@ -3825,6 +3915,82 @@
           "level01": "Level 1",
           "level02": "Level 2",
           "level03": "Level 3"
+        }
+      },
+      "select_oven_meat_probe_temperature": {
+        "name": "Meat probe target temperature",
+        "state": {
+          "off": "Off",
+          "30dc": "30 °C",
+          "31dc": "31 °C",
+          "32dc": "32 °C",
+          "33dc": "33 °C",
+          "34dc": "34 °C",
+          "35dc": "35 °C",
+          "36dc": "36 °C",
+          "37dc": "37 °C",
+          "38dc": "38 °C",
+          "39dc": "39 °C",
+          "40dc": "40 °C",
+          "41dc": "41 °C",
+          "42dc": "42 °C",
+          "43dc": "43 °C",
+          "44dc": "44 °C",
+          "45dc": "45 °C",
+          "46dc": "46 °C",
+          "47dc": "47 °C",
+          "48dc": "48 °C",
+          "49dc": "49 °C",
+          "50dc": "50 °C",
+          "51dc": "51 °C",
+          "52dc": "52 °C",
+          "53dc": "53 °C",
+          "54dc": "54 °C",
+          "55dc": "55 °C",
+          "56dc": "56 °C",
+          "57dc": "57 °C",
+          "58dc": "58 °C",
+          "59dc": "59 °C",
+          "60dc": "60 °C",
+          "61dc": "61 °C",
+          "62dc": "62 °C",
+          "63dc": "63 °C",
+          "64dc": "64 °C",
+          "65dc": "65 °C",
+          "66dc": "66 °C",
+          "67dc": "67 °C",
+          "68dc": "68 °C",
+          "69dc": "69 °C",
+          "70dc": "70 °C",
+          "71dc": "71 °C",
+          "72dc": "72 °C",
+          "73dc": "73 °C",
+          "74dc": "74 °C",
+          "75dc": "75 °C",
+          "76dc": "76 °C",
+          "77dc": "77 °C",
+          "78dc": "78 °C",
+          "79dc": "79 °C",
+          "80dc": "80 °C",
+          "81dc": "81 °C",
+          "82dc": "82 °C",
+          "83dc": "83 °C",
+          "84dc": "84 °C",
+          "85dc": "85 °C",
+          "86dc": "86 °C",
+          "87dc": "87 °C",
+          "88dc": "88 °C",
+          "89dc": "89 °C",
+          "90dc": "90 °C",
+          "91dc": "91 °C",
+          "92dc": "92 °C",
+          "93dc": "93 °C",
+          "94dc": "94 °C",
+          "95dc": "95 °C",
+          "96dc": "96 °C",
+          "97dc": "97 °C",
+          "98dc": "98 °C",
+          "99dc": "99 °C"
         }
       },
       "select_oven_used_heating_mode": {
@@ -4110,6 +4276,12 @@
       "button_mains_power_off": {
         "name": "PowerOFF"
       },
+      "button_deactivate_remote_control": {
+        "name": "Deactivate remote control"
+      },
+      "button_deactivate_remote_control_start": {
+        "name": "Deactivate remote start"
+      },
       "button_sync_time": {
         "name": "Sync time from Home Assistant"
       },
@@ -4151,6 +4323,9 @@
       "number_laundry_spin_class": {
         "name": "Spin class"
       },
+      "number_laundry_soak_duration": {
+        "name": "Soak duration"
+      },
       "number_setpoint_freezer": {
         "name": "Freezer Temperature"
       },
@@ -4174,6 +4349,9 @@
       },
       "number_oven_display_brightness": {
         "name": "Display brightness"
+      },
+      "number_oven_weight": {
+        "name": "Weight"
       },
       "number_hood_interval_off": {
         "name": "Interval time off"

@@ -108,6 +108,10 @@ class HCSensorEntityDescription(
     # going up. Shows the value anyway while a program is active (and there
     # is a value), falling back to the appliance's own flag otherwise.
     available_while_program_active: bool = False
+    # Converts the appliance's value before it's shown, for a unit HA's
+    # device class doesn't accept (water in mL) or a value that means
+    # "not measured yet".
+    value_fn: Callable[[StateType], StateType] | None = None
 
 
 def keep_known_events(
