@@ -3351,7 +3351,7 @@
         }
       },
       "select_laundry_sound_volume": {
-        "name": "Głośność sygnału klawiszy",
+        "name": "Głośność dźwięku",
         "state": {
           "off": "wyłączone",
           "volume1": "głośność 1",

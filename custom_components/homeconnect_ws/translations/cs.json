@@ -1570,7 +1570,7 @@
         }
       },
       "select_laundry_sound_volume": {
-        "name": "Hlasitost tlačítek",
+        "name": "Hlasitost zvuku",
         "state": {
           "off": "Vypnuto",
           "volume1": "Hlasitost 1",
