@@ -187,6 +187,9 @@
       "switch_laundry_intensive_plus": {
         "name": "Intensive Plus"
       },
+      "switch_laundry_mini_load": {
+        "name": "Mini load"
+      },
       "switch_laundry_less_ironing": {
         "name": "Less Ironing"
       },
@@ -365,6 +368,9 @@
       },
       "binary_remote_start_allowed": {
         "name": "Remote start allowed"
+      },
+      "binary_sensor_confirm_permanent_remote_start": {
+        "name": "Confirm permanent remote start"
       },
       "binary_sensor_refresher_level": {
         "name": "Refresher fill level",
@@ -570,6 +576,33 @@
       },
       "binary_sensor_oven_alarm_clock_elapsed": {
         "name": "Alarm Clock Elapsed{group_name}"
+      },
+      "binary_sensor_oven_insert_food_now": {
+        "name": "Insert food now{group_name}"
+      },
+      "binary_sensor_oven_turn_food_now": {
+        "name": "Turn food now{group_name}"
+      },
+      "binary_sensor_oven_regular_preheat_finished": {
+        "name": "Preheating finished{group_name}"
+      },
+      "binary_sensor_oven_fast_preheat_finished": {
+        "name": "Fast preheating finished{group_name}"
+      },
+      "binary_sensor_oven_program_finished": {
+        "name": "Program finished{group_name}"
+      },
+      "binary_sensor_oven_program_aborted": {
+        "name": "Program aborted{group_name}"
+      },
+      "binary_sensor_oven_open_door": {
+        "name": "Open the door{group_name}"
+      },
+      "binary_sensor_oven_close_door": {
+        "name": "Close the door{group_name}"
+      },
+      "binary_sensor_oven_cavity_temperature_too_high": {
+        "name": "Cavity temperature too high{group_name}"
       },
       "binary_sensor_alarm_clock_elapsed": {
         "name": "Alarm Clock Elapsed"
@@ -1851,6 +1884,12 @@
       },
       "sensor_water_consumed": {
         "name": "Water consumed"
+      },
+      "sensor_energy_consumed_last": {
+        "name": "Last program energy"
+      },
+      "sensor_water_consumed_last": {
+        "name": "Last program water"
       },
       "sensor_laundry_load": {
         "name": "Laundry load"
@@ -3760,6 +3799,34 @@
           "plus3": "Plus 3"
         }
       },
+      "select_laundry_pretreatment": {
+        "name": "Pre-treatment",
+        "state": {
+          "off": "Off",
+          "prewash": "Prewash",
+          "handsoak": "Hand soak"
+        }
+      },
+      "select_laundry_soak_temperature": {
+        "name": "Soak temperature",
+        "state": {
+          "cold": "Cold",
+          "gc20": "20°C",
+          "ulcold": "Ultra Cold",
+          "ulwarm": "Ultra Warm",
+          "ulhot": "Ultra Hot",
+          "ulextrahot": "Ultra Extra Hot",
+          "gc30": "30°C",
+          "auto": "Auto",
+          "max": "Max",
+          "gc40": "40°C",
+          "gc50": "50°C",
+          "gc60": "60°C",
+          "gc70": "70°C",
+          "gc80": "80°C",
+          "gc90": "90°C"
+        }
+      },
       "select_laundry_rinseplus": {
         "name": "Rinse Plus",
         "state": {
@@ -4209,6 +4276,12 @@
       "button_mains_power_off": {
         "name": "PowerOFF"
       },
+      "button_deactivate_remote_control": {
+        "name": "Deactivate remote control"
+      },
+      "button_deactivate_remote_control_start": {
+        "name": "Deactivate remote start"
+      },
       "button_sync_time": {
         "name": "Sync time from Home Assistant"
       },
@@ -4250,6 +4323,9 @@
       "number_laundry_spin_class": {
         "name": "Spin class"
       },
+      "number_laundry_soak_duration": {
+        "name": "Soak duration"
+      },
       "number_setpoint_freezer": {
         "name": "Freezer Temperature"
       },
@@ -4273,6 +4349,9 @@
       },
       "number_oven_display_brightness": {
         "name": "Display brightness"
+      },
+      "number_oven_weight": {
+        "name": "Weight"
       },
       "number_hood_interval_off": {
         "name": "Interval time off"

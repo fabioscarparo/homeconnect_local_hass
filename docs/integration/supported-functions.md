@@ -16,6 +16,8 @@ The following entities are available. Which ones appear depends on the appliance
 | Power State | Switch / Select | Turn the appliance on or off |
 | Child Lock | Switch | Lock the physical controls |
 | Remote Start Allowed | Binary Sensor | Whether remote control is enabled on the device |
+| Deactivate Remote Control / Remote Start | Button | Turns remote control or remote start off again, until it is turned on at the appliance |
+| Confirm Permanent Remote Start | Binary Sensor | Turns on when the appliance asks to confirm permanent remote start on its display |
 | Door State | Binary Sensor / Sensor | Whether the door is open or closed |
 | Program Finished | Binary Sensor | Turns on when the current cycle completes |
 | Wi-Fi Signal Strength | Sensor | Device's Wi-Fi signal strength - polled hourly (see Data Updates), not pushed like everything else |
@@ -61,6 +63,8 @@ Some entites are excluded from this integration on purpose, even though the Home
 
 - Program options
   - Temperature, spin speed, prewash, rinse plus, gentle cycle, hygienic steam
+- Mini load, pre-treatment and soak options
+  - Mini load switch, pre-treatment (prewash or hand soak), soak temperature and soak duration
 - iDos automatic dosing (levels 1 & 2)
   - Automatic detergent dosing levels
 - Drum light and door ring LED control
@@ -69,6 +73,8 @@ Some entites are excluded from this integration on purpose, even though the Home
   - Keeps tumbling laundry after a cycle ends to prevent wrinkles
 - Maintenance reminders
   - Drum clean, lint filter full
+- Energy and water used by the last program
+  - Updated when a program ends, and kept when Home Assistant reconnects to the appliance
 - Condensate container alert (dryer)
   - Alerts when the condensate/water container needs emptying
 
@@ -82,6 +88,12 @@ Some entites are excluded from this integration on purpose, even though the Home
   - Choose the oven's heating mode (e.g. top/bottom heat, convection)
 - Fast preheat
   - Speeds up preheating to the target temperature
+- Cooking hints
+  - When to put in or turn the food, when preheating has finished, and when to open or close the door
+- Program finished and program aborted
+  - Turn on when the oven ends or stops a program
+- Weight for automatic programs
+  - The weight of the dish, for the programs that cook by weight
 - Sabbath mode
   - Disables automatic timers/notifications for Sabbath observance
 - Convection conversion
