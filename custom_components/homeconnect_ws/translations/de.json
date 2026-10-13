@@ -3956,6 +3956,14 @@
           "extradry": "Extratrocken"
         }
       },
+      "select_laundry_program_mode": {
+        "name": "Programmmodus",
+        "state": {
+          "washing": "Waschen",
+          "washinganddrying": "Waschen und Trocknen",
+          "drying": "Trocknen"
+        }
+      },
       "select_laundry_refresher": {
         "name": "Trockenziel",
         "state": {
