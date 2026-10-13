@@ -650,6 +650,11 @@ COOKING_ENTITY_DESCRIPTIONS: _EntityDescriptionsDefinitionsType = {
             has_state_translation=True,
         ),
         HCSelectEntityDescription(
+            key="select_oven_meat_probe_temperature",
+            entity="Cooking.Oven.Option.MeatProbeTemperatureV2",
+            has_state_translation=True,
+        ),
+        HCSelectEntityDescription(
             key="select_pyrolysis_level",
             entity="Cooking.Oven.Option.PyrolysisLevel",
             has_state_translation=True,

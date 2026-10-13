@@ -543,6 +543,9 @@
             "select_oven_clock_display": {
                 "default": "mdi:clock-digital"
             },
+            "select_oven_meat_probe_temperature": {
+                "default": "mdi:thermometer-probe"
+            },
             "select_dishwasher_auto_power_off": {
                 "default": "mdi:power-sleep"
             },
