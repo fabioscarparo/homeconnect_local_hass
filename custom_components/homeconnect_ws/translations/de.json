@@ -551,6 +551,33 @@
       "binary_sensor_oven_alarm_clock_elapsed": {
         "name": "Alarm abgelaufen{group_name}"
       },
+      "binary_sensor_oven_insert_food_now": {
+        "name": "Gargut jetzt einschieben{group_name}"
+      },
+      "binary_sensor_oven_turn_food_now": {
+        "name": "Gargut jetzt wenden{group_name}"
+      },
+      "binary_sensor_oven_regular_preheat_finished": {
+        "name": "Vorheizen beendet{group_name}"
+      },
+      "binary_sensor_oven_fast_preheat_finished": {
+        "name": "Schnellaufheizen beendet{group_name}"
+      },
+      "binary_sensor_oven_program_finished": {
+        "name": "Programm beendet{group_name}"
+      },
+      "binary_sensor_oven_program_aborted": {
+        "name": "Programm abgebrochen{group_name}"
+      },
+      "binary_sensor_oven_open_door": {
+        "name": "Tür öffnen{group_name}"
+      },
+      "binary_sensor_oven_close_door": {
+        "name": "Tür schließen{group_name}"
+      },
+      "binary_sensor_oven_cavity_temperature_too_high": {
+        "name": "Garraumtemperatur zu hoch{group_name}"
+      },
       "binary_sensor_alarm_clock_elapsed": {
         "name": "Alarm abgelaufen"
       },
@@ -4641,6 +4668,9 @@
       },
       "number_oven_display_brightness": {
         "name": "Display Helligkeit"
+      },
+      "number_oven_weight": {
+        "name": "Gewicht"
       },
       "number_oven_sound_volume": {
         "name": "Lautstärke"

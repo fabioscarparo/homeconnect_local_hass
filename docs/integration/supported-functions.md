@@ -84,6 +84,12 @@ Some entites are excluded from this integration on purpose, even though the Home
   - Choose the oven's heating mode (e.g. top/bottom heat, convection)
 - Fast preheat
   - Speeds up preheating to the target temperature
+- Cooking hints
+  - When to put in or turn the food, when preheating has finished, and when to open or close the door
+- Program finished and program aborted
+  - Turn on when the oven ends or stops a program
+- Weight for automatic programs
+  - The weight of the dish, for the programs that cook by weight
 - Sabbath mode
   - Disables automatic timers/notifications for Sabbath observance
 - Convection conversion

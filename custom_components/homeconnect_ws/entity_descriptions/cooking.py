@@ -9,7 +9,13 @@ from homeassistant.components.binary_sensor.const import BinarySensorDeviceClass
 from homeassistant.components.number import NumberDeviceClass, NumberMode
 from homeassistant.components.sensor import SensorDeviceClass
 from homeassistant.components.switch.const import SwitchDeviceClass
-from homeassistant.const import PERCENTAGE, EntityCategory, UnitOfTemperature, UnitOfTime
+from homeassistant.const import (
+    PERCENTAGE,
+    EntityCategory,
+    UnitOfMass,
+    UnitOfTemperature,
+    UnitOfTime,
+)
 
 from .descriptions_definitions import (
     EntityDescriptions,
@@ -161,6 +167,24 @@ def generate_oven_status(appliance: Appliance) -> EntityDescriptions:
     return descriptions
 
 
+# What the oven asks for or reports while cooking: event name, key, device class
+_OVEN_COOKING_EVENTS = (
+    ("InsertFoodNow", "binary_sensor_oven_insert_food_now", None),
+    ("TurnFoodNow", "binary_sensor_oven_turn_food_now", None),
+    ("RegularPreheatFinished", "binary_sensor_oven_regular_preheat_finished", None),
+    ("FastPreheatFinished", "binary_sensor_oven_fast_preheat_finished", None),
+    ("ProgramFinished", "binary_sensor_oven_program_finished", None),
+    ("ProgramAborted", "binary_sensor_oven_program_aborted", None),
+    ("OpenDoor", "binary_sensor_oven_open_door", None),
+    ("CloseDoor", "binary_sensor_oven_close_door", None),
+    (
+        "CavityTemperatureTooHigh",
+        "binary_sensor_oven_cavity_temperature_too_high",
+        BinarySensorDeviceClass.PROBLEM,
+    ),
+)
+
+
 def generate_oven_event(appliance: Appliance) -> EntityDescriptions:
     """Get Oven event descriptions."""
     groups = appliance.group_ids("Cooking.Oven.Event.Cavity")
@@ -183,6 +207,23 @@ def generate_oven_event(appliance: Appliance) -> EntityDescriptions:
                     value_off={"Off"},
                 )
             )
+
+        for event, key, device_class in _OVEN_COOKING_EVENTS:
+            entity = f"Cooking.Oven.Event.Cavity.{group}.{event}"
+            if entity in appliance.entities:
+                descriptions["binary_sensor"].append(
+                    HCBinarySensorEntityDescription(
+                        key=f"{key}_{group}",
+                        translation_key=key,
+                        translation_placeholders={"group_name": group_name},
+                        entity=entity,
+                        device_class=device_class,
+                        # Problem sensors feed the appliance's Problem sensor instead
+                        entity_registry_enabled_default=device_class is None,
+                        value_on={"Present", "Confirmed"},
+                        value_off={"Off"},
+                    )
+                )
 
     return descriptions
 
@@ -577,6 +618,13 @@ COOKING_ENTITY_DESCRIPTIONS: _EntityDescriptionsDefinitionsType = {
             device_class=NumberDeviceClass.TEMPERATURE,
             native_unit_of_measurement=UnitOfTemperature.FAHRENHEIT,
             mode=NumberMode.AUTO,
+        ),
+        HCNumberEntityDescription(
+            key="number_oven_weight",
+            entity="Cooking.Oven.Option.Weight",
+            device_class=NumberDeviceClass.WEIGHT,
+            native_unit_of_measurement=UnitOfMass.GRAMS,
+            mode=NumberMode.BOX,
         ),
         HCNumberEntityDescription(
             key="number_oven_display_brightness",

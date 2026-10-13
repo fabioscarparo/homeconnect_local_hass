@@ -571,6 +571,33 @@
       "binary_sensor_oven_alarm_clock_elapsed": {
         "name": "Alarm Clock Elapsed{group_name}"
       },
+      "binary_sensor_oven_insert_food_now": {
+        "name": "Insert food now{group_name}"
+      },
+      "binary_sensor_oven_turn_food_now": {
+        "name": "Turn food now{group_name}"
+      },
+      "binary_sensor_oven_regular_preheat_finished": {
+        "name": "Preheating finished{group_name}"
+      },
+      "binary_sensor_oven_fast_preheat_finished": {
+        "name": "Fast preheating finished{group_name}"
+      },
+      "binary_sensor_oven_program_finished": {
+        "name": "Program finished{group_name}"
+      },
+      "binary_sensor_oven_program_aborted": {
+        "name": "Program aborted{group_name}"
+      },
+      "binary_sensor_oven_open_door": {
+        "name": "Open the door{group_name}"
+      },
+      "binary_sensor_oven_close_door": {
+        "name": "Close the door{group_name}"
+      },
+      "binary_sensor_oven_cavity_temperature_too_high": {
+        "name": "Cavity temperature too high{group_name}"
+      },
       "binary_sensor_alarm_clock_elapsed": {
         "name": "Alarm Clock Elapsed"
       },
@@ -4279,6 +4306,9 @@
       },
       "number_oven_display_brightness": {
         "name": "Display brightness"
+      },
+      "number_oven_weight": {
+        "name": "Weight"
       },
       "number_hood_interval_off": {
         "name": "Interval time off"

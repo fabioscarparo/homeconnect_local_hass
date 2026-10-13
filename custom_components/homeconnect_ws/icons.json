@@ -132,6 +132,33 @@
         "binary_sensor": {
             "connection": {},
             "binary_sensor_door_state": {},
+            "binary_sensor_oven_insert_food_now": {
+                "default": "mdi:food"
+            },
+            "binary_sensor_oven_turn_food_now": {
+                "default": "mdi:rotate-3d-variant"
+            },
+            "binary_sensor_oven_regular_preheat_finished": {
+                "default": "mdi:thermometer-check"
+            },
+            "binary_sensor_oven_fast_preheat_finished": {
+                "default": "mdi:fast-forward"
+            },
+            "binary_sensor_oven_program_finished": {
+                "default": "mdi:check-circle-outline"
+            },
+            "binary_sensor_oven_program_aborted": {
+                "default": "mdi:cancel"
+            },
+            "binary_sensor_oven_open_door": {
+                "default": "mdi:door-open"
+            },
+            "binary_sensor_oven_close_door": {
+                "default": "mdi:door-closed"
+            },
+            "binary_sensor_oven_cavity_temperature_too_high": {
+                "default": "mdi:thermometer-alert"
+            },
             "binary_sensor_eco_dry_active": {},
             "binary_sensor_aqua_stop": {
                 "default": "mdi:water-check-outline",
@@ -627,6 +654,9 @@
         "number": {
             "number_delay_start": {
                 "default": "mdi:timer-play-outline"
+            },
+            "number_oven_weight": {
+                "default": "mdi:weight-gram"
             },
             "number_fill_quantity": {},
             "number_coffee_display_brightness": {

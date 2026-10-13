@@ -196,6 +196,33 @@
       "binary_sensor_door_state": {
         "name": "Porta"
       },
+      "binary_sensor_oven_insert_food_now": {
+        "name": "Inserire il cibo ora{group_name}"
+      },
+      "binary_sensor_oven_turn_food_now": {
+        "name": "Girare il cibo ora{group_name}"
+      },
+      "binary_sensor_oven_regular_preheat_finished": {
+        "name": "Preriscaldamento terminato{group_name}"
+      },
+      "binary_sensor_oven_fast_preheat_finished": {
+        "name": "Riscaldamento rapido terminato{group_name}"
+      },
+      "binary_sensor_oven_program_finished": {
+        "name": "Programma completato{group_name}"
+      },
+      "binary_sensor_oven_program_aborted": {
+        "name": "Programma annullato{group_name}"
+      },
+      "binary_sensor_oven_open_door": {
+        "name": "Aprire la porta{group_name}"
+      },
+      "binary_sensor_oven_close_door": {
+        "name": "Chiudere la porta{group_name}"
+      },
+      "binary_sensor_oven_cavity_temperature_too_high": {
+        "name": "Temperatura del forno troppo alta{group_name}"
+      },
       "binary_sensor_eco_dry_active": {
         "name": "EcoDry Attivo"
       },
@@ -1517,6 +1544,9 @@
       },
       "number_oven_display_brightness": {
         "name": "Luminosità display"
+      },
+      "number_oven_weight": {
+        "name": "Peso"
       },
       "number_oven_sound_volume": {
         "name": "Volume"
