@@ -5,7 +5,7 @@ from __future__ import annotations
 from typing import TYPE_CHECKING
 
 from homeassistant.components.binary_sensor.const import BinarySensorDeviceClass
-from homeassistant.components.number import NumberMode
+from homeassistant.components.number import NumberDeviceClass, NumberMode
 from homeassistant.components.sensor import SensorDeviceClass, SensorStateClass
 from homeassistant.components.switch.const import SwitchDeviceClass
 from homeassistant.const import (
@@ -13,6 +13,7 @@ from homeassistant.const import (
     REVOLUTIONS_PER_MINUTE,
     EntityCategory,
     UnitOfMass,
+    UnitOfTime,
     UnitOfVolume,
 )
 
@@ -389,6 +390,22 @@ LAUNDRY_ENTITY_DESCRIPTIONS: _EntityDescriptionsDefinitionsType = {
             entity="LaundryCare.Common.Option.HygienicSteamIntensity",
             has_state_translation=True,
         ),
+        # The same option, under the Washer name a Bosch WGH24400IT uses
+        HCSelectEntityDescription(
+            key="select_laundry_hygienic_steam_intensity",
+            entity="LaundryCare.Washer.Option.HygienicSteamIntensity",
+            has_state_translation=True,
+        ),
+        HCSelectEntityDescription(
+            key="select_laundry_pretreatment",
+            entity="LaundryCare.Washer.Option.PreTreatment",
+            has_state_translation=True,
+        ),
+        HCSelectEntityDescription(
+            key="select_laundry_soak_temperature",
+            entity="LaundryCare.Washer.Option.SoakTemperature",
+            has_state_translation=True,
+        ),
         HCSelectEntityDescription(
             key="select_laundry_multiple_soak",
             entity="LaundryCare.Washer.Option.MultipleSoak",
@@ -439,6 +456,13 @@ LAUNDRY_ENTITY_DESCRIPTIONS: _EntityDescriptionsDefinitionsType = {
             native_unit_of_measurement=PERCENTAGE,
             entity_category=EntityCategory.CONFIG,
             mode=NumberMode.AUTO,
+        ),
+        HCNumberEntityDescription(
+            key="number_laundry_soak_duration",
+            entity="LaundryCare.Washer.Option.SoakDuration",
+            device_class=NumberDeviceClass.DURATION,
+            native_unit_of_measurement=UnitOfTime.SECONDS,
+            mode=NumberMode.BOX,
         ),
         HCNumberEntityDescription(
             key="number_laundry_spin_class",
@@ -552,6 +576,11 @@ LAUNDRY_ENTITY_DESCRIPTIONS: _EntityDescriptionsDefinitionsType = {
         HCSwitchEntityDescription(
             key="switch_laundry_intensive_plus",
             entity="LaundryCare.Washer.Option.IntensivePlus",
+            device_class=SwitchDeviceClass.SWITCH,
+        ),
+        HCSwitchEntityDescription(
+            key="switch_laundry_mini_load",
+            entity="LaundryCare.Washer.Option.MiniLoad",
             device_class=SwitchDeviceClass.SWITCH,
         ),
         HCSwitchEntityDescription(

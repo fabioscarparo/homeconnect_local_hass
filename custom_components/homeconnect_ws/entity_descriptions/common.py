@@ -445,6 +445,16 @@ COMMON_ENTITY_DESCRIPTIONS: _EntityDescriptionsDefinitionsType = {
             entity="BSH.Common.Command.MainsPowerOff",
         ),
         HCButtonEntityDescription(
+            key="button_deactivate_remote_control",
+            entity="BSH.Common.Command.DeactivateRemoteControl",
+            entity_category=EntityCategory.CONFIG,
+        ),
+        HCButtonEntityDescription(
+            key="button_deactivate_remote_control_start",
+            entity="BSH.Common.Command.DeactivateRemoteControlStart",
+            entity_category=EntityCategory.CONFIG,
+        ),
+        HCButtonEntityDescription(
             key="button_sync_time",
             entity="BSH.Common.Setting.ApplianceDateTime",
             entity_category=EntityCategory.CONFIG,
@@ -484,6 +494,13 @@ COMMON_ENTITY_DESCRIPTIONS: _EntityDescriptionsDefinitionsType = {
             key="binary_remote_start_allowed",
             entity="BSH.Common.Status.RemoteControlStartAllowed",
             entity_category=EntityCategory.DIAGNOSTIC,
+        ),
+        HCBinarySensorEntityDescription(
+            key="binary_sensor_confirm_permanent_remote_start",
+            entity="BSH.Common.Event.ConfirmPermanentRemoteStart",
+            entity_category=EntityCategory.DIAGNOSTIC,
+            value_on={"Present", "Confirmed"},
+            value_off={"Off"},
         ),
         HCBinarySensorEntityDescription(
             key="binary_sensor_program_aborted",

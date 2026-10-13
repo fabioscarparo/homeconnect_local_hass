@@ -4,6 +4,9 @@
             "switch_power_state": {
                 "default": "mdi:power"
             },
+            "switch_laundry_mini_load": {
+                "default": "mdi:tshirt-crew-outline"
+            },
             "switch_hygiene_plus": {
                 "default": "mdi:thermometer-plus"
             },
@@ -132,6 +135,9 @@
         "binary_sensor": {
             "connection": {},
             "binary_sensor_door_state": {},
+            "binary_sensor_confirm_permanent_remote_start": {
+                "default": "mdi:remote"
+            },
             "binary_sensor_oven_insert_food_now": {
                 "default": "mdi:food"
             },
@@ -492,6 +498,12 @@
             "select_hot_water": {
                 "default": "mdi:water-thermometer-outline"
             },
+            "select_laundry_pretreatment": {
+                "default": "mdi:hand-wash-outline"
+            },
+            "select_laundry_soak_temperature": {
+                "default": "mdi:thermometer-water"
+            },
             "select_rinse_aid": {
                 "default": "mdi:water-plus"
             },
@@ -623,6 +635,12 @@
             "button_pause_program": {
                 "default": "mdi:pause"
             },
+            "button_deactivate_remote_control": {
+                "default": "mdi:remote-off"
+            },
+            "button_deactivate_remote_control_start": {
+                "default": "mdi:remote-off"
+            },
             "button_resume_program": {
                 "default": "mdi:play"
             },
@@ -654,6 +672,9 @@
         "number": {
             "number_delay_start": {
                 "default": "mdi:timer-play-outline"
+            },
+            "number_laundry_soak_duration": {
+                "default": "mdi:timer-sand"
             },
             "number_oven_weight": {
                 "default": "mdi:weight-gram"

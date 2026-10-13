@@ -16,6 +16,8 @@ The following entities are available. Which ones appear depends on the appliance
 | Power State | Switch / Select | Turn the appliance on or off |
 | Child Lock | Switch | Lock the physical controls |
 | Remote Start Allowed | Binary Sensor | Whether remote control is enabled on the device |
+| Deactivate Remote Control / Remote Start | Button | Turns remote control or remote start off again, until it is turned on at the appliance |
+| Confirm Permanent Remote Start | Binary Sensor | Turns on when the appliance asks to confirm permanent remote start on its display |
 | Door State | Binary Sensor / Sensor | Whether the door is open or closed |
 | Program Finished | Binary Sensor | Turns on when the current cycle completes |
 | Wi-Fi Signal Strength | Sensor | Device's Wi-Fi signal strength - polled hourly (see Data Updates), not pushed like everything else |
@@ -61,6 +63,8 @@ Some entites are excluded from this integration on purpose, even though the Home
 
 - Program options
   - Temperature, spin speed, prewash, rinse plus, gentle cycle, hygienic steam
+- Mini load, pre-treatment and soak options
+  - Mini load switch, pre-treatment (prewash or hand soak), soak temperature and soak duration
 - iDos automatic dosing (levels 1 & 2)
   - Automatic detergent dosing levels
 - Drum light and door ring LED control
