@@ -3429,7 +3429,7 @@
         }
       },
       "select_laundry_refresher": {
-        "name": "Cel suszenia",
+        "name": "Odświeżanie",
         "state": {
           "shirt1": "koszula 1",
           "shirt5": "koszula 5",

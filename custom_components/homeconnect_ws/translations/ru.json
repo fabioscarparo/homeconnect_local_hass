@@ -1521,7 +1521,7 @@
         }
       },
       "select_laundry_refresher": {
-        "name": "Цель сушки",
+        "name": "Освежение",
         "state": {
           "shirt1": "Рубашка 1",
           "shirt5": "Рубашка 5",
