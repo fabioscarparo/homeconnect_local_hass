@@ -264,13 +264,8 @@
           "ok": "OK",
           "aqua_stop": "Произошло AquaStop",
           "bean_container_empty": "Контейнер для зерен пуст",
-          "door_alarm_freezer": "Тревога двери морозилки",
-          "door_alarm_fridge": "Тревога двери холодильника",
           "low_water_pressure": "Низкое давление воды",
-          "maintenance_reminder": "Рекомендуется уход",
-          "program_aborted": "Программа прервана",
-          "temperature_alarm_freezer": "Тревога температуры морозилки",
-          "water_filter_full": "Водяной фильтр полон"
+          "program_aborted": "Программа прервана"
         }
       },
       "sensor_remaining_program_time": {
