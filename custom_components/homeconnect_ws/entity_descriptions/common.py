@@ -17,7 +17,9 @@ from homeassistant.const import (
     PERCENTAGE,
     SIGNAL_STRENGTH_DECIBELS_MILLIWATT,
     EntityCategory,
+    UnitOfEnergy,
     UnitOfTime,
+    UnitOfVolume,
 )
 from homeassistant.util import dt as dt_util
 
@@ -571,6 +573,23 @@ COMMON_ENTITY_DESCRIPTIONS: _EntityDescriptionsDefinitionsType = {
             entity_category=EntityCategory.DIAGNOSTIC,
             entity_registry_enabled_default=False,
             state_class=SensorStateClass.TOTAL_INCREASING,
+        ),
+        HCSensorEntityDescription(
+            key="sensor_energy_consumed",
+            entity="BSH.Common.Status.Program.All.Energy.Consumed",
+            device_class=SensorDeviceClass.ENERGY,
+            state_class=SensorStateClass.TOTAL_INCREASING,
+            native_unit_of_measurement=UnitOfEnergy.WATT_HOUR,
+            suggested_unit_of_measurement=UnitOfEnergy.KILO_WATT_HOUR,
+        ),
+        HCSensorEntityDescription(
+            key="sensor_water_consumed",
+            entity="BSH.Common.Status.Program.All.Water.Consumed",
+            device_class=SensorDeviceClass.WATER,
+            state_class=SensorStateClass.TOTAL_INCREASING,
+            native_unit_of_measurement=UnitOfVolume.LITERS,
+            # Reported in mL, which the water device class doesn't take
+            value_fn=lambda value: value / 1000 if isinstance(value, int | float) else None,
         ),
         HCSensorEntityDescription(
             key="sensor_end_trigger",
