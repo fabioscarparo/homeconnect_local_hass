@@ -3965,7 +3965,7 @@
         }
       },
       "select_laundry_refresher": {
-        "name": "Trockenziel",
+        "name": "Auffrischen",
         "state": {
           "shirt1": "Hemd 1",
           "shirt5": "Hemd 5",

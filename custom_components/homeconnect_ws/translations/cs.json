@@ -1648,7 +1648,7 @@
         }
       },
       "select_laundry_refresher": {
-        "name": "Cíl sušení",
+        "name": "Osvěžení",
         "state": {
           "shirt1": "Košile 1",
           "shirt5": "Košile 5",

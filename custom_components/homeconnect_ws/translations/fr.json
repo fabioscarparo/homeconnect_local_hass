@@ -1557,7 +1557,7 @@
         }
       },
       "select_laundry_refresher": {
-        "name": "Drying target",
+        "name": "Rafraîchissement",
         "state": {
           "shirt1": "Shirt 1",
           "shirt5": "Shirt 5",
