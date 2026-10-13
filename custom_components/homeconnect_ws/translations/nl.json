@@ -259,6 +259,21 @@
       }
     },
     "sensor": {
+      "sensor_problem": {
+        "name": "Probleem",
+        "state": {
+          "ok": "OK",
+          "aqua_stop": "AquaStop",
+          "bean_container_empty": "Bonenreservoir leeg",
+          "door_alarm_freezer": "Vriezer deuralarm",
+          "door_alarm_fridge": "Koelkast deuralarm",
+          "low_water_pressure": "Lage waterdruk",
+          "maintenance_reminder": "Machinereiniging",
+          "program_aborted": "Programma afgebroken",
+          "temperature_alarm_freezer": "Vriezer temperatuuralarm",
+          "water_filter_full": "Waterfilter vol"
+        }
+      },
       "sensor_remaining_program_time": {
         "name": "Resterende tijd"
       },

@@ -391,6 +391,37 @@
       }
     },
     "sensor": {
+      "sensor_problem": {
+        "name": "Problème",
+        "state": {
+          "ok": "OK",
+          "aqua_stop": "AquaStop déclenché",
+          "bean_container_empty": "Bac à grains vide",
+          "checkfiltersystem": "Check Filter System",
+          "door_alarm_freezer": "Alarme de la porte du congélateur",
+          "door_alarm_fridge": "Alarme de la porte du réfrigérateur",
+          "door_not_lockable": "Porte non verrouillable",
+          "door_not_unlockable": "Porte non deverrouiable",
+          "drainingnotpossible": "Draining Not Possible",
+          "drainpumpblocked": "Drain Pump Blocked",
+          "drum_clean_reminder": "Drum Clean Reminder",
+          "fatal_error_occurred": "Erreur fatale",
+          "idos1_fill_level_poor": "i-DOS 1 faible",
+          "idos2_fill_level_poor": "i-DOS 2 faible",
+          "idos_unit_defect": "i-DOS Defect",
+          "low_voltage": "Faible Voltage",
+          "low_water_pressure": "Pression d'eau faible",
+          "maintenance_reminder": "Maintenance recommandée",
+          "program_aborted": "Programme annulé",
+          "pump_error": "Erreur de la pompe",
+          "spin_abort": "Essorage annulé",
+          "supply_voltage_too_low": "Tension faible",
+          "temperature_alarm_freezer": "Alarme de température du congélateur",
+          "water_filter_full": "Filtre à eau plein",
+          "water_level_too_high": "Nideau d'eau trop élevé",
+          "waterheatercalcified": "Water Heater Calcified"
+        }
+      },
       "sensor_remaining_program_time": {
         "name": "Temps restant"
       },

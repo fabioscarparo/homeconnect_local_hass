@@ -428,6 +428,41 @@
       }
     },
     "sensor": {
+      "sensor_problem": {
+        "name": "Problem",
+        "state": {
+          "ok": "OK",
+          "aqua_stop": "AquaStop utlöst",
+          "bean_container_empty": "Bönbehållare tom",
+          "checkfiltersystem": "Kontrollera filtersystem",
+          "door_alarm_chiller_common": "Dörrlarm – kylzon",
+          "door_alarm_freezer": "Dörrlarm – frys",
+          "door_alarm_fridge": "Dörrlarm – kyl",
+          "door_not_lockable": "Dörr kan inte låsas",
+          "door_not_unlockable": "Dörr kan inte låsas upp",
+          "drainingnotpossible": "Tömning ej möjlig",
+          "drainpumpblocked": "Avloppspump blockerad",
+          "drum_clean_reminder": "Trumrengöring rekommenderas",
+          "fatal_error_occurred": "Kritiskt fel",
+          "flexspray_error_blocked": "FlexSpray blockerad",
+          "flexspray_error_general": "FlexSpray fel",
+          "flexspray_error_spray_arm_not_mounted": "Sprayarm ej monterad",
+          "idos1_fill_level_poor": "i-DOS 1 låg nivå",
+          "idos2_fill_level_poor": "i-DOS 2 låg nivå",
+          "idos_unit_defect": "i-DOS fel",
+          "low_voltage": "Låg spänning",
+          "low_water_pressure": "Lågt vattentryck",
+          "maintenance_reminder": "Underhåll rekommenderas",
+          "program_aborted": "Program avbrutet",
+          "pump_error": "Pumpfel",
+          "spin_abort": "Centrifugering avbruten",
+          "supply_voltage_too_low": "För låg matningsspänning",
+          "temperature_alarm_freezer": "Temperaturlarm – frys",
+          "water_filter_full": "Vattenfilter fullt",
+          "water_level_too_high": "För hög vattennivå",
+          "waterheatercalcified": "Värmeelement kalkat"
+        }
+      },
       "sensor_remaining_program_time": {
         "name": "Återstående programtid"
       },

@@ -430,6 +430,41 @@
       }
     },
     "sensor": {
+      "sensor_problem": {
+        "name": "问题",
+        "state": {
+          "ok": "正常",
+          "aqua_stop": "漏水保护触发",
+          "bean_container_empty": "豆仓已空",
+          "checkfiltersystem": "检查过滤系统",
+          "door_alarm_chiller_common": "冷藏室门报警",
+          "door_alarm_freezer": "冷冻室门报警",
+          "door_alarm_fridge": "冷藏室门报警",
+          "door_not_lockable": "门无法上锁",
+          "door_not_unlockable": "门无法解锁",
+          "drainingnotpossible": "无法排水",
+          "drainpumpblocked": "排水泵堵塞",
+          "drum_clean_reminder": "滚筒清洁提醒",
+          "fatal_error_occurred": "严重故障",
+          "flexspray_error_blocked": "FlexSpray堵塞",
+          "flexspray_error_general": "FlexSpray故障",
+          "flexspray_error_spray_arm_not_mounted": "喷臂未安装",
+          "idos1_fill_level_poor": "i-DOS 1 液位低",
+          "idos2_fill_level_poor": "i-DOS 2 液位低",
+          "idos_unit_defect": "i-DOS 故障",
+          "low_voltage": "低电压",
+          "low_water_pressure": "水压过低",
+          "maintenance_reminder": "建议保养清洗",
+          "program_aborted": "程序已中止",
+          "pump_error": "水泵故障",
+          "spin_abort": "脱水中止",
+          "supply_voltage_too_low": "供电电压过低",
+          "temperature_alarm_freezer": "冷冻室温度报警",
+          "water_filter_full": "滤水器已满",
+          "water_level_too_high": "水位过高",
+          "waterheatercalcified": "热水器结垢"
+        }
+      },
       "sensor_remaining_program_time": {
         "name": "剩余程序时间"
       },

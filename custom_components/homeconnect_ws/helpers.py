@@ -27,8 +27,27 @@ if TYPE_CHECKING:
 
     from . import HCConfigEntry, HCData
     from .entity import HCEntity
+    from .entity_descriptions.descriptions_definitions import HCBinarySensorEntityDescription
 
 _LOGGER = logging.getLogger(__name__)
+
+
+def binary_is_on(
+    description: HCBinarySensorEntityDescription, entity: HcEntity | None
+) -> bool | None:
+    """Whether the entity's value means on, or None if it's unknown."""
+    if entity is None:
+        return None
+    if description.value_on:
+        if entity.value in description.value_on:
+            return True
+        if description.value_off and entity.value in description.value_off:
+            return False
+        return None
+    if entity.value is None:
+        # Not reported by the appliance yet - "unknown", not "off".
+        return None
+    return bool(entity.value)
 
 
 def create_entities(

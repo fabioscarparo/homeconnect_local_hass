@@ -7,10 +7,15 @@ from datetime import timedelta
 from typing import TYPE_CHECKING, Any, ClassVar, cast
 
 from home_disconnect.entities import Program
-from homeassistant.components.sensor import SensorEntity
+from homeassistant.components.binary_sensor.const import BinarySensorDeviceClass
+from homeassistant.components.sensor import SensorDeviceClass, SensorEntity
 
 from .entity import HCEntity
-from .helpers import create_entities
+from .entity_descriptions.descriptions_definitions import (
+    HCBinarySensorEntityDescription,
+    HCSensorEntityDescription,
+)
+from .helpers import binary_is_on, create_entities
 
 _LOGGER = logging.getLogger(__name__)
 
@@ -20,7 +25,6 @@ if TYPE_CHECKING:
     from homeassistant.helpers.entity_platform import AddEntitiesCallback
 
     from . import HCConfigEntry, HCData
-    from .entity_descriptions.descriptions_definitions import HCSensorEntityDescription
 
 PARALLEL_UPDATES = 0
 
@@ -89,6 +93,15 @@ async def async_setup_entry(
         },
         config_entry.runtime_data,
     )
+    problem_descriptions = [
+        cast("HCBinarySensorEntityDescription", description)
+        for description in config_entry.runtime_data.available_entity_descriptions.get(
+            "binary_sensor", []
+        )
+        if description.device_class == BinarySensorDeviceClass.PROBLEM
+    ]
+    if problem_descriptions:
+        entities.add(HCProblemSensor(problem_descriptions, config_entry.runtime_data))
     async_add_entites(entities)
 
 
@@ -202,6 +215,109 @@ class HCEventSensor(HCEntity, SensorEntity):
             self._runtime_data.appliance.connected
             or self._runtime_data.coordinator.expected_offline
         )
+
+
+PROBLEM_SENSOR_KEY = "sensor_problem"
+PROBLEM_OK = "ok"
+# When several problems are active, the sensor shows the most urgent one: these alarms
+# first, then everything else, then the reminders.
+_ALARM_PROBLEMS = (
+    "aqua_stop",
+    "door_alarm_chiller_common",
+    "door_alarm_freezer",
+    "door_alarm_fridge",
+    "oven_cavity_temperature_too_high",
+    "temperature_alarm_chiller_common",
+    "temperature_alarm_freezer",
+)
+_REMINDER_PROBLEMS = (
+    "bean_container_empty",
+    "checkfiltersystem",
+    "coffee_calc_n_clean_due",
+    "coffee_clean_brewing_unit",
+    "coffee_cleaning_due",
+    "coffee_milk_reminder",
+    "coffee_water_filter_change",
+    "condensate_container_full",
+    "drum_clean_reminder",
+    "ice_expired",
+    "idos1_fill_level_poor",
+    "idos2_fill_level_poor",
+    "lint_filter_full",
+    "machinecareandfiltercleaningreminder",
+    "machinecarereminder",
+    "maintenance_reminder",
+    "party_mode_empty_ice_hopper",
+    "refresher_level",
+    "smartfiltercleaningreminder",
+    "water_expired",
+    "water_filter_almost_full",
+    "water_filter_full",
+    "waterheatercalcified",
+)
+
+
+def problem_state(description: HCBinarySensorEntityDescription) -> str:
+    """Get the Problem sensor's state for a problem: its binary sensor's key, unprefixed."""
+    return (description.translation_key or description.key).removeprefix("binary_sensor_")
+
+
+def _urgency(state: str) -> int:
+    if state in _ALARM_PROBLEMS:
+        return 0
+    if state in _REMINDER_PROBLEMS:
+        return 2
+    return 1
+
+
+class HCProblemSensor(HCEntity, SensorEntity):
+    """
+    Which of the appliance's problems is active, or "ok".
+
+    Most per-problem binary sensors are disabled by default, so this is the one to watch;
+    enable a per-problem sensor to see or automate on that problem alone, also while a more
+    urgent one is shown here.
+    """
+
+    entity_description: HCSensorEntityDescription
+
+    def __init__(
+        self, problem_descriptions: list[HCBinarySensorEntityDescription], runtime_data: HCData
+    ) -> None:
+        super().__init__(
+            HCSensorEntityDescription(
+                key=PROBLEM_SENSOR_KEY,
+                entities=[
+                    description.entity for description in problem_descriptions if description.entity
+                ],
+                device_class=SensorDeviceClass.ENUM,
+            ),
+            runtime_data,
+        )
+        self._problems = sorted(
+            (
+                (problem_state(description), description, runtime_data.appliance.entities[entity])
+                for description in problem_descriptions
+                if (entity := description.entity)
+            ),
+            key=lambda problem: _urgency(problem[0]),
+        )
+        self._attr_options = list(dict.fromkeys([PROBLEM_OK] + [p[0] for p in self._problems]))
+
+    @property
+    def native_value(self) -> str | None:
+        states = [
+            (state, binary_is_on(description, entity))
+            for state, description, entity in self._problems
+        ]
+        for state, is_on in states:
+            if is_on:
+                return state
+        if all(is_on is None for _, is_on in states):
+            # None of them reported yet.
+            return None
+        # A problem the appliance hasn't reported isn't active.
+        return PROBLEM_OK
 
 
 class HCActiveProgram(HCSensor):

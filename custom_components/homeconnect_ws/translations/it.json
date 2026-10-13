@@ -408,6 +408,39 @@
       }
     },
     "sensor": {
+      "sensor_problem": {
+        "name": "Problema",
+        "state": {
+          "ok": "OK",
+          "aqua_stop": "AquaStop intervenuto",
+          "bean_container_empty": "Contenitore chicchi vuoto",
+          "checkfiltersystem": "Filtro intasato",
+          "door_alarm_freezer": "Allarme porta congelatore",
+          "door_alarm_fridge": "Allarme porta frigo",
+          "door_not_lockable": "Porta non bloccabile",
+          "door_not_unlockable": "Porta non sbloccabile",
+          "drainingnotpossible": "Drenaggio non possibile",
+          "drainpumpblocked": "Pompa di drenaggio bloccata",
+          "drum_clean_reminder": "Pulizia cestello",
+          "fatal_error_occurred": "Errore generale",
+          "idos1_fill_level_poor": "Livello i-DOS 1",
+          "idos2_fill_level_poor": "Livello i-DOS 2",
+          "idos_open_tray": "Cassetto detersivo aperto",
+          "idos_unit_defect": "Difetto unità i-DOS",
+          "low_voltage": "Tensione bassa",
+          "low_water_pressure": "Bassa pressione acqua",
+          "maintenance_reminder": "Ciclo di cura raccomandato",
+          "oven_cavity_temperature_too_high": "Temperatura del forno troppo alta",
+          "program_aborted": "Programma interrotto",
+          "pump_error": "Errore pompa",
+          "release_rinse_hold_pending": "Ammollo a fine ciclo in sospeso",
+          "spin_abort": "Centrifuga annullata",
+          "supply_voltage_too_low": "Tensione di alimentazione bassa",
+          "temperature_alarm_freezer": "Allarme temperatura congelatore",
+          "water_level_too_high": "Livello acqua troppo alto",
+          "waterheatercalcified": "Riscaldatore calcificato"
+        }
+      },
       "sensor_remaining_program_time": {
         "name": "Tempo programma rimanente"
       },

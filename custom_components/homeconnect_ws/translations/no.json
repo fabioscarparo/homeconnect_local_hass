@@ -391,6 +391,37 @@
       }
     },
     "sensor": {
+      "sensor_problem": {
+        "name": "Problem",
+        "state": {
+          "ok": "OK",
+          "aqua_stop": "AquaStop oppstod",
+          "bean_container_empty": "Bønnebeholder tom",
+          "checkfiltersystem": "Sjekk filtersystem",
+          "door_alarm_freezer": "Døralarm fryser",
+          "door_alarm_fridge": "Døralarm kjøleskap",
+          "door_not_lockable": "Dør kan ikke låses",
+          "door_not_unlockable": "Dør kan ikke låses opp",
+          "drainingnotpossible": "Tømming ikke mulig",
+          "drainpumpblocked": "Tømmepumpe blokkert",
+          "drum_clean_reminder": "Trommelrengjøring påminnelse",
+          "fatal_error_occurred": "Kritisk feil",
+          "idos1_fill_level_poor": "i-DOS 1 lav",
+          "idos2_fill_level_poor": "i-DOS 2 lav",
+          "idos_unit_defect": "i-DOS defekt",
+          "low_voltage": "Lav spenning",
+          "low_water_pressure": "Lavt vanntrykk",
+          "maintenance_reminder": "Vedlikeholdssyklus anbefalt",
+          "program_aborted": "Program avbrutt",
+          "pump_error": "Pumpefeil",
+          "spin_abort": "Sentrifugering avbrutt",
+          "supply_voltage_too_low": "Forsyningsspenning lav",
+          "temperature_alarm_freezer": "Temperaturalarm fryser",
+          "water_filter_full": "Vannfilter fullt",
+          "water_level_too_high": "Vannnivå høyt",
+          "waterheatercalcified": "Vannvarmer kalket"
+        }
+      },
       "sensor_remaining_program_time": {
         "name": "Gjenværende programtid"
       },
