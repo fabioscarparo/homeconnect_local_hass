@@ -448,11 +448,15 @@ COMMON_ENTITY_DESCRIPTIONS: _EntityDescriptionsDefinitionsType = {
             key="button_deactivate_remote_control",
             entity="BSH.Common.Command.DeactivateRemoteControl",
             entity_category=EntityCategory.CONFIG,
+            # One press locks Home Assistant out until it's turned on at the appliance
+            entity_registry_enabled_default=False,
         ),
         HCButtonEntityDescription(
             key="button_deactivate_remote_control_start",
             entity="BSH.Common.Command.DeactivateRemoteControlStart",
             entity_category=EntityCategory.CONFIG,
+            # One press locks Home Assistant out until it's turned on at the appliance
+            entity_registry_enabled_default=False,
         ),
         HCButtonEntityDescription(
             key="button_sync_time",
