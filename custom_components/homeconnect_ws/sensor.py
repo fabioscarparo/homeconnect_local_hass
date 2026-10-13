@@ -157,7 +157,11 @@ class HCSensor(HCEntity, SensorEntity):
             return None
         if self._entity.enum and self.entity_description.has_state_translation:
             return str(self._entity.value).lower()
-        return cast("int | float | str", self._entity.value)
+        if (value_fn := self.entity_description.value_fn) is not None:
+            value = value_fn(self._entity.value)
+        else:
+            value = cast("int | float | str", self._entity.value)
+        return value
 
     @property
     def available(self) -> bool:
