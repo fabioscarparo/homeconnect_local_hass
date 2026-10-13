@@ -2023,6 +2023,12 @@
       "sensor_water_consumed": {
         "name": "Wasserverbrauch"
       },
+      "sensor_energy_consumed_last": {
+        "name": "Energieverbrauch letztes Programm"
+      },
+      "sensor_water_consumed_last": {
+        "name": "Wasserverbrauch letztes Programm"
+      },
       "sensor_laundry_load": {
         "name": "Beladung"
       },

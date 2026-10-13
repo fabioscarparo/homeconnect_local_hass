@@ -1852,6 +1852,12 @@
       "sensor_water_consumed": {
         "name": "Water consumed"
       },
+      "sensor_energy_consumed_last": {
+        "name": "Last program energy"
+      },
+      "sensor_water_consumed_last": {
+        "name": "Last program water"
+      },
       "sensor_laundry_load": {
         "name": "Laundry load"
       },

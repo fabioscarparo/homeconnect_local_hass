@@ -69,6 +69,8 @@ Some entites are excluded from this integration on purpose, even though the Home
   - Keeps tumbling laundry after a cycle ends to prevent wrinkles
 - Maintenance reminders
   - Drum clean, lint filter full
+- Energy and water used by the last program
+  - Updated when a program ends, and kept when Home Assistant reconnects to the appliance
 - Condensate container alert (dryer)
   - Alerts when the condensate/water container needs emptying
 

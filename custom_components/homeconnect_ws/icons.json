@@ -302,6 +302,12 @@
             "sensor_water_forecast": {
                 "default": "mdi:water"
             },
+            "sensor_energy_consumed_last": {
+                "default": "mdi:lightning-bolt"
+            },
+            "sensor_water_consumed_last": {
+                "default": "mdi:water"
+            },
             "sensor_energy_forecast": {
                 "default": "mdi:lightning-bolt"
             },

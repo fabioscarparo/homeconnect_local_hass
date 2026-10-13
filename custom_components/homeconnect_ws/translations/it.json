@@ -390,6 +390,12 @@
       "sensor_energy_forecast": {
         "name": "Previsione energia"
       },
+      "sensor_energy_consumed_last": {
+        "name": "Consumo energia ultimo programma"
+      },
+      "sensor_water_consumed_last": {
+        "name": "Consumo acqua ultimo programma"
+      },
       "sensor_operation_state": {
         "name": "Stato funzionamento",
         "state": {

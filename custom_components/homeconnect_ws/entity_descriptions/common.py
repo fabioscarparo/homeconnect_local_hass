@@ -38,7 +38,10 @@ from .descriptions_definitions import (
 )
 
 if TYPE_CHECKING:
+    from collections.abc import Callable
+
     from home_disconnect import Appliance
+    from homeassistant.helpers.typing import StateType
 
 
 POWER_SWITCH_VALUE_MAPINGS = (
@@ -258,6 +261,83 @@ def generate_program(appliance: Appliance) -> EntityDescriptions:
             )
         ]
 
+    return descriptions
+
+
+PROGRAM_SESSION_SUMMARY = "BSH.Common.Status.ProgramSessionSummary.Latest"
+ENERGY_CONSUMED_LAST = "BSH.Common.Status.Program.Last.Energy.Consumed"
+WATER_CONSUMED_LAST = "BSH.Common.Status.Program.Last.Water.Consumed"
+
+
+def session_summary_detail(appliance: Appliance, uid: int) -> object:
+    """Get a value from the details of the latest Program Session Summary."""
+    summary = appliance.entities.get(PROGRAM_SESSION_SUMMARY)
+    if summary is None or not isinstance(summary.value, dict):
+        return None
+    for run in reversed(summary.value.get("sequence", [])):
+        for detail in run.get("details", []):
+            if detail.get("uid") == uid:
+                return detail.get("value")
+    return None
+
+
+def last_program_value(appliance: Appliance, name: str) -> float | None:
+    """
+    Get the value of a Program.Last status.
+
+    Falls back to the latest Program Session Summary: a Bosch WGH24400IT
+    washer leaves the Program.Last statuses empty after reconnecting, while
+    the summary still lists them.
+    """
+    status = appliance.entities[name]
+    value = status.value
+    if value is None:
+        value = session_summary_detail(appliance, status.uid)
+    return value if isinstance(value, int | float) else None
+
+
+def generate_last_program_consumption(appliance: Appliance) -> EntityDescriptions:
+    """
+    Get the energy and water consumption of the last program.
+
+    When the appliance has a Program Session Summary, the sensors follow it
+    instead of the Program.Last status, so they still get a value while the
+    status is empty, and they listen to the status too.
+    """
+    descriptions = EntityDescriptions(sensor=[])
+    summary = PROGRAM_SESSION_SUMMARY if PROGRAM_SESSION_SUMMARY in appliance.entities else None
+
+    def value_fn(name: str, scale: int = 1) -> Callable[[StateType], StateType]:
+        def read(_: StateType) -> StateType:
+            value = last_program_value(appliance, name)
+            return None if value is None else value / scale
+
+        return read
+
+    if ENERGY_CONSUMED_LAST in appliance.entities:
+        descriptions["sensor"].append(
+            HCSensorEntityDescription(
+                key="sensor_energy_consumed_last",
+                entity=summary or ENERGY_CONSUMED_LAST,
+                entities=[ENERGY_CONSUMED_LAST] if summary else None,
+                device_class=SensorDeviceClass.ENERGY,
+                native_unit_of_measurement=UnitOfEnergy.WATT_HOUR,
+                suggested_unit_of_measurement=UnitOfEnergy.KILO_WATT_HOUR,
+                value_fn=value_fn(ENERGY_CONSUMED_LAST),
+            )
+        )
+    if WATER_CONSUMED_LAST in appliance.entities:
+        descriptions["sensor"].append(
+            HCSensorEntityDescription(
+                key="sensor_water_consumed_last",
+                entity=summary or WATER_CONSUMED_LAST,
+                entities=[WATER_CONSUMED_LAST] if summary else None,
+                device_class=SensorDeviceClass.WATER,
+                native_unit_of_measurement=UnitOfVolume.LITERS,
+                # Reported in mL, which the water device class doesn't take
+                value_fn=value_fn(WATER_CONSUMED_LAST, scale=1000),
+            )
+        )
     return descriptions
 
 
@@ -668,5 +748,5 @@ COMMON_ENTITY_DESCRIPTIONS: _EntityDescriptionsDefinitionsType = {
     "ipv4": [generate_ipv4],
     "ipv6": [generate_ipv6],
     "update": [generate_software_download_update, generate_software_update],
-    "dynamic": [generate_power_switch, generate_program],
+    "dynamic": [generate_power_switch, generate_program, generate_last_program_consumption],
 }
