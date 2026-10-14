@@ -111,6 +111,17 @@ async def test_number_defaults_to_no_delay_and_stores_it(
     mock_appliance.session.request.assert_not_awaited()
 
 
+async def test_number_max_without_appliance_max(
+    hass: HomeAssistant,
+    mock_appliance: Appliance,
+    patch_entity_description: None,
+) -> None:
+    """Without a maximum from the appliance, the delay goes up to 24 hours."""
+    mock_appliance.entities["BSH.Common.Option.FinishInRelative"].max = None
+    assert await setup_config_entry(hass, MOCK_CONFIG_DATA)
+    assert hass.states.get(NUMBER_ENTITY_ID).attributes[ATTR_MAX] == 1440
+
+
 async def test_number_restores_last_delay(
     hass: HomeAssistant,
     mock_appliance: Appliance,
