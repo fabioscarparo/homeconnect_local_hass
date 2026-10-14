@@ -1,0 +1,35 @@
+name: Upstream tracker
+
+# Lists upstream PRs that aren't in the fork yet in one issue, and pushes the ones that
+# cherry-pick cleanly onto dev as upstream/pr-<number> branches. See
+# .github/scripts/upstream_tracker.py and .github/upstream-prs.yaml.
+
+on:
+  schedule:
+    - cron: "17 6 * * *"
+  workflow_dispatch:
+
+permissions:
+  contents: write
+  issues: write
+  pull-requests: read
+
+concurrency:
+  group: upstream-tracker
+
+jobs:
+  track:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
+        with:
+          # Scheduled runs start on the default branch; the list and the script live on dev
+          ref: dev
+          fetch-depth: 0
+      - uses: astral-sh/setup-uv@c771a70e6277c0a99b617c7a806ffedaca235ff9
+      - run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+      - run: uv run --no-project --with pyyaml==6.0.3 python .github/scripts/upstream_tracker.py
+        env:
+          GH_TOKEN: ${{ github.token }}

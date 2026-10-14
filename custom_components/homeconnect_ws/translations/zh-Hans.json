@@ -430,6 +430,30 @@
       }
     },
     "sensor": {
+      "sensor_problem": {
+        "name": "问题",
+        "state": {
+          "ok": "正常",
+          "aqua_stop": "漏水保护触发",
+          "bean_container_empty": "豆仓已空",
+          "door_not_lockable": "门无法上锁",
+          "door_not_unlockable": "门无法解锁",
+          "drainingnotpossible": "无法排水",
+          "drainpumpblocked": "排水泵堵塞",
+          "fatal_error_occurred": "严重故障",
+          "flexspray_error_blocked": "FlexSpray堵塞",
+          "flexspray_error_general": "FlexSpray故障",
+          "flexspray_error_spray_arm_not_mounted": "喷臂未安装",
+          "idos_unit_defect": "i-DOS 故障",
+          "low_voltage": "低电压",
+          "low_water_pressure": "水压过低",
+          "program_aborted": "程序已中止",
+          "pump_error": "水泵故障",
+          "spin_abort": "脱水中止",
+          "supply_voltage_too_low": "供电电压过低",
+          "water_level_too_high": "水位过高"
+        }
+      },
       "sensor_remaining_program_time": {
         "name": "剩余程序时间"
       },

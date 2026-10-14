@@ -428,6 +428,30 @@
       }
     },
     "sensor": {
+      "sensor_problem": {
+        "name": "Problem",
+        "state": {
+          "ok": "OK",
+          "aqua_stop": "AquaStop utlöst",
+          "bean_container_empty": "Bönbehållare tom",
+          "door_not_lockable": "Dörr kan inte låsas",
+          "door_not_unlockable": "Dörr kan inte låsas upp",
+          "drainingnotpossible": "Tömning ej möjlig",
+          "drainpumpblocked": "Avloppspump blockerad",
+          "fatal_error_occurred": "Kritiskt fel",
+          "flexspray_error_blocked": "FlexSpray blockerad",
+          "flexspray_error_general": "FlexSpray fel",
+          "flexspray_error_spray_arm_not_mounted": "Sprayarm ej monterad",
+          "idos_unit_defect": "i-DOS fel",
+          "low_voltage": "Låg spänning",
+          "low_water_pressure": "Lågt vattentryck",
+          "program_aborted": "Program avbrutet",
+          "pump_error": "Pumpfel",
+          "spin_abort": "Centrifugering avbruten",
+          "supply_voltage_too_low": "För låg matningsspänning",
+          "water_level_too_high": "För hög vattennivå"
+        }
+      },
       "sensor_remaining_program_time": {
         "name": "Återstående programtid"
       },

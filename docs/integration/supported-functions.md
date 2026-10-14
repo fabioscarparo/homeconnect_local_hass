@@ -15,6 +15,7 @@ The following entities are available. Which ones appear depends on the appliance
 | Start / Abort / Pause / Resume | Button | Control the active program |
 | Power State | Switch / Select | Turn the appliance on or off |
 | Child Lock | Switch | Lock the physical controls |
+| Problem | Sensor | Which problem is stopping the appliance from working, for example a blocked drain pump or a missing brewing unit, or OK. Alarms and reminders, like a door left open or cleaning due, have their own binary sensors instead |
 | Remote Start Allowed | Binary Sensor | Whether remote control is enabled on the device |
 | Deactivate Remote Control / Remote Start | Button | Turns remote control or remote start off again, until it is turned on at the appliance. Disabled by default |
 | Confirm Permanent Remote Start | Binary Sensor | Turns on when the appliance asks to confirm permanent remote start on its display |

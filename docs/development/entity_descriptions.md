@@ -54,7 +54,9 @@ Fields common to every entity type:
 - `value_on`: set of values for which the sensor should be `on`, e.g. `{"Open", "Ajar"}`
 - `value_off`: set of values for which the sensor should be `off`, e.g. `{"Closed", "Locked"}`
 
-Every binary sensor with `device_class=BinarySensorDeviceClass.PROBLEM` also feeds the appliance's "Problem" sensor (`binary_sensor_problem`), which is on while any of them is on, including disabled ones. Give a new problem sensor `entity_registry_enabled_default=False`, so the Problem sensor is the one people see. The exceptions are the refrigeration door and temperature alarms, which people act on right away.
+Every binary sensor with `device_class=BinarySensorDeviceClass.PROBLEM` also feeds the appliance's "Problem" sensor (`sensor_problem` in `sensor.py`), unless it has `in_problem_sensor=False`. The Problem sensor is for problems that stop the appliance working now, like a blocked drain pump or a missing brewing unit. It's an enum sensor that shows which of them is active, or `ok`, including ones whose own sensor is disabled. Give those problem sensors `entity_registry_enabled_default=False`, so the Problem sensor is the one people see. Its state for a problem is the binary sensor's translation key (or key) without `binary_sensor_`, so a new one needs that state in `sensor_problem` in `en.json` and `de.json`; a test checks this.
+
+Alarms (fridge and freezer door and temperature alarms) and reminders (cleaning or descaling due, filters, i-DOS low) don't stop the appliance, so they get `in_problem_sensor=False` and stay enabled by default as their own binary sensors.
 
 ## Number Entity (`HCNumberEntityDescription`)
 

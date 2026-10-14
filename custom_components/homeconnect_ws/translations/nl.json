@@ -259,6 +259,16 @@
       }
     },
     "sensor": {
+      "sensor_problem": {
+        "name": "Probleem",
+        "state": {
+          "ok": "OK",
+          "aqua_stop": "AquaStop",
+          "bean_container_empty": "Bonenreservoir leeg",
+          "low_water_pressure": "Lage waterdruk",
+          "program_aborted": "Programma afgebroken"
+        }
+      },
       "sensor_remaining_program_time": {
         "name": "Resterende tijd"
       },

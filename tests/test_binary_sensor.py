@@ -3,23 +3,16 @@
 from __future__ import annotations
 
 from typing import TYPE_CHECKING
-from unittest.mock import Mock
 
-from custom_components import homeconnect_ws
 from custom_components.homeconnect_ws.const import DOMAIN
-from custom_components.homeconnect_ws.entity_descriptions import HCBinarySensorEntityDescription
-from homeassistant.components.binary_sensor.const import BinarySensorDeviceClass
 from homeassistant.const import ATTR_FRIENDLY_NAME, STATE_OFF, STATE_ON, STATE_UNKNOWN
 
 from . import setup_config_entry, update_entity
-from .const import ENTITY_DESCRIPTIONS, MOCK_CONFIG_DATA
+from .const import MOCK_CONFIG_DATA
 
 if TYPE_CHECKING:
-    import pytest
     from home_disconnect import Appliance
     from homeassistant.core import HomeAssistant
-
-PROBLEM_ENTITY_ID = "binary_sensor.fake_brand_homeappliance_problem"
 
 
 async def test_setup(
@@ -121,59 +114,3 @@ async def test_update_enum(
 
     state = hass.states.get(entity_id)
     assert state.state == STATE_ON
-
-
-async def test_problem_sensor_follows_every_problem(
-    hass: HomeAssistant, mock_appliance: Appliance, monkeypatch: pytest.MonkeyPatch
-) -> None:
-    """The Problem sensor is on while any problem is, including disabled ones."""
-    problems = [
-        HCBinarySensorEntityDescription(
-            key="problem_1",
-            name="Salt",
-            entity="Test.Event1",
-            device_class=BinarySensorDeviceClass.PROBLEM,
-            value_on={"Present", "Confirmed"},
-            value_off={"Off"},
-        ),
-        HCBinarySensorEntityDescription(
-            key="problem_2",
-            name="Pump",
-            entity="Test.Event2",
-            device_class=BinarySensorDeviceClass.PROBLEM,
-            entity_registry_enabled_default=False,
-            value_on={"Present", "Confirmed"},
-            value_off={"Off"},
-        ),
-    ]
-    descriptions = {**ENTITY_DESCRIPTIONS, "binary_sensor": problems}
-    monkeypatch.setattr(homeconnect_ws, "get_available_entities", Mock(return_value=descriptions))
-    assert await setup_config_entry(hass, MOCK_CONFIG_DATA)
-
-    # Nothing reported yet.
-    assert hass.states.get(PROBLEM_ENTITY_ID).state == STATE_UNKNOWN
-
-    # One reported off, the other still unreported.
-    await update_entity(mock_appliance.entities["Test.Event1"], {"value": 0})
-    await hass.async_block_till_done()
-    assert hass.states.get(PROBLEM_ENTITY_ID).state == STATE_OFF
-
-    # The disabled problem sensor still counts.
-    await update_entity(mock_appliance.entities["Test.Event2"], {"value": 1})
-    await hass.async_block_till_done()
-    assert hass.states.get("binary_sensor.fake_brand_homeappliance_pump") is None
-    assert hass.states.get(PROBLEM_ENTITY_ID).state == STATE_ON
-
-    await update_entity(mock_appliance.entities["Test.Event2"], {"value": 0})
-    await hass.async_block_till_done()
-    assert hass.states.get(PROBLEM_ENTITY_ID).state == STATE_OFF
-
-
-async def test_no_problem_sensor_without_problems(
-    hass: HomeAssistant,
-    mock_appliance: Appliance,
-    patch_entity_description: None,
-) -> None:
-    """An appliance without problem sensors gets no Problem sensor."""
-    assert await setup_config_entry(hass, MOCK_CONFIG_DATA)
-    assert hass.states.get(PROBLEM_ENTITY_ID) is None

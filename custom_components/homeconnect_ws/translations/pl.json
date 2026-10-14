@@ -503,6 +503,30 @@
       }
     },
     "sensor": {
+      "sensor_problem": {
+        "name": "Problem",
+        "state": {
+          "ok": "OK",
+          "aqua_stop": "AquaStop wystąpił",
+          "bean_container_empty": "Pojemnik na ziarna pusty",
+          "door_not_lockable": "Nie można zablokować drzwi",
+          "door_not_unlockable": "Nie można odblokować drzwi",
+          "drainingnotpossible": "Odprowadzanie niemożliwe",
+          "drainpumpblocked": "Pompa odpływowa zablokowana",
+          "fatal_error_occurred": "Błąd krytyczny",
+          "flexspray_error_blocked": "FlexSpray zablokowany",
+          "flexspray_error_general": "Błąd FlexSpray",
+          "flexspray_error_spray_arm_not_mounted": "Ramię spryskiwacza niezamontowane",
+          "idos_unit_defect": "Usterka i-DOS",
+          "low_voltage": "Niskie napięcie",
+          "low_water_pressure": "Niskie ciśnienie wody",
+          "program_aborted": "Program przerwany",
+          "pump_error": "Błąd pompy",
+          "spin_abort": "Wirowanie przerwane",
+          "supply_voltage_too_low": "Napięcie zasilania za niskie",
+          "water_level_too_high": "Wysoki poziom wody"
+        }
+      },
       "sensor_remaining_program_time": {
         "name": "Pozostały czas programu"
       },

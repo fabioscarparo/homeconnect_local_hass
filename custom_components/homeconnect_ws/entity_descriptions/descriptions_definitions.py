@@ -148,6 +148,8 @@ class HCBinarySensorEntityDescription(
     value_on: set[str] | None = None
     value_off: set[str] | None = None
     available_access: tuple[Access, ...] = (Access.READ, Access.READ_WRITE)
+    # Problem sensors only: whether the appliance's Problem sensor counts this one
+    in_problem_sensor: bool = True
 
 
 class HCButtonEntityDescription(

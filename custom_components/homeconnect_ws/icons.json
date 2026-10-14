@@ -320,6 +320,12 @@
             "binary_sensor_coffee_close_door": {}
         },
         "sensor": {
+            "sensor_problem": {
+                "default": "mdi:alert-circle-outline",
+                "state": {
+                    "ok": "mdi:check-circle-outline"
+                }
+            },
             "sensor_laundry_load_recommendation": {
                 "default": "mdi:weight-kilogram"
             },

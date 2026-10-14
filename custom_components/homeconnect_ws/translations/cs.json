@@ -449,6 +449,31 @@
       }
     },
     "sensor": {
+      "sensor_problem": {
+        "name": "Problém",
+        "state": {
+          "ok": "OK",
+          "aqua_stop": "Zasáhl AquaStop",
+          "door_not_lockable": "Dvířka nelze zamknout",
+          "door_not_unlockable": "Dvířka nelze odemknout",
+          "drainingnotpossible": "Nelze odčerpat vodu",
+          "drainpumpblocked": "Zablokované vypouštěcí čerpadlo",
+          "fatal_error_occurred": "Závažná chyba",
+          "flexspray_error_blocked": "FlexSpray zablokovaný",
+          "flexspray_error_general": "Chyba FlexSpray",
+          "flexspray_error_spray_arm_not_mounted": "Ostřikovací rameno není nasazené",
+          "idos_open_tray": "Otevřená zásuvka i-DOS",
+          "idos_unit_defect": "Porucha i-DOS",
+          "low_voltage": "Nízké napětí",
+          "low_water_pressure": "Nízký tlak vody",
+          "program_aborted": "Program přerušen",
+          "pump_error": "Chyba čerpadla",
+          "release_rinse_hold_pending": "Čeká na ukončení stopu máchání",
+          "spin_abort": "Odstřeďování přerušeno",
+          "supply_voltage_too_low": "Nízké napájecí napětí",
+          "water_level_too_high": "Vysoká hladina vody"
+        }
+      },
       "sensor_remaining_program_time": {
         "name": "Zbývající čas programu"
       },
