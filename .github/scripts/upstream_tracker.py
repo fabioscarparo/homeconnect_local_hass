@@ -26,6 +26,7 @@ from datetime import UTC, datetime, time, timedelta
 from pathlib import Path
 from typing import Any
 from urllib.parse import urlencode
+from zoneinfo import ZoneInfo
 
 import yaml
 
@@ -45,6 +46,8 @@ UPSTREAM_LINK = f"https://redirect.github.com/{UPSTREAM}/pull/{{}}"
 PORTED_RE = re.compile(
     rf"\bport(?:ed|s)?\b(?:\s+from)?\s+{re.escape(UPSTREAM)}#(\d+)", re.IGNORECASE
 )
+# Times in the issue are shown in the maintainer's time zone, PST or PDT
+DISPLAY_TZ = ZoneInfo("America/Los_Angeles")
 PR_FIELDS = "number,title,author,state,updatedAt,closedAt,mergedAt,additions,deletions"
 
 
@@ -256,7 +259,7 @@ def pr_line(result: Result, repo: str, now: datetime) -> str:
         parts.append("closed upstream in the last day")
     updated = parse_time(pr["updatedAt"])
     if updated and now - updated < SETTLE_TIME:
-        parts.append(f"⏳ still changing, updated {updated.date()}")
+        parts.append(f"⏳ still changing, updated {updated.astimezone(DISPLAY_TZ).date()}")
     if result.note:
         parts.append(result.note)
     if result.fork_pr:
@@ -282,7 +285,7 @@ def issue_body(results: list[Result], exclusions: dict[int, str], repo: str, now
         (
             f"Upstream PRs from {UPSTREAM} that aren't in this fork yet. The "
             f"[upstream tracker]({tracker}) updates this daily; last run "
-            f"{now:%Y-%m-%d %H:%M} UTC."
+            f"{now.astimezone(DISPLAY_TZ):%Y-%m-%d %-I:%M %p %Z}."
         ),
         "",
         (
@@ -345,7 +348,9 @@ def main() -> None:
         if number in rejected and number not in in_progress:
             exclusions[number] = f"{pr['title']} (fork PR #{rejected[number]} closed)"
         elif pr["state"] == "CLOSED" and closed and now - closed > CLOSE_GRACE:
-            exclusions[number] = f"{pr['title']} (closed upstream on {closed.date()})"
+            exclusions[number] = (
+                f"{pr['title']} (closed upstream on {closed.astimezone(DISPLAY_TZ).date()})"
+            )
         else:
             pending.append(pr)
 
