@@ -258,6 +258,16 @@
       }
     },
     "sensor": {
+      "sensor_problem": {
+        "name": "Проблема",
+        "state": {
+          "ok": "OK",
+          "aqua_stop": "Произошло AquaStop",
+          "bean_container_empty": "Контейнер для зерен пуст",
+          "low_water_pressure": "Низкое давление воды",
+          "program_aborted": "Программа прервана"
+        }
+      },
       "sensor_remaining_program_time": {
         "name": "Оставшееся время программы"
       },

@@ -391,6 +391,27 @@
       }
     },
     "sensor": {
+      "sensor_problem": {
+        "name": "Problem",
+        "state": {
+          "ok": "OK",
+          "aqua_stop": "AquaStop oppstod",
+          "bean_container_empty": "Bønnebeholder tom",
+          "door_not_lockable": "Dør kan ikke låses",
+          "door_not_unlockable": "Dør kan ikke låses opp",
+          "drainingnotpossible": "Tømming ikke mulig",
+          "drainpumpblocked": "Tømmepumpe blokkert",
+          "fatal_error_occurred": "Kritisk feil",
+          "idos_unit_defect": "i-DOS defekt",
+          "low_voltage": "Lav spenning",
+          "low_water_pressure": "Lavt vanntrykk",
+          "program_aborted": "Program avbrutt",
+          "pump_error": "Pumpefeil",
+          "spin_abort": "Sentrifugering avbrutt",
+          "supply_voltage_too_low": "Forsyningsspenning lav",
+          "water_level_too_high": "Vannnivå høyt"
+        }
+      },
       "sensor_remaining_program_time": {
         "name": "Gjenværende programtid"
       },

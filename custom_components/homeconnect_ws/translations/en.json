@@ -321,9 +321,6 @@
       "connection": {
         "name": "Connection"
       },
-      "binary_sensor_problem": {
-        "name": "Problem"
-      },
       "binary_sensor_door_state": {
         "name": "Door"
       },
@@ -636,6 +633,38 @@
       }
     },
     "sensor": {
+      "sensor_problem": {
+        "name": "Problem",
+        "state": {
+          "ok": "OK",
+          "aqua_stop": "AquaStop triggered",
+          "bean_container_empty": "Bean container empty",
+          "coffee_brewing_unit_missing": "Brewing unit missing",
+          "coffee_outlet_missing": "Beverage outlet missing",
+          "condensate_container_full": "Condensate container full",
+          "door_not_lockable": "Door can't be locked",
+          "door_not_unlockable": "Door can't be unlocked",
+          "drainingnotpossible": "Draining not possible",
+          "drainpumpblocked": "Drain pump blocked",
+          "fatal_error_occurred": "Fatal error",
+          "flexspray_error_blocked": "FlexSpray blocked",
+          "flexspray_error_general": "FlexSpray error",
+          "flexspray_error_spray_arm_not_mounted": "Spray arm not mounted",
+          "foam_detection": "Foam detected",
+          "freezer_appliance_error": "Freezer error",
+          "idos_open_tray": "i-DOS tray open",
+          "idos_unit_defect": "i-DOS defect",
+          "low_voltage": "Low voltage",
+          "low_water_pressure": "Low water pressure",
+          "oven_cavity_temperature_too_high": "Cavity temperature too high",
+          "program_aborted": "Program aborted",
+          "pump_error": "Pump error",
+          "release_rinse_hold_pending": "Rinse hold release pending",
+          "spin_abort": "Spin aborted",
+          "supply_voltage_too_low": "Supply voltage low",
+          "water_level_too_high": "Water level too high"
+        }
+      },
       "sensor_remaining_program_time": {
         "name": "Remaining Program Time"
       },

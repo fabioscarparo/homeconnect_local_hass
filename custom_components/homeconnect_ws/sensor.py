@@ -7,10 +7,15 @@ from datetime import timedelta
 from typing import TYPE_CHECKING, Any, ClassVar, cast
 
 from home_disconnect.entities import Program
-from homeassistant.components.sensor import SensorEntity
+from homeassistant.components.binary_sensor.const import BinarySensorDeviceClass
+from homeassistant.components.sensor import SensorDeviceClass, SensorEntity
 
 from .entity import HCEntity
-from .helpers import create_entities
+from .entity_descriptions.descriptions_definitions import (
+    HCBinarySensorEntityDescription,
+    HCSensorEntityDescription,
+)
+from .helpers import binary_is_on, create_entities
 
 _LOGGER = logging.getLogger(__name__)
 
@@ -20,7 +25,6 @@ if TYPE_CHECKING:
     from homeassistant.helpers.entity_platform import AddEntitiesCallback
 
     from . import HCConfigEntry, HCData
-    from .entity_descriptions.descriptions_definitions import HCSensorEntityDescription
 
 PARALLEL_UPDATES = 0
 
@@ -89,6 +93,16 @@ async def async_setup_entry(
         },
         config_entry.runtime_data,
     )
+    problem_descriptions = [
+        cast("HCBinarySensorEntityDescription", description)
+        for description in config_entry.runtime_data.available_entity_descriptions.get(
+            "binary_sensor", []
+        )
+        if description.device_class == BinarySensorDeviceClass.PROBLEM
+        and cast("HCBinarySensorEntityDescription", description).in_problem_sensor
+    ]
+    if problem_descriptions:
+        entities.add(HCProblemSensor(problem_descriptions, config_entry.runtime_data))
     async_add_entites(entities)
 
 
@@ -202,6 +216,63 @@ class HCEventSensor(HCEntity, SensorEntity):
             self._runtime_data.appliance.connected
             or self._runtime_data.coordinator.expected_offline
         )
+
+
+PROBLEM_SENSOR_KEY = "sensor_problem"
+PROBLEM_OK = "ok"
+
+
+def problem_state(description: HCBinarySensorEntityDescription) -> str:
+    """Get the Problem sensor's state for a problem: its binary sensor's key, unprefixed."""
+    return (description.translation_key or description.key).removeprefix("binary_sensor_")
+
+
+class HCProblemSensor(HCEntity, SensorEntity):
+    """
+    Which problem is stopping the appliance from working, or "ok".
+
+    Alarms and reminders (in_problem_sensor=False) have their own binary sensors instead. The
+    per-problem binary sensors counted here are disabled by default, so this is the one to
+    watch; enable one to see or automate on that problem alone, also while another one is
+    shown here.
+    """
+
+    entity_description: HCSensorEntityDescription
+
+    def __init__(
+        self, problem_descriptions: list[HCBinarySensorEntityDescription], runtime_data: HCData
+    ) -> None:
+        super().__init__(
+            HCSensorEntityDescription(
+                key=PROBLEM_SENSOR_KEY,
+                entities=[
+                    description.entity for description in problem_descriptions if description.entity
+                ],
+                device_class=SensorDeviceClass.ENUM,
+            ),
+            runtime_data,
+        )
+        self._problems = [
+            (problem_state(description), description, runtime_data.appliance.entities[entity])
+            for description in problem_descriptions
+            if (entity := description.entity)
+        ]
+        self._attr_options = list(dict.fromkeys([PROBLEM_OK] + [p[0] for p in self._problems]))
+
+    @property
+    def native_value(self) -> str | None:
+        states = [
+            (state, binary_is_on(description, entity))
+            for state, description, entity in self._problems
+        ]
+        for state, is_on in states:
+            if is_on:
+                return state
+        if all(is_on is None for _, is_on in states):
+            # None of them reported yet.
+            return None
+        # A problem the appliance hasn't reported isn't active.
+        return PROBLEM_OK
 
 
 class HCActiveProgram(HCSensor):

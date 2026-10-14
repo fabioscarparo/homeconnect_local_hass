@@ -408,6 +408,30 @@
       }
     },
     "sensor": {
+      "sensor_problem": {
+        "name": "Problema",
+        "state": {
+          "ok": "OK",
+          "aqua_stop": "AquaStop intervenuto",
+          "bean_container_empty": "Contenitore chicchi vuoto",
+          "door_not_lockable": "Porta non bloccabile",
+          "door_not_unlockable": "Porta non sbloccabile",
+          "drainingnotpossible": "Drenaggio non possibile",
+          "drainpumpblocked": "Pompa di drenaggio bloccata",
+          "fatal_error_occurred": "Errore generale",
+          "idos_open_tray": "Cassetto detersivo aperto",
+          "idos_unit_defect": "Difetto unità i-DOS",
+          "low_voltage": "Tensione bassa",
+          "low_water_pressure": "Bassa pressione acqua",
+          "oven_cavity_temperature_too_high": "Temperatura del forno troppo alta",
+          "program_aborted": "Programma interrotto",
+          "pump_error": "Errore pompa",
+          "release_rinse_hold_pending": "Ammollo a fine ciclo in sospeso",
+          "spin_abort": "Centrifuga annullata",
+          "supply_voltage_too_low": "Tensione di alimentazione bassa",
+          "water_level_too_high": "Livello acqua troppo alto"
+        }
+      },
       "sensor_remaining_program_time": {
         "name": "Tempo programma rimanente"
       },

@@ -391,6 +391,27 @@
       }
     },
     "sensor": {
+      "sensor_problem": {
+        "name": "Problème",
+        "state": {
+          "ok": "OK",
+          "aqua_stop": "AquaStop déclenché",
+          "bean_container_empty": "Bac à grains vide",
+          "door_not_lockable": "Porte non verrouillable",
+          "door_not_unlockable": "Porte non deverrouiable",
+          "drainingnotpossible": "Draining Not Possible",
+          "drainpumpblocked": "Drain Pump Blocked",
+          "fatal_error_occurred": "Erreur fatale",
+          "idos_unit_defect": "i-DOS Defect",
+          "low_voltage": "Faible Voltage",
+          "low_water_pressure": "Pression d'eau faible",
+          "program_aborted": "Programme annulé",
+          "pump_error": "Erreur de la pompe",
+          "spin_abort": "Essorage annulé",
+          "supply_voltage_too_low": "Tension faible",
+          "water_level_too_high": "Nideau d'eau trop élevé"
+        }
+      },
       "sensor_remaining_program_time": {
         "name": "Temps restant"
       },
