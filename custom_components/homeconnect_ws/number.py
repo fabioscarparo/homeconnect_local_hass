@@ -25,6 +25,10 @@ if TYPE_CHECKING:
 
 PARALLEL_UPDATES = 0
 
+# The longest delay when the appliance doesn't report a maximum, in minutes: 24 hours, like
+# the Delay start select before 2.0 and the Home Connect app.
+DELAY_START_FALLBACK_MAX = 24 * 60
+
 
 async def async_setup_entry(
     hass: HomeAssistant,  # noqa: ARG001
@@ -137,7 +141,7 @@ class HCDelayStartNumber(HCEntity, RestoreNumber):
         # longest delay is a bit shorter; the Start button says so if it's too long.
         if self._entity is not None and getattr(self._entity, "max", None) is not None:
             return float(self._entity.max) / 60
-        return DEFAULT_MAX_VALUE
+        return DELAY_START_FALLBACK_MAX
 
     @property
     def native_step(self) -> float | None:
