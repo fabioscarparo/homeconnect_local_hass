@@ -616,6 +616,13 @@ async def test_internal_light(mock_homeconnect_appliance: MockApplianceFactory) 
         entity="Refrigeration.Common.Setting.Light.Internal.Power",
     )
 
+    # Fixed power: the light can't be switched
+    fixed = copy.deepcopy(INTERNAL_LIGHT)
+    fixed["setting"][0]["access"] = Access.READ_STATIC
+    appliance = await mock_homeconnect_appliance(description=fixed)
+    assert generate_internal_light(appliance) is None
+    assert generate_internal_light_brightness(appliance).entity_registry_enabled_default
+
     # No internal light
     appliance = await mock_homeconnect_appliance(description={})
     assert generate_internal_light(appliance) is None

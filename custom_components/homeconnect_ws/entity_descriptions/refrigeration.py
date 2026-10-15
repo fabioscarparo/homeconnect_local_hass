@@ -4,6 +4,7 @@ from __future__ import annotations
 
 from typing import TYPE_CHECKING
 
+from home_disconnect.entities import Access
 from homeassistant.components.binary_sensor.const import BinarySensorDeviceClass
 from homeassistant.components.number import NumberDeviceClass, NumberMode
 from homeassistant.components.sensor import SensorDeviceClass, SensorStateClass
@@ -27,14 +28,30 @@ if TYPE_CHECKING:
     from home_disconnect import Appliance
 
 
+_INTERNAL_LIGHT_POWER = "Refrigeration.Common.Setting.Light.Internal.Power"
+_INTERNAL_LIGHT_BRIGHTNESS = "Refrigeration.Common.Setting.Light.Internal.Brightness"
+
+
+def _has_internal_light(appliance: Appliance) -> bool:
+    """
+    Whether the interior light can be switched.
+
+    Some appliances list its power as fixed (Access.READ_STATIC, e.g. a Thermador
+    T36IF905SP freezer): the light just comes on with the door, and a light
+    entity for it could never be used.
+    """
+    power = appliance.entities.get(_INTERNAL_LIGHT_POWER)
+    return power is not None and power.access is not Access.READ_STATIC
+
+
 def generate_internal_light(appliance: Appliance) -> HCLightEntityDescription | None:
     """Get internal light description."""
-    if "Refrigeration.Common.Setting.Light.Internal.Power" not in appliance.entities:
+    if not _has_internal_light(appliance):
         return None
-    brightness = "Refrigeration.Common.Setting.Light.Internal.Brightness"
+    brightness = _INTERNAL_LIGHT_BRIGHTNESS
     return HCLightEntityDescription(
         key="light_internal",
-        entity="Refrigeration.Common.Setting.Light.Internal.Power",
+        entity=_INTERNAL_LIGHT_POWER,
         brightness_entity=brightness if brightness in appliance.entities else None,
     )
 
@@ -43,20 +60,18 @@ def generate_internal_light_brightness(
     appliance: Appliance,
 ) -> HCNumberEntityDescription | None:
     """Get internal light brightness description."""
-    if "Refrigeration.Common.Setting.Light.Internal.Brightness" not in appliance.entities:
+    if _INTERNAL_LIGHT_BRIGHTNESS not in appliance.entities:
         return None
-
-    # The light entity already exposes brightness, so this would be a
-    # second control for the same setting.
-    owned_by_light = "Refrigeration.Common.Setting.Light.Internal.Power" in appliance.entities
 
     return HCNumberEntityDescription(
         key="number_light_internal_brightness",
-        entity="Refrigeration.Common.Setting.Light.Internal.Brightness",
+        entity=_INTERNAL_LIGHT_BRIGHTNESS,
         native_unit_of_measurement=PERCENTAGE,
         mode=NumberMode.AUTO,
         native_step=1,
-        entity_registry_enabled_default=not owned_by_light,
+        # The light entity already exposes brightness, so this would be a
+        # second control for the same setting.
+        entity_registry_enabled_default=not _has_internal_light(appliance),
     )
 
 
