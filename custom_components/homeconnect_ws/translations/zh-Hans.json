@@ -1390,7 +1390,7 @@
         }
       },
       "select_door_light_ring_brightness": {
-        "name": "门环形灯亮度",
+        "name": "门环形灯亮度等级",
         "state": {
           "low": "低",
           "medium": "中",

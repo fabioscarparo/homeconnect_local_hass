@@ -1524,7 +1524,7 @@
         }
       },
       "select_door_light_ring_brightness": {
-        "name": "Jas světelného kruhu dvířek",
+        "name": "Úroveň jasu světelného kruhu dvířek",
         "state": {
           "low": "Nízký",
           "medium": "Střední",

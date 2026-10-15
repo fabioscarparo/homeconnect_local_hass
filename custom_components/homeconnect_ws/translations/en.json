@@ -3615,7 +3615,7 @@
         }
       },
       "select_door_light_ring_brightness": {
-        "name": "Door Ring light brightness Level",
+        "name": "Door Ring Light Brightness Level",
         "state": {
           "low": "Low",
           "medium": "Medium",
@@ -4302,7 +4302,7 @@
         "name": "Brightness"
       },
       "number_door_light_ring_brightness": {
-        "name": "Door Ring light brightness"
+        "name": "Door Ring Light Brightness"
       },
       "number_duration": {
         "name": "Duration"

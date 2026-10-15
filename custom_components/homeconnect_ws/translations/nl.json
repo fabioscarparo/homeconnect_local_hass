@@ -1702,7 +1702,7 @@
         }
       },
       "select_laundry_brightness": {
-        "name": "Helderheid",
+        "name": "Helderheidsniveau",
         "state": {
           "low": "Laag",
           "medium": "Gemiddeld",
@@ -1719,7 +1719,7 @@
         }
       },
       "select_door_light_ring_brightness": {
-        "name": "Deur ringlicht helderheid",
+        "name": "Helderheidsniveau deurverlichting",
         "state": {
           "low": "Laag",
           "medium": "Gemiddeld",

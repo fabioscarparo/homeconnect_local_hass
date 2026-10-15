@@ -1412,7 +1412,7 @@
         }
       },
       "select_laundry_brightness": {
-        "name": "Luminosité",
+        "name": "Niveau de luminosité",
         "state": {
           "low": "Faible",
           "medium": "Moyen",
@@ -1429,7 +1429,7 @@
         }
       },
       "select_door_light_ring_brightness": {
-        "name": "Luminosité de l'éclairage du hublot",
+        "name": "Niveau de luminosité de l'éclairage du hublot",
         "state": {
           "low": "Faible",
           "medium": "Moyen",
