@@ -683,15 +683,6 @@
       "sensor_delayed_shutoff_time": {
         "name": "Arrêt programmé"
       },
-      "sensor_power_state": {
-        "name": "Etat de l'alimentation",
-        "state": {
-          "mainsoff": "Alimentation principale coupée",
-          "off": "Éteint",
-          "on": "Allumé",
-          "standby": "En veille"
-        }
-      },
       "sensor_door_state": {
         "name": "Porte",
         "state": {

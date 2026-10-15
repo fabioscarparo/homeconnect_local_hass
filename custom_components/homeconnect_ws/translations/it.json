@@ -627,15 +627,6 @@
       "sensor_delayed_shutoff_time": {
         "name": "Spegnimento ritardato"
       },
-      "sensor_power_state": {
-        "name": "Stato alimentazione",
-        "state": {
-          "mainsoff": "Alimentazione spenta",
-          "off": "Spento",
-          "on": "Acceso",
-          "standby": "In attesa"
-        }
-      },
       "sensor_door_state": {
         "name": "Porta",
         "state": {

@@ -662,15 +662,6 @@
       "sensor_delayed_shutoff_time": {
         "name": "Forsinket avstenging"
       },
-      "sensor_power_state": {
-        "name": "Strømtilstand",
-        "state": {
-          "mainsoff": "Nett av",
-          "off": "Av",
-          "on": "På",
-          "standby": "Standby"
-        }
-      },
       "sensor_door_state": {
         "name": "Dør",
         "state": {

@@ -620,15 +620,6 @@
       "sensor_delayed_shutoff_time": {
         "name": "Отложенное выключение"
       },
-      "sensor_power_state": {
-        "name": "Состояние питания",
-        "state": {
-          "mainsoff": "Питание отключено",
-          "off": "Выключено",
-          "on": "Включено",
-          "standby": "Ожидание"
-        }
-      },
       "sensor_door_state": {
         "name": "Дверь",
         "state": {

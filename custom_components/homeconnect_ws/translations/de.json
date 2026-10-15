@@ -1983,15 +1983,6 @@
       "sensor_delayed_shutoff_time": {
         "name": "Verzögerte Abschaltung"
       },
-      "sensor_power_state": {
-        "name": "Status",
-        "state": {
-          "mainsoff": "Strom getrennt",
-          "off": "Aus",
-          "on": "An",
-          "standby": "Standby"
-        }
-      },
       "sensor_door_state": {
         "name": "Tür",
         "state": {

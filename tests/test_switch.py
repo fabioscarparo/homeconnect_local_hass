@@ -247,6 +247,32 @@ async def test_is_on_not_forced_when_not_expected_offline() -> None:
     assert entity.is_on is None
 
 
+@pytest.mark.parametrize(
+    ("value", "is_on"),
+    [("On", True), ("Off", False), ("MainsOff", False), ("Standby", False)],
+)
+async def test_is_on_with_on_values(value: str, *, is_on: bool) -> None:
+    """A power switch shows off for every state but on, not just the one it sets."""
+    appliance = MagicMock()
+    appliance.info = {"deviceID": "test_device_id"}
+    appliance.entities = {"BSH.Common.Setting.PowerState": MagicMock(value=value)}
+    runtime_data = HCData(
+        appliance=appliance,
+        device_info=MagicMock(),
+        available_entity_descriptions=MagicMock(),
+        coordinator=MagicMock(expected_offline=False),
+    )
+    entity_description = HCSwitchEntityDescription(
+        key="switch_power_state",
+        entity="BSH.Common.Setting.PowerState",
+        value_mapping=("On", "Off"),
+        on_values=("On",),
+    )
+    entity = HCSwitch(entity_description, runtime_data)
+
+    assert entity.is_on is is_on
+
+
 async def test_available_and_readonly_when_option_locked(
     hass: HomeAssistant,
     mock_appliance: Appliance,

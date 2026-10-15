@@ -417,15 +417,6 @@
             "sensor_delayed_shutoff_time": {
                 "default": "mdi:timer-stop-outline"
             },
-            "sensor_power_state": {
-                "default": "mdi:power",
-                "state": {
-                    "mainsoff": "mdi:power-plug-off-outline",
-                    "off": "mdi:power-off",
-                    "on": "mdi:power-on",
-                    "standby": "mdi:power-standby"
-                }
-            },
             "sensor_door_state": {
                 "default": "mdi:door",
                 "state": {

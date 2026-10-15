@@ -760,15 +760,6 @@
       "sensor_delayed_shutoff_time": {
         "name": "Vertraagde uitschakeling"
       },
-      "sensor_power_state": {
-        "name": "Voedingsstatus",
-        "state": {
-          "mainsoff": "Voeding uit",
-          "off": "Uit",
-          "on": "Aan",
-          "standby": "Standby"
-        }
-      },
       "sensor_door_state": {
         "name": "Deur",
         "state": {

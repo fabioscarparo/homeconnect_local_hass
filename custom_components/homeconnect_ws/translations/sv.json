@@ -719,15 +719,6 @@
       "sensor_delayed_shutoff_time": {
         "name": "Fördröjd avstängning"
       },
-      "sensor_power_state": {
-        "name": "Strömläge",
-        "state": {
-          "mainsoff": "Huvudström av",
-          "off": "Av",
-          "on": "På",
-          "standby": "Vänteläge"
-        }
-      },
       "sensor_door_state": {
         "name": "Dörr",
         "state": {

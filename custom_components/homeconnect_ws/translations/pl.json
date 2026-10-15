@@ -1634,15 +1634,6 @@
       "sensor_delayed_shutoff_time": {
         "name": "Opóźnione wyłączenie"
       },
-      "sensor_power_state": {
-        "name": "Stan zasilania",
-        "state": {
-          "mainsoff": "sieć wyłączona",
-          "off": "wyłączony",
-          "on": "włączony",
-          "standby": "czuwanie"
-        }
-      },
       "sensor_door_state": {
         "name": "Drzwi",
         "state": {

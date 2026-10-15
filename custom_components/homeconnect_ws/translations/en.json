@@ -1812,15 +1812,6 @@
       "sensor_delayed_shutoff_time": {
         "name": "Delayed Shutoff"
       },
-      "sensor_power_state": {
-        "name": "Power state",
-        "state": {
-          "mainsoff": "Mains off",
-          "off": "Off",
-          "on": "On",
-          "standby": "Standby"
-        }
-      },
       "sensor_door_state": {
         "name": "Door",
         "state": {

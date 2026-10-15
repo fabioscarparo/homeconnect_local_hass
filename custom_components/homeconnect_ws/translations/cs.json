@@ -815,15 +815,6 @@
       "sensor_delayed_shutoff_time": {
         "name": "Dobíhání"
       },
-      "sensor_power_state": {
-        "name": "Stav napájení",
-        "state": {
-          "mainsoff": "Odpojeno od sítě",
-          "off": "Vypnuto",
-          "on": "Zapnuto",
-          "standby": "Pohotovostní režim"
-        }
-      },
       "sensor_door_state": {
         "name": "Dvířka",
         "state": {
