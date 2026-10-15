@@ -27,7 +27,40 @@ from .descriptions_definitions import (
 )
 
 if TYPE_CHECKING:
+    from home_disconnect import Appliance
+
     from .descriptions_definitions import _EntityDescriptionsDefinitionsType
+
+
+def generate_speed_perfect(appliance: Appliance) -> HCSwitchEntityDescription | None:
+    """
+    Get the Speed Perfect switch description.
+
+    Washers have it under two names, LaundryCare.Common.Option.SpeedPerfect and
+    LaundryCare.Washer.Option.SpeedPerfect, both in the profile. A WGB244A0BY's
+    debug log (fork issue #59) only ever used the Common one, but a WGB256ABSN
+    profile has a few programs with only the Washer one. So one switch backs
+    both and follows whichever the program offers. Keeps each one's own key
+    when it's the only one, so existing entities keep their IDs.
+    """
+    common = "LaundryCare.Common.Option.SpeedPerfect"
+    washer = "LaundryCare.Washer.Option.SpeedPerfect"
+    if common in appliance.entities:
+        return HCSwitchEntityDescription(
+            key="switch_laundry_common_speed_perfect",
+            entity=common,
+            alternate_entities=(washer,) if washer in appliance.entities else None,
+            device_class=SwitchDeviceClass.SWITCH,
+            translation_key="switch_laundry_speed_perfect",
+        )
+    if washer in appliance.entities:
+        return HCSwitchEntityDescription(
+            key="switch_laundry_speed_perfect",
+            entity=washer,
+            device_class=SwitchDeviceClass.SWITCH,
+        )
+    return None
+
 
 LAUNDRY_ENTITY_DESCRIPTIONS: _EntityDescriptionsDefinitionsType = {
     "sensor": [
@@ -505,12 +538,7 @@ LAUNDRY_ENTITY_DESCRIPTIONS: _EntityDescriptionsDefinitionsType = {
             entity="LaundryCare.Common.Option.SilentMode",
             device_class=SwitchDeviceClass.SWITCH,
         ),
-        HCSwitchEntityDescription(
-            key="switch_laundry_common_speed_perfect",
-            entity="LaundryCare.Common.Option.SpeedPerfect",
-            device_class=SwitchDeviceClass.SWITCH,
-            translation_key="switch_laundry_speed_perfect",
-        ),
+        generate_speed_perfect,
         HCSwitchEntityDescription(
             key="switch_laundry_low_temperature_hygiene",
             entity="LaundryCare.Common.Option.LowTemperatureHygiene",
@@ -569,11 +597,6 @@ LAUNDRY_ENTITY_DESCRIPTIONS: _EntityDescriptionsDefinitionsType = {
         HCSwitchEntityDescription(
             key="switch_laundry_silent_wash",
             entity="LaundryCare.Washer.Option.SilentWash",
-            device_class=SwitchDeviceClass.SWITCH,
-        ),
-        HCSwitchEntityDescription(
-            key="switch_laundry_speed_perfect",
-            entity="LaundryCare.Washer.Option.SpeedPerfect",
             device_class=SwitchDeviceClass.SWITCH,
         ),
         HCSwitchEntityDescription(

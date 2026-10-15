@@ -3,7 +3,7 @@
 from __future__ import annotations
 
 from typing import TYPE_CHECKING
-from unittest.mock import MagicMock
+from unittest.mock import AsyncMock, MagicMock
 
 import pytest
 from custom_components.homeconnect_ws import HCData
@@ -11,6 +11,7 @@ from custom_components.homeconnect_ws.entity_descriptions.descriptions_definitio
     HCSwitchEntityDescription,
 )
 from custom_components.homeconnect_ws.switch import HCSwitch
+from home_disconnect import Access
 from home_disconnect.messages import Action, Message
 from homeassistant.components.switch import DOMAIN as SWITCH_DOMAIN
 from homeassistant.const import (
@@ -390,3 +391,47 @@ async def test_turn_on_raises_when_setting_locked(
         )
 
     mock_appliance.session.request.assert_not_awaited()
+
+
+async def test_switch_follows_offered_alternate() -> None:
+    """A feature under two names reads and writes the one the program offers."""
+    common = MagicMock(
+        value=False, access=Access.NONE, available=True, locked=False, set_value=AsyncMock()
+    )
+    washer = MagicMock(
+        value=True, access=Access.READ_WRITE, available=True, locked=False, set_value=AsyncMock()
+    )
+    appliance = MagicMock()
+    appliance.info = {"deviceID": "test_device_id"}
+    appliance.entities = {
+        "LaundryCare.Common.Option.SpeedPerfect": common,
+        "LaundryCare.Washer.Option.SpeedPerfect": washer,
+    }
+    runtime_data = HCData(
+        appliance=appliance,
+        device_info=MagicMock(),
+        available_entity_descriptions=MagicMock(),
+        coordinator=MagicMock(expected_offline=False),
+    )
+    entity = HCSwitch(
+        HCSwitchEntityDescription(
+            key="switch_laundry_common_speed_perfect",
+            entity="LaundryCare.Common.Option.SpeedPerfect",
+            alternate_entities=("LaundryCare.Washer.Option.SpeedPerfect",),
+        ),
+        runtime_data,
+    )
+    entity.async_write_ha_state = MagicMock()
+
+    assert entity.is_on is True
+    await entity.async_turn_off()
+    assert washer.set_value.await_args.args == (False,)
+
+    # The next program offers the Common one instead
+    common.access = Access.READ_WRITE
+    washer.access = Access.NONE
+    await entity.callback(common)
+
+    assert entity.is_on is False
+    await entity.async_turn_on()
+    assert common.set_value.await_args.args == (True,)
