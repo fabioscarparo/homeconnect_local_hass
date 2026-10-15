@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import copy
 import json
 import re
 from datetime import datetime
@@ -148,77 +149,95 @@ POWER_SWITCH = {
 
 
 async def test_power_switch(mock_homeconnect_appliance: MockApplianceFactory) -> None:
-    """Test dynamic Power switch."""
-    device_description = POWER_SWITCH.copy()
+    """Power state gets one entity: a switch for two states, a select for more."""
+    device_description = copy.deepcopy(POWER_SWITCH)
 
     # On/Off Switch
     device_description["setting"][0]["min"] = 1
     device_description["setting"][0]["max"] = 2
     appliance = await mock_homeconnect_appliance(description=device_description)
-    switch_description = generate_power_switch(appliance)
+    power_descriptions = generate_power_switch(appliance)
 
-    assert switch_description["switch"][0] == HCSwitchEntityDescription(
-        key="switch_power_state",
-        entity="BSH.Common.Setting.PowerState",
-        device_class=SwitchDeviceClass.SWITCH,
-        value_mapping=("On", "Off"),
-        force_off_when_expected_offline=True,
-    )
-    assert switch_description["select"][0].force_option_when_expected_offline == "off"
-    assert switch_description["sensor"][0].force_option_when_expected_offline == "off"
+    assert power_descriptions == {
+        "switch": [
+            HCSwitchEntityDescription(
+                key="switch_power_state",
+                entity="BSH.Common.Setting.PowerState",
+                device_class=SwitchDeviceClass.SWITCH,
+                value_mapping=("On", "Off"),
+                on_values=("On",),
+                force_off_when_expected_offline=True,
+            )
+        ]
+    }
 
-    # No Switch
+    # More than two states: a select, enabled by default
     device_description["setting"][0]["min"] = 0
     device_description["setting"][0]["max"] = 4
     appliance = await mock_homeconnect_appliance(description=device_description)
-    switch_description = generate_power_switch(appliance)
+    power_descriptions = generate_power_switch(appliance)
 
-    assert "switch" not in switch_description
-    assert switch_description["select"][0].force_option_when_expected_offline == "off"
-    assert switch_description["sensor"][0].force_option_when_expected_offline == "off"
+    assert set(power_descriptions) == {"select"}
+    select = power_descriptions["select"][0]
+    assert select.key == "select_power_state"
+    assert sorted(select.options) == ["mainsoff", "off", "on", "standby"]
+    assert select.entity_registry_enabled_default
+    assert select.force_option_when_expected_offline == "off"
 
-    # On/MainsOff Switch - "Off" isn't one of this appliance's power states at
-    # all, only "MainsOff" is, so forcing to "off" would return an option
-    # SelectEntity doesn't recognize (confirmed live on fork issue #7 as the
-    # entity's state silently degrading to "Unknown").
+    # On/MainsOff Switch
     device_description["setting"][0]["enumeration"] = {"0": "MainsOff", "2": "On"}
     appliance = await mock_homeconnect_appliance(description=device_description)
-    switch_description = generate_power_switch(appliance)
+    power_descriptions = generate_power_switch(appliance)
 
-    assert switch_description["switch"][0] == HCSwitchEntityDescription(
-        key="switch_power_state",
-        entity="BSH.Common.Setting.PowerState",
-        device_class=SwitchDeviceClass.SWITCH,
-        value_mapping=("On", "MainsOff"),
-        force_off_when_expected_offline=True,
-    )
-    assert switch_description["select"][0].force_option_when_expected_offline == "mainsoff"
-    assert switch_description["sensor"][0].force_option_when_expected_offline == "mainsoff"
+    assert set(power_descriptions) == {"switch"}
+    assert power_descriptions["switch"][0].value_mapping == ("On", "MainsOff")
 
     # Standby/Off Switch
     device_description["setting"][0]["enumeration"] = {"1": "Off", "3": "Standby"}
     appliance = await mock_homeconnect_appliance(description=device_description)
-    switch_description = generate_power_switch(appliance)
+    power_descriptions = generate_power_switch(appliance)
 
-    assert switch_description["switch"][0] == HCSwitchEntityDescription(
-        key="switch_power_state",
-        entity="BSH.Common.Setting.PowerState",
-        device_class=SwitchDeviceClass.SWITCH,
-        value_mapping=("Standby", "Off"),
-        force_off_when_expected_offline=True,
-    )
-    assert switch_description["select"][0].force_option_when_expected_offline == "off"
-    assert switch_description["sensor"][0].force_option_when_expected_offline == "off"
+    assert set(power_descriptions) == {"switch"}
+    assert power_descriptions["switch"][0].value_mapping == ("Standby", "Off")
+    assert power_descriptions["switch"][0].on_values == ("On", "Standby")
+
+    # Two states that aren't an on/off pair: a select
+    device_description["setting"][0]["enumeration"] = {"1": "Off", "2": "MainsOff"}
+    appliance = await mock_homeconnect_appliance(description=device_description)
+    power_descriptions = generate_power_switch(appliance)
+
+    assert set(power_descriptions) == {"select"}
+    assert power_descriptions["select"][0].force_option_when_expected_offline == "off"
 
     # Neither "Off" nor "MainsOff" is a valid state for this appliance at all -
     # nothing to force to, so it should fall back to None rather than an
     # invalid option.
-    device_description["setting"][0]["enumeration"] = {"2": "On", "3": "Standby"}
+    device_description["setting"][0]["enumeration"] = {"2": "On", "3": "Standby", "4": "Eco"}
     appliance = await mock_homeconnect_appliance(description=device_description)
-    switch_description = generate_power_switch(appliance)
+    power_descriptions = generate_power_switch(appliance)
 
-    assert switch_description["select"][0].force_option_when_expected_offline is None
-    assert switch_description["sensor"][0].force_option_when_expected_offline is None
+    assert set(power_descriptions) == {"select"}
+    assert power_descriptions["select"][0].force_option_when_expected_offline is None
+
+
+async def test_power_select_when_profile_says_read(
+    mock_homeconnect_appliance: MockApplianceFactory,
+) -> None:
+    """
+    A power state the profile marks "read" still gets a select, not a sensor.
+
+    Fork issue #7's Bosch WAU28PEHSN washer has access="read" with min 0 and
+    max 3 in its profile, and was turned off through its power state select.
+    """
+    device_description = copy.deepcopy(POWER_SWITCH)
+    device_description["setting"][0]["access"] = "read"
+    device_description["setting"][0]["min"] = 0
+    device_description["setting"][0]["max"] = 3
+    appliance = await mock_homeconnect_appliance(description=device_description)
+    power_descriptions = generate_power_switch(appliance)
+
+    assert set(power_descriptions) == {"select"}
+    assert sorted(power_descriptions["select"][0].options) == ["mainsoff", "off", "on", "standby"]
 
 
 async def test_power_switch_present_on_venting_hood(
@@ -260,6 +279,7 @@ async def test_power_switch_present_on_venting_hood(
         entity="BSH.Common.Setting.PowerState",
         device_class=SwitchDeviceClass.SWITCH,
         value_mapping=("On", "Off"),
+        on_values=("On",),
         force_off_when_expected_offline=True,
     )
 

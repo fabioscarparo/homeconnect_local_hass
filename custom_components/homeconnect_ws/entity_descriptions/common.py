@@ -134,69 +134,70 @@ def generate_delay_start(appliance: Appliance) -> HCNumberEntityDescription | No
 
 
 def generate_power_switch(appliance: Appliance) -> EntityDescriptions:
-    """Get Power switch description."""
+    """
+    Get the Power entity description: one switch or select.
+
+    A switch when the appliance switches between two states (on and off, or on
+    and standby), and a select for anything else. There's no read-only sensor:
+    while the appliance locks its power state, the switch or select shows it
+    read-only, like the Home Connect app does. The profile's access can't
+    decide this, since a profile marking it "read" doesn't mean it stays that
+    way (fork issue #7's washer was turned off through it).
+    """
     entity_descriptions = EntityDescriptions()
-    if entity := appliance.entities.get("BSH.Common.Setting.PowerState"):
-        entity_min = getattr(entity, "min", None)
-        entity_max = getattr(entity, "max", None)
-        if entity_min is not None and entity_max is not None:
-            # has min/max
-            settable_states = set()
-            for key, value in (entity.enum or {}).items():
-                if int(key) >= entity_min and int(key) <= entity_max:
-                    settable_states.add(value)
-        else:
-            settable_states = set((entity.enum or {}).values())
+    entity = appliance.entities.get("BSH.Common.Setting.PowerState")
+    if entity is None:
+        return entity_descriptions
 
-        if len(settable_states) == 2:
-            # only two power states
-            for mapping in POWER_SWITCH_VALUE_MAPINGS:
-                if settable_states == set(mapping):
-                    entity_descriptions["switch"] = [
-                        HCSwitchEntityDescription(
-                            key="switch_power_state",
-                            entity="BSH.Common.Setting.PowerState",
-                            device_class=SwitchDeviceClass.SWITCH,
-                            value_mapping=mapping,
-                            force_off_when_expected_offline=True,
-                        )
-                    ]
+    entity_min = getattr(entity, "min", None)
+    entity_max = getattr(entity, "max", None)
+    if entity_min is not None and entity_max is not None:
+        # has min/max
+        settable_states = set()
+        for key, value in (entity.enum or {}).items():
+            if int(key) >= entity_min and int(key) <= entity_max:
+                settable_states.add(value)
+    else:
+        settable_states = set((entity.enum or {}).values())
 
-        # "off" is only a valid option if this appliance's PowerState is
-        # actually settable to Off/MainsOff - forcing to a name that isn't
-        # one of its real options makes SelectEntity.state fall back to
-        # None (shown as "Unknown"), confirmed live on fork issue #7.
-        force_off_option = next(
-            (name.lower() for name in POWER_OFF_STATE_NAMES if name in settable_states),
-            None,
+    for mapping in POWER_SWITCH_VALUE_MAPINGS:
+        if settable_states == set(mapping):
+            entity_descriptions["switch"] = [
+                HCSwitchEntityDescription(
+                    key="switch_power_state",
+                    entity="BSH.Common.Setting.PowerState",
+                    device_class=SwitchDeviceClass.SWITCH,
+                    value_mapping=mapping,
+                    # MainsOff, Standby (when "On" is the on side) and Off all
+                    # mean not on, even the ones the switch never sets.
+                    on_values=tuple(sorted({mapping[0], "On"})),
+                    force_off_when_expected_offline=True,
+                )
+            ]
+            return entity_descriptions
+
+    entity_descriptions["select"] = [
+        HCSelectEntityDescription(
+            key="select_power_state",
+            entity="BSH.Common.Setting.PowerState",
+            options=[value.lower() for value in settable_states],
+            has_state_translation=True,
+            force_option_when_expected_offline=_power_off_option(settable_states),
         )
-
-        entity_descriptions["select"] = [
-            HCSelectEntityDescription(
-                key="select_power_state",
-                entity="BSH.Common.Setting.PowerState",
-                options=[value.lower() for value in settable_states],
-                has_state_translation=True,
-                # more then two power states
-                entity_registry_enabled_default=len(settable_states) > 2,
-                force_option_when_expected_offline=force_off_option,
-            )
-        ]
-
-        # Same race as the select above (BSH.Common.Setting.PowerState never gets
-        # a confirming update before a laundry appliance's clean disconnect), but
-        # for the read-only sensor mirror of power state - confirmed live on fork
-        # issue #7 as the sensor staying frozen on its last real value forever.
-        entity_descriptions["sensor"] = [
-            HCSensorEntityDescription(
-                key="sensor_power_state",
-                entity="BSH.Common.Setting.PowerState",
-                device_class=SensorDeviceClass.ENUM,
-                has_state_translation=True,
-                force_option_when_expected_offline=force_off_option,
-            )
-        ]
+    ]
     return entity_descriptions
+
+
+def _power_off_option(states: set[str]) -> str | None:
+    """
+    Return the option for powered off, if the appliance has one.
+
+    "off" is only a valid option if this appliance's PowerState actually has
+    Off/MainsOff - forcing to a name that isn't one of its real options makes
+    SelectEntity.state fall back to None (shown as "Unknown"), confirmed live
+    on fork issue #7.
+    """
+    return next((name.lower() for name in POWER_OFF_STATE_NAMES if name in states), None)
 
 
 def generate_door_state(appliance: Appliance) -> HCSensorEntityDescription | None:

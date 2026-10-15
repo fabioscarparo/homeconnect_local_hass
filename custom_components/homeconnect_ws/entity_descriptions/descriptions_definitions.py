@@ -70,6 +70,10 @@ class HCSwitchEntityDescription(
     """Description for Switch Entity."""
 
     value_mapping: tuple[str, str] | None = None
+    # The values that show as on; any other value shows as off. Without it, a
+    # value that's neither side of value_mapping shows as unknown. For power
+    # state, whose list of states is longer than the two the switch sets.
+    on_values: tuple[str, ...] | None = None
     available_access: tuple[Access, ...] = (Access.READ_WRITE, Access.WRITE_ONLY)
     # See HCSelectEntityDescription.force_option_when_expected_offline - same
     # race, but for the 2-state (on/off) power switch instead of the select.

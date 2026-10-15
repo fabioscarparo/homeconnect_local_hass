@@ -124,12 +124,6 @@
       "switch_child_lock": {
         "name": "Dětská pojistka"
       },
-      "switch_door_light_ring": {
-        "name": "Světelný kruh dvířek"
-      },
-      "switch_drum_light": {
-        "name": "Osvětlení bubnu"
-      },
       "switch_laundry_end_signal": {
         "name": "Signál ukončení"
       },
@@ -806,24 +800,6 @@
           "programabortedbyappliancecriticalerror": "Kritická chyba"
         }
       },
-      "sensor_interval_time_off": {
-        "name": "Interval vypnuto"
-      },
-      "sensor_interval_time_on": {
-        "name": "Interval zapnuto"
-      },
-      "sensor_delayed_shutoff_time": {
-        "name": "Dobíhání"
-      },
-      "sensor_power_state": {
-        "name": "Stav napájení",
-        "state": {
-          "mainsoff": "Odpojeno od sítě",
-          "off": "Vypnuto",
-          "on": "Zapnuto",
-          "standby": "Pohotovostní režim"
-        }
-      },
       "sensor_door_state": {
         "name": "Dvířka",
         "state": {
@@ -947,24 +923,6 @@
       },
       "sensor_laundry_load_recommendation": {
         "name": "Doporučená náplň"
-      },
-      "sensor_laundry_spin_speed": {
-        "name": "Rychlost odstřeďování",
-        "state": {
-          "off": "Bez odstředění",
-          "rpm400": "400 ot./min",
-          "rpm600": "600 ot./min",
-          "rpm700": "700 ot./min",
-          "rpm800": "800 ot./min",
-          "rpm900": "900 ot./min",
-          "rpm1000": "1000 ot./min",
-          "rpm1200": "1200 ot./min",
-          "rpm1400": "1400 ot./min",
-          "rpm1500": "1500 ot./min",
-          "rpm1600": "1600 ot./min",
-          "rinsehold": "Stop máchání",
-          "auto": "Auto"
-        }
       },
       "sensor_estimated_remaining_program_time": {
         "name": "Předpokládaná délka programu"
