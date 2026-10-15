@@ -130,12 +130,6 @@
       "switch_child_lock": {
         "name": "Kindersicherung"
       },
-      "switch_door_light_ring": {
-        "name": "Tür Ringlicht"
-      },
-      "switch_drum_light": {
-        "name": "Trommellicht"
-      },
       "switch_laundry_end_signal": {
         "name": "Beendet-Ton"
       },
@@ -1974,15 +1968,6 @@
           "programabortedbyappliancecriticalerror": "Kritischer Fehler"
         }
       },
-      "sensor_interval_time_off": {
-        "name": "Intervall Aus"
-      },
-      "sensor_interval_time_on": {
-        "name": "Intervall An"
-      },
-      "sensor_delayed_shutoff_time": {
-        "name": "Verzögerte Abschaltung"
-      },
       "sensor_door_state": {
         "name": "Tür",
         "state": {
@@ -2127,24 +2112,6 @@
       },
       "sensor_temperature_ambient": {
         "name": "Umgebungstemperatur"
-      },
-      "sensor_laundry_spin_speed": {
-        "name": "Schleuderdrehzahl",
-        "state": {
-          "off": "Aus",
-          "rpm400": "400 U/min",
-          "rpm600": "600 U/min",
-          "rpm700": "700 U/min",
-          "rpm800": "800 U/min",
-          "rpm900": "900 U/min",
-          "rpm1000": "1000 U/min",
-          "rpm1200": "1200 U/min",
-          "rpm1400": "1400 U/min",
-          "rpm1500": "1500 U/min",
-          "rpm1600": "1600 U/min",
-          "rinsehold": "Spülstopp",
-          "auto": "Auto"
-        }
       },
       "sensor_estimated_remaining_program_time": {
         "name": "Geschätzte Verbleibende Programmlaufzeit"

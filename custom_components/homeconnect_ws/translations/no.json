@@ -74,12 +74,6 @@
       "switch_child_lock": {
         "name": "Barnesikring"
       },
-      "switch_door_light_ring": {
-        "name": "Dørringlys"
-      },
-      "switch_drum_light": {
-        "name": "Trommellys"
-      },
       "switch_laundry_end_signal": {
         "name": "Slutt-signal"
       },
@@ -653,15 +647,6 @@
           "programabortedbyappliancecriticalerror": "Kritisk feil"
         }
       },
-      "sensor_interval_time_off": {
-        "name": "Intervall av"
-      },
-      "sensor_interval_time_on": {
-        "name": "Intervall på"
-      },
-      "sensor_delayed_shutoff_time": {
-        "name": "Forsinket avstenging"
-      },
       "sensor_door_state": {
         "name": "Dør",
         "state": {
@@ -791,24 +776,6 @@
       },
       "sensor_temperature_memory_freezer": {
         "name": "Minnetemperatur fryser"
-      },
-      "sensor_laundry_spin_speed": {
-        "name": "Sentrifugeringshastighet",
-        "state": {
-          "off": "Av",
-          "rpm400": "400 rpm",
-          "rpm600": "600 rpm",
-          "rpm700": "700 rpm",
-          "rpm800": "800 rpm",
-          "rpm900": "900 rpm",
-          "rpm1000": "1000 rpm",
-          "rpm1200": "1200 rpm",
-          "rpm1400": "1400 rpm",
-          "rpm1500": "1500 rpm",
-          "rpm1600": "1600 rpm",
-          "rinsehold": "Skyllepause",
-          "auto": "Auto"
-        }
       },
       "sensor_estimated_remaining_program_time": {
         "name": "Estimert total programtid"

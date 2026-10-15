@@ -50,16 +50,6 @@ LAUNDRY_ENTITY_DESCRIPTIONS: _EntityDescriptionsDefinitionsType = {
             has_state_translation=True,
         ),
         HCSensorEntityDescription(
-            key="sensor_laundry_spin_speed",
-            entity="LaundryCare.Washer.Option.SpinSpeed",
-            device_class=SensorDeviceClass.ENUM,
-            has_state_translation=True,
-            # Otherwise stays frozen on the last active spin speed (e.g.
-            # RPM1400) while the appliance is off, misleadingly implying it's
-            # still running - confirmed live on fork issue #7.
-            force_option_when_expected_offline="off",
-        ),
-        HCSensorEntityDescription(
             key="sensor_laundry_load_recommendation",
             entity="LaundryCare.Common.Option.LoadRecommendation",
             device_class=SensorDeviceClass.WEIGHT,
@@ -486,18 +476,6 @@ LAUNDRY_ENTITY_DESCRIPTIONS: _EntityDescriptionsDefinitionsType = {
         ),
     ],
     "switch": [
-        HCSwitchEntityDescription(
-            key="switch_door_light_ring",
-            entity="LaundryCare.Common.Setting.DoorLightRing.Active",
-            device_class=SwitchDeviceClass.SWITCH,
-            entity_registry_enabled_default=False,
-        ),
-        HCSwitchEntityDescription(
-            key="switch_drum_light",
-            entity="LaundryCare.Common.Setting.DrumLight.Active",
-            device_class=SwitchDeviceClass.SWITCH,
-            entity_registry_enabled_default=False,
-        ),
         HCSwitchEntityDescription(
             key="switch_laundry_end_signal",
             entity="LaundryCare.Common.Setting.EndSignal",

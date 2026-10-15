@@ -533,27 +533,6 @@ def generate_oven_cavity_light(appliance: Appliance) -> HCLightEntityDescription
 COOKING_ENTITY_DESCRIPTIONS: _EntityDescriptionsDefinitionsType = {
     "sensor": [
         HCSensorEntityDescription(
-            key="sensor_interval_time_off",
-            entity="Cooking.Hood.Setting.IntervalTimeOff",
-            device_class=SensorDeviceClass.DURATION,
-            native_unit_of_measurement=UnitOfTime.SECONDS,
-            entity_registry_enabled_default=False,
-        ),
-        HCSensorEntityDescription(
-            key="sensor_interval_time_on",
-            entity="Cooking.Hood.Setting.IntervalTimeOn",
-            device_class=SensorDeviceClass.DURATION,
-            native_unit_of_measurement=UnitOfTime.SECONDS,
-            entity_registry_enabled_default=False,
-        ),
-        HCSensorEntityDescription(
-            key="sensor_delayed_shutoff_time",
-            entity="Cooking.Hood.Setting.DelayedShutOffTime",
-            device_class=SensorDeviceClass.DURATION,
-            native_unit_of_measurement=UnitOfTime.SECONDS,
-            entity_registry_enabled_default=False,
-        ),
-        HCSensorEntityDescription(
             key="sensor_heatup_progress",
             entity="Cooking.Oven.Option.HeatupProgress",
             native_unit_of_measurement=PERCENTAGE,

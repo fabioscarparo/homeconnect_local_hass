@@ -74,12 +74,6 @@
       "switch_child_lock": {
         "name": "Kinderslot"
       },
-      "switch_door_light_ring": {
-        "name": "Deur ringlicht"
-      },
-      "switch_drum_light": {
-        "name": "Trommelverlichting"
-      },
       "switch_laundry_end_signal": {
         "name": "Eindsignaal"
       },
@@ -751,15 +745,6 @@
           "programabortedbyappliancecriticalerror": "Kritieke Fout"
         }
       },
-      "sensor_interval_time_off": {
-        "name": "Interval Uit"
-      },
-      "sensor_interval_time_on": {
-        "name": "Interval Aan"
-      },
-      "sensor_delayed_shutoff_time": {
-        "name": "Vertraagde uitschakeling"
-      },
       "sensor_door_state": {
         "name": "Deur",
         "state": {
@@ -883,24 +868,6 @@
       },
       "sensor_temperature_ambient": {
         "name": "Omgevingstemperatuur"
-      },
-      "sensor_laundry_spin_speed": {
-        "name": "Centrifugetoerental",
-        "state": {
-          "off": "Uit",
-          "rpm400": "400 tpm",
-          "rpm600": "600 tpm",
-          "rpm700": "700 tpm",
-          "rpm800": "800 tpm",
-          "rpm900": "900 tpm",
-          "rpm1000": "1000 tpm",
-          "rpm1200": "1200 tpm",
-          "rpm1400": "1400 tpm",
-          "rpm1500": "1500 tpm",
-          "rpm1600": "1600 tpm",
-          "rinsehold": "Spoelen vasthouden",
-          "auto": "Auto"
-        }
       },
       "sensor_estimated_remaining_program_time": {
         "name": "Geschatte resterende tijd"
@@ -1099,6 +1066,24 @@
       }
     },
     "select": {
+      "select_laundry_spin_speed": {
+        "name": "Centrifugetoerental",
+        "state": {
+          "off": "Uit",
+          "rpm400": "400 tpm",
+          "rpm600": "600 tpm",
+          "rpm700": "700 tpm",
+          "rpm800": "800 tpm",
+          "rpm900": "900 tpm",
+          "rpm1000": "1000 tpm",
+          "rpm1200": "1200 tpm",
+          "rpm1400": "1400 tpm",
+          "rpm1500": "1500 tpm",
+          "rpm1600": "1600 tpm",
+          "rinsehold": "Spoelen vasthouden",
+          "auto": "Auto"
+        }
+      },
       "select_drying_assistant_all_programs": {
         "name": "Automatische deuropening",
         "state": {

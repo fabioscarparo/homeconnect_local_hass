@@ -74,12 +74,6 @@
       "switch_child_lock": {
         "name": "Блокировка от детей"
       },
-      "switch_door_light_ring": {
-        "name": "Подсветка дверного кольца"
-      },
-      "switch_drum_light": {
-        "name": "Подсветка барабана"
-      },
       "switch_laundry_end_signal": {
         "name": "Сигнал окончания"
       },
@@ -611,15 +605,6 @@
           "programabortedbyappliancecriticalerror": "Критическая ошибка"
         }
       },
-      "sensor_interval_time_off": {
-        "name": "Интервал выключения"
-      },
-      "sensor_interval_time_on": {
-        "name": "Интервал включения"
-      },
-      "sensor_delayed_shutoff_time": {
-        "name": "Отложенное выключение"
-      },
       "sensor_door_state": {
         "name": "Дверь",
         "state": {
@@ -742,24 +727,6 @@
       },
       "sensor_temperature_ambient": {
         "name": "Температура окружающей среды"
-      },
-      "sensor_laundry_spin_speed": {
-        "name": "Скорость отжима",
-        "state": {
-          "off": "Выключено",
-          "rpm400": "400 об/мин",
-          "rpm600": "600 об/мин",
-          "rpm700": "700 об/мин",
-          "rpm800": "800 об/мин",
-          "rpm900": "900 об/мин",
-          "rpm1000": "1000 об/мин",
-          "rpm1200": "1200 об/мин",
-          "rpm1400": "1400 об/мин",
-          "rpm1500": "1500 об/мин",
-          "rpm1600": "1600 об/мин",
-          "rinsehold": "Удержание полоскания",
-          "auto": "Авто"
-        }
       },
       "sensor_estimated_remaining_program_time": {
         "name": "Расчетное общее время программы"
@@ -911,6 +878,24 @@
       }
     },
     "select": {
+      "select_laundry_spin_speed": {
+        "name": "Скорость отжима",
+        "state": {
+          "off": "Выключено",
+          "rpm400": "400 об/мин",
+          "rpm600": "600 об/мин",
+          "rpm700": "700 об/мин",
+          "rpm800": "800 об/мин",
+          "rpm900": "900 об/мин",
+          "rpm1000": "1000 об/мин",
+          "rpm1200": "1200 об/мин",
+          "rpm1400": "1400 об/мин",
+          "rpm1500": "1500 об/мин",
+          "rpm1600": "1600 об/мин",
+          "rinsehold": "Удержание полоскания",
+          "auto": "Авто"
+        }
+      },
       "select_drying_assistant_all_programs": {
         "name": "Помощник сушки для всех программ",
         "state": {

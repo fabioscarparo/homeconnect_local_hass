@@ -138,12 +138,6 @@
       "switch_child_lock": {
         "name": "Blokada dla dzieci"
       },
-      "switch_door_light_ring": {
-        "name": "Podświetlenie pierścienia drzwi"
-      },
-      "switch_drum_light": {
-        "name": "Oświetlenie bębna"
-      },
       "switch_laundry_end_signal": {
         "name": "Sygnał końca"
       },
@@ -1625,15 +1619,6 @@
           "programabortedbyappliancecriticalerror": "krytyczny błąd"
         }
       },
-      "sensor_interval_time_off": {
-        "name": "Interwał wyłączenia"
-      },
-      "sensor_interval_time_on": {
-        "name": "Interwał włączenia"
-      },
-      "sensor_delayed_shutoff_time": {
-        "name": "Opóźnione wyłączenie"
-      },
       "sensor_door_state": {
         "name": "Drzwi",
         "state": {
@@ -1763,24 +1748,6 @@
       },
       "sensor_temperature_memory_freezer": {
         "name": "Temperatura pamięci zamrażarki"
-      },
-      "sensor_laundry_spin_speed": {
-        "name": "Prędkość wirowania",
-        "state": {
-          "off": "wyłączone",
-          "rpm400": "400 obr./min",
-          "rpm600": "600 obr./min",
-          "rpm700": "700 obr./min",
-          "rpm800": "800 obr./min",
-          "rpm900": "900 obr./min",
-          "rpm1000": "1000 obr./min",
-          "rpm1200": "1200 obr./min",
-          "rpm1400": "1400 obr./min",
-          "rpm1500": "1500 obr./min",
-          "rpm1600": "1600 obr./min",
-          "rinsehold": "podtrzymanie płukania",
-          "auto": "auto"
-        }
       },
       "sensor_estimated_remaining_program_time": {
         "name": "Szacowany całkowity czas programu"
