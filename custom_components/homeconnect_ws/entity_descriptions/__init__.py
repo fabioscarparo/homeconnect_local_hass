@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import logging
+from dataclasses import replace
 from typing import TYPE_CHECKING, cast
 
 from homeassistant.const import UnitOfTemperature
@@ -164,19 +165,24 @@ def _one_temperature_unit(
     Some appliances (e.g. Thermador fridges and ovens) report a setpoint in both
     units, as two entities. Keeps the one in Home Assistant's unit, so a setpoint
     steps in whole degrees of the unit the user sees; Home Assistant converts the
-    shown value either way. A Fahrenheit description's key is the Celsius one's
-    with FAHRENHEIT_KEY_SUFFIX.
+    shown value either way. The kept one also gets the other's entity, to follow
+    the appliance's own unit setting between them (see HCEntity). A Fahrenheit
+    description's key is the Celsius one's with FAHRENHEIT_KEY_SUFFIX.
     """
-    keys = {description.key for description in descriptions}
+    by_key = {description.key: description for description in descriptions}
     keep_fahrenheit = temperature_unit == UnitOfTemperature.FAHRENHEIT
     kept = []
     for description in descriptions:
         if description.key.endswith(FAHRENHEIT_KEY_SUFFIX):
-            celsius_key = description.key.removesuffix(FAHRENHEIT_KEY_SUFFIX)
-            if celsius_key in keys and not keep_fahrenheit:
+            other = by_key.get(description.key.removesuffix(FAHRENHEIT_KEY_SUFFIX))
+            if other is not None and not keep_fahrenheit:
                 continue
-        elif keep_fahrenheit and description.key + FAHRENHEIT_KEY_SUFFIX in keys:
-            continue
+        else:
+            other = by_key.get(description.key + FAHRENHEIT_KEY_SUFFIX)
+            if other is not None and keep_fahrenheit:
+                continue
+        if other is not None:
+            description = replace(description, other_unit_entity=other.entity)  # noqa: PLW2901
         kept.append(description)
     return kept
 

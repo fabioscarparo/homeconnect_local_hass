@@ -28,6 +28,7 @@ from custom_components.homeconnect_ws.entity_descriptions.common import (
     generate_power_switch,
     generate_program,
     generate_start_button,
+    generate_temperature_unit,
 )
 from custom_components.homeconnect_ws.entity_descriptions.cooking import generate_hood_light
 from custom_components.homeconnect_ws.entity_descriptions.refrigeration import (
@@ -821,14 +822,23 @@ async def test_door_sensor_when_more_states(
 def test_one_temperature_unit(temperature_unit: str, expected: list[str]) -> None:
     """A temperature reported in both units keeps the one in Home Assistant's unit."""
     descriptions = [
-        HCNumberEntityDescription(key="number_setpoint_freezer"),
-        HCNumberEntityDescription(key="number_setpoint_freezer_fahrenheit"),
-        HCNumberEntityDescription(key="number_oven_alarm"),
+        HCNumberEntityDescription(key="number_setpoint_freezer", entity="Test.Setpoint"),
+        HCNumberEntityDescription(
+            key="number_setpoint_freezer_fahrenheit", entity="Test.SetpointFahrenheit"
+        ),
+        HCNumberEntityDescription(key="number_oven_alarm", entity="Test.Alarm"),
     ]
 
     kept = entity_descriptions._one_temperature_unit(descriptions, temperature_unit)
 
     assert [description.key for description in kept] == expected
+    # The kept one can still follow the appliance to the other unit's entity
+    assert kept[0].other_unit_entity == (
+        "Test.SetpointFahrenheit"
+        if temperature_unit == UnitOfTemperature.CELSIUS
+        else "Test.Setpoint"
+    )
+    assert kept[1].other_unit_entity is None
 
 
 @pytest.mark.parametrize(
@@ -844,3 +854,26 @@ def test_one_temperature_unit_keeps_the_only_one(temperature_unit: str) -> None:
     kept = entity_descriptions._one_temperature_unit(descriptions, temperature_unit)
 
     assert kept == descriptions
+
+
+async def test_temperature_unit_select_with_celsius_and_fahrenheit(
+    mock_homeconnect_appliance: MockApplianceFactory,
+) -> None:
+    """An appliance that switches between Celsius and Fahrenheit gets a unit select."""
+    appliance = await mock_homeconnect_appliance(
+        description={
+            "setting": [
+                {
+                    "access": "readwrite",
+                    "available": True,
+                    "enumeration": {"0": "Celsius", "1": "Fahrenheit"},
+                    "uid": 4153,
+                    "name": "BSH.Common.Setting.TemperatureUnit",
+                },
+            ]
+        }
+    )
+    description = generate_temperature_unit(appliance)
+
+    assert description is not None
+    assert description.key == "select_temperature_unit"

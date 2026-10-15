@@ -46,6 +46,10 @@ class HCEntityDescription(EntityDescription, frozen_or_thawed=True):
     # it. Clears to None instead of showing a stale in-progress-looking value
     # once coordinator.expected_offline is true.
     clear_on_expected_offline: bool = False
+    # The same temperature in the other unit (Celsius or Fahrenheit), for an
+    # appliance that reports both. The entity follows the appliance's own
+    # temperature unit setting between the two, see HCEntity.
+    other_unit_entity: str | None = None
 
 
 class HCSelectEntityDescription(

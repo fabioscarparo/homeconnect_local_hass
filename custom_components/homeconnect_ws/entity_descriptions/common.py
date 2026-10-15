@@ -402,7 +402,7 @@ def generate_ipv6(appliance: Appliance) -> HCSensorEntityDescription:  # noqa: A
 def generate_temperature_unit(appliance: Appliance) -> HCSelectEntityDescription | None:
     """Get Temperature unit description."""
     entity = appliance.entities.get("BSH.Common.Setting.TemperatureUnit")
-    if entity and len(entity.enum or {}) > 2:
+    if entity and len(entity.enum or {}) >= 2:
         return HCSelectEntityDescription(
             key="select_temperature_unit",
             entity="BSH.Common.Setting.TemperatureUnit",
