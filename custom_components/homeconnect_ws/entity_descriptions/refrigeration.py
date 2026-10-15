@@ -31,17 +31,11 @@ def generate_internal_light(appliance: Appliance) -> HCLightEntityDescription | 
     """Get internal light description."""
     if "Refrigeration.Common.Setting.Light.Internal.Power" not in appliance.entities:
         return None
-
-    if "Refrigeration.Common.Setting.Light.Internal.Brightness" in appliance.entities:
-        return HCLightEntityDescription(
-            key="light_internal",
-            entity="Refrigeration.Common.Setting.Light.Internal.Power",
-            brightness_entity="Refrigeration.Common.Setting.Light.Internal.Brightness",
-        )
-
+    brightness = "Refrigeration.Common.Setting.Light.Internal.Brightness"
     return HCLightEntityDescription(
         key="light_internal",
         entity="Refrigeration.Common.Setting.Light.Internal.Power",
+        brightness_entity=brightness if brightness in appliance.entities else None,
     )
 
 

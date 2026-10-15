@@ -467,87 +467,62 @@ def generate_hob_zones(appliance: Appliance) -> EntityDescriptions:
 
 
 def generate_hood_light(appliance: Appliance) -> HCLightEntityDescription | None:
-    """Get Hood light descriptions."""
+    """Get Hood light description."""
+
     # Some hoods declare ColorTemperaturePercent/LightingBrightness in their
     # profile but mark them unavailable (confirmed live on fork issue #15,
     # Bosch DWK91LT60) - checking membership alone picked the wrong branch
     # and referenced an unavailable entity, making the whole light entity
     # report Unavailable even though the plain on/off Lighting control works
     # fine on its own.
-    color_temperature_entity = appliance.entities.get(
-        "Cooking.Hood.Setting.ColorTemperaturePercent"
+    def available(name: str) -> bool:
+        return bool(getattr(appliance.entities.get(name), "available", False))
+
+    color_temperature = available("Cooking.Hood.Setting.ColorTemperaturePercent")
+    brightness = (
+        color_temperature
+        or available("Cooking.Hood.Setting.LightingBrightness")
+        or available("Cooking.Common.Setting.LightingBrightness")
     )
-    if getattr(color_temperature_entity, "available", False):
-        return HCLightEntityDescription(
-            key="light_cooking_lighting",
-            entity="Cooking.Common.Setting.Lighting",
-            brightness_entity="Cooking.Common.Setting.LightingBrightness",
-            color_temperature_entity="Cooking.Hood.Setting.ColorTemperaturePercent",
-        )
-
-    hood_brightness_entity = appliance.entities.get("Cooking.Hood.Setting.LightingBrightness")
-    common_brightness_entity = appliance.entities.get("Cooking.Common.Setting.LightingBrightness")
-    if getattr(hood_brightness_entity, "available", False) or getattr(
-        common_brightness_entity, "available", False
-    ):
-        return HCLightEntityDescription(
-            key="light_cooking_lighting",
-            entity="Cooking.Common.Setting.Lighting",
-            brightness_entity="Cooking.Common.Setting.LightingBrightness",
-        )
-
-    if getattr(appliance.entities.get("Cooking.Common.Setting.Lighting"), "available", False):
-        return HCLightEntityDescription(
-            key="light_cooking_lighting",
-            entity="Cooking.Common.Setting.Lighting",
-        )
-    return None
+    if not brightness and not available("Cooking.Common.Setting.Lighting"):
+        return None
+    return HCLightEntityDescription(
+        key="light_cooking_lighting",
+        entity="Cooking.Common.Setting.Lighting",
+        brightness_entity="Cooking.Common.Setting.LightingBrightness" if brightness else None,
+        color_temperature_entity=(
+            "Cooking.Hood.Setting.ColorTemperaturePercent" if color_temperature else None
+        ),
+    )
 
 
 def generate_hood_ambient_light(appliance: Appliance) -> HCLightEntityDescription | None:
-    """Get Hood light descriptions."""
-    if (
+    """Get Hood ambient light description."""
+    color = (
         "BSH.Common.Setting.AmbientLightCustomColor" in appliance.entities
         and "BSH.Common.Setting.AmbientLightColor" in appliance.entities
-    ):
-        return HCLightEntityDescription(
-            key="light_cooking_ambient_lighting",
-            entity="BSH.Common.Setting.AmbientLightEnabled",
-            brightness_entity="BSH.Common.Setting.AmbientLightBrightness",
-            color_entity="BSH.Common.Setting.AmbientLightCustomColor",
-            color_mode_entity="BSH.Common.Setting.AmbientLightColor",
-        )
-
-    if "BSH.Common.Setting.AmbientLightBrightness" in appliance.entities:
-        return HCLightEntityDescription(
-            key="light_cooking_ambient_lighting",
-            entity="BSH.Common.Setting.AmbientLightEnabled",
-            brightness_entity="BSH.Common.Setting.AmbientLightBrightness",
-        )
-
-    if "BSH.Common.Setting.AmbientLightEnabled" in appliance.entities:
-        return HCLightEntityDescription(
-            key="light_cooking_ambient_lighting",
-            entity="BSH.Common.Setting.AmbientLightEnabled",
-        )
-    return None
+    )
+    brightness = color or "BSH.Common.Setting.AmbientLightBrightness" in appliance.entities
+    if not brightness and "BSH.Common.Setting.AmbientLightEnabled" not in appliance.entities:
+        return None
+    return HCLightEntityDescription(
+        key="light_cooking_ambient_lighting",
+        entity="BSH.Common.Setting.AmbientLightEnabled",
+        brightness_entity="BSH.Common.Setting.AmbientLightBrightness" if brightness else None,
+        color_entity="BSH.Common.Setting.AmbientLightCustomColor" if color else None,
+        color_mode_entity="BSH.Common.Setting.AmbientLightColor" if color else None,
+    )
 
 
 def generate_oven_cavity_light(appliance: Appliance) -> HCLightEntityDescription | None:
     """Get oven cavity light description."""
     if "Cooking.Oven.Setting.Light.Cavity.001.Power" not in appliance.entities:
         return None
-
-    if "Cooking.Oven.Setting.Light.Cavity.001.Brightness" in appliance.entities:
-        return HCLightEntityDescription(
-            key="light_oven_cavity",
-            entity="Cooking.Oven.Setting.Light.Cavity.001.Power",
-            brightness_entity="Cooking.Oven.Setting.Light.Cavity.001.Brightness",
-        )
-
+    brightness = "Cooking.Oven.Setting.Light.Cavity.001.Brightness"
     return HCLightEntityDescription(
         key="light_oven_cavity",
         entity="Cooking.Oven.Setting.Light.Cavity.001.Power",
+        brightness_entity=brightness if brightness in appliance.entities else None,
     )
 
 

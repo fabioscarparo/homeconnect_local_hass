@@ -546,11 +546,6 @@ LAUNDRY_ENTITY_DESCRIPTIONS: _EntityDescriptionsDefinitionsType = {
             device_class=SwitchDeviceClass.SWITCH,
         ),
         HCSwitchEntityDescription(
-            key="switch_half_load",
-            entity="LaundryCare.Dryer.Option.HalfLoad",
-            device_class=SwitchDeviceClass.SWITCH,
-        ),
-        HCSwitchEntityDescription(
             key="switch_laundry_hygiene",
             entity="LaundryCare.Dryer.Option.Hygiene",
             device_class=SwitchDeviceClass.SWITCH,

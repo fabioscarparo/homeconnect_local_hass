@@ -11,22 +11,21 @@ Nothing here is scheduled yet, so treat this as the order of work, not a timelin
 
 Entity descriptions in `entity_descriptions/`, counted on `dev` on 2026-10-14 (after #196). This number changes with almost every feature PR, so recount before relying on it.
 
-| Platform | Descriptions | Without repeats |
-| --- | --- | --- |
-| `sensor` | 75 | 75 |
-| `binary_sensor` | 72 | 72 |
-| `switch` | 74 | 73 |
-| `select` | 102 | 102 |
-| `number` | 33 | 33 |
-| `button` | 14 | 14 |
-| `light` | 13 | 7 |
-| `fan` | 1 | 1 |
-| `update` | 2 | 2 |
-| **Total** | **386** | **379** |
+| Platform | Descriptions |
+| --- | --- |
+| `sensor` | 75 |
+| `binary_sensor` | 72 |
+| `switch` | 73 |
+| `select` | 102 |
+| `number` | 33 |
+| `button` | 14 |
+| `light` | 7 |
+| `fan` | 1 |
+| `update` | 2 |
+| **Total** | **379** |
 
-- **Descriptions** is every `HC*EntityDescription(...)` in the code.
-- **Without repeats** counts each key once. Repeats are the same entity described more than once: the light variants (for example a hood light with or without color temperature) and Half load, which the dishwasher and dryer describe in their own files under one key. An appliance gets only the first description for a key (#169). The old and new names for the same fridge and washer features (for example `Refrigeration.FridgeFreezer.Setting.EcoMode` and `Refrigeration.Common.Setting.EcoMode`) are one description with `alternate_entities`, so they aren't repeats (#196). Celsius/Fahrenheit pairs have a key each, so they count twice here, but an appliance that reports both gets one entity, in Home Assistant's unit (#194).
-- Neither is the number of entities one appliance gets. An appliance only gets the descriptions it reports, and a few descriptions (oven cavities, hob zones) create one entity per cavity or zone.
+- **Descriptions** is every `HC*EntityDescription(...)` in the code. Each key is described once (#196): a feature with an old and a new name (for example `Refrigeration.FridgeFreezer.Setting.EcoMode` and `Refrigeration.Common.Setting.EcoMode`) is one description with `alternate_entities`, and a light with or without brightness or color is one description too. Celsius/Fahrenheit pairs have a key each, so they count twice, but an appliance that reports both gets one entity, in Home Assistant's unit (#194).
+- It isn't the number of entities one appliance gets. An appliance only gets the descriptions it reports, and a few descriptions (oven cavities, hob zones) create one entity per cavity or zone.
 
 <details>
 <summary>Recount</summary>
@@ -200,7 +199,7 @@ Start tracking this once the initial PR is merged, and update it with every foll
 | `update` | 2 | 0 | `░░░░░░░░░░` 0% |
 | **Total** | **389** | **0** | `░░░░░░░░░░` **0%** |
 
-Each `█` is 10%. Take the **Without repeats** count from [Current size](#current-size) at the time, since the custom integration keeps changing while the port runs.
+Each `█` is 10%. Take the count from [Current size](#current-size) at the time, since the custom integration keeps changing while the port runs.
 
 Suggested order (description counts are how many entity descriptions each platform has; one appliance only gets the ones it reports):
 

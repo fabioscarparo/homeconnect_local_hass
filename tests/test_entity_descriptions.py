@@ -188,7 +188,7 @@ async def test_power_switch(mock_homeconnect_appliance: MockApplianceFactory) ->
     assert set(power_descriptions) == {"select"}
     select = power_descriptions["select"][0]
     assert select.key == "select_power_state"
-    assert sorted(select.options) == ["mainsoff", "off", "on", "standby"]
+    assert select.options == ["mainsoff", "off", "on", "standby"]
     assert select.entity_registry_enabled_default
     assert select.force_option_when_expected_offline == "off"
 
