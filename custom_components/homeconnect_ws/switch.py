@@ -52,12 +52,11 @@ class HCSwitch(HCEntity, SwitchEntity):
         if self._entity is None or self._entity.value is None:
             # No entity, or not reported by the appliance yet - "unknown", not "off".
             return None
+        if (on_values := self.entity_description.on_values) is not None:
+            return self._entity.value in on_values
         if self._value_mapping:
-            if self._value_mapping[0] == self._entity.value:
-                return True
-            if self._value_mapping[1] == self._entity.value:
-                return False
-            return None
+            on_value, off_value = self._value_mapping
+            return {on_value: True, off_value: False}.get(self._entity.value)
         return bool(self._entity.value)
 
     @error_decorator

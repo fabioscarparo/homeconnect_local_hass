@@ -6,6 +6,7 @@ import logging
 from typing import TYPE_CHECKING, Any
 
 from home_disconnect.entities import Access
+from homeassistant.const import UnitOfTemperature
 from homeassistant.helpers.entity import Entity
 from homeassistant.helpers.update_coordinator import CoordinatorEntity
 
@@ -25,6 +26,13 @@ if TYPE_CHECKING:
 
 _LOGGER = logging.getLogger(__name__)
 
+TEMPERATURE_UNIT_ENTITY = "BSH.Common.Setting.TemperatureUnit"
+# BSH.Common.Setting.TemperatureUnit values
+_APPLIANCE_TEMPERATURE_UNITS = {
+    "Celsius": UnitOfTemperature.CELSIUS,
+    "Fahrenheit": UnitOfTemperature.FAHRENHEIT,
+}
+
 
 class HCEntity(CoordinatorEntity[HomeConnectCoordinator], Entity):
     """Base Entity."""
@@ -39,6 +47,15 @@ class HCEntity(CoordinatorEntity[HomeConnectCoordinator], Entity):
     # visible with a readonly attribute instead of going unavailable. Off for
     # entities that have no state to show while locked, like buttons.
     _show_when_locked: bool = True
+    # For a temperature reported in both units: the backing entity per unit,
+    # and the appliance's temperature unit setting that picks between them.
+    _unit_entities: dict[str, HcEntity] | None = None
+    _temperature_unit_entity: HcEntity | None = None
+    # The unit of the backing entity _follow_temperature_unit picked, if any.
+    # The number and sensor entities show their value in it.
+    _temperature_unit: str | None = None
+    # For a feature under several names: the backing entity per name, in order.
+    _alternates: list[HcEntity] | None = None
 
     def __init__(
         self,
@@ -58,6 +75,8 @@ class HCEntity(CoordinatorEntity[HomeConnectCoordinator], Entity):
         if entity_description.entity:
             self._entity = self._runtime_data.appliance.entities[entity_description.entity]
             self._entities.append(self._runtime_data.appliance.entities[entity_description.entity])
+        self._set_up_unit_entities()
+        self._set_up_alternate_entities()
         if entity_description.entities:
             for entity_name in entity_description.entities:
                 self._entities.append(self._runtime_data.appliance.entities[entity_name])
@@ -116,7 +135,76 @@ class HCEntity(CoordinatorEntity[HomeConnectCoordinator], Entity):
                 extra_state_attributes[description["name"]] = entity.value
         return extra_state_attributes
 
+    def _set_up_unit_entities(self) -> None:
+        """Back a temperature reported in both units by both, see _follow_temperature_unit."""
+        entities = self._runtime_data.appliance.entities
+        other_unit_entity = self.entity_description.other_unit_entity
+        unit = getattr(self.entity_description, "native_unit_of_measurement", None)
+        if (
+            self._entity is None
+            or other_unit_entity is None
+            or other_unit_entity not in entities
+            or TEMPERATURE_UNIT_ENTITY not in entities
+        ):
+            return
+        if unit == UnitOfTemperature.CELSIUS:
+            other_unit = UnitOfTemperature.FAHRENHEIT
+        elif unit == UnitOfTemperature.FAHRENHEIT:
+            other_unit = UnitOfTemperature.CELSIUS
+        else:
+            return
+        self._unit_entities = {unit: self._entity, other_unit: entities[other_unit_entity]}
+        self._temperature_unit_entity = entities[TEMPERATURE_UNIT_ENTITY]
+        self._entities.extend((entities[other_unit_entity], self._temperature_unit_entity))
+        self._follow_temperature_unit()
+
+    def _follow_temperature_unit(self) -> None:
+        """
+        Read the temperature in the unit the appliance is set to.
+
+        An appliance that reports a temperature in both units may only keep the
+        one in its current unit up to date, so this follows its temperature unit
+        setting. Home Assistant converts the shown value to its own unit either
+        way. Keeps the current one while the appliance's unit is unknown.
+        """
+        if self._unit_entities is None or self._temperature_unit_entity is None:
+            return
+        unit = _APPLIANCE_TEMPERATURE_UNITS.get(str(self._temperature_unit_entity.value))
+        if unit is None:
+            return
+        self._entity = self._unit_entities[unit]
+        self._temperature_unit = unit
+
+    def _set_up_alternate_entities(self) -> None:
+        """Back a feature under several names by all of them, see _follow_alternate."""
+        entities = self._runtime_data.appliance.entities
+        names = self.entity_description.alternate_entities or ()
+        alternates = [entities[name] for name in names if name in entities]
+        if self._entity is None or not alternates:
+            return
+        self._alternates = [self._entity, *alternates]
+        self._entities.extend(alternates)
+        self._follow_alternate()
+
+    def _follow_alternate(self) -> None:
+        """
+        Read and write the name the appliance currently offers.
+
+        Some appliances offer one feature under different names in different
+        programs (e.g. a washer's LaundryCare.Common.Option.SpeedPerfect and
+        LaundryCare.Washer.Option.SpeedPerfect), marking the others Access.NONE.
+        Keeps the current one while none is offered.
+        """
+        if self._alternates is None:
+            return
+        for entity in self._alternates:
+            if entity.access not in (None, Access.NONE) and entity.available is not False:
+                self._entity = entity
+                return
+
     async def callback(self, _: HcEntity) -> None:
+        self._follow_temperature_unit()
+        self._follow_alternate()
         if not self._has_callback:
             self._has_callback = True
             try:

@@ -110,7 +110,7 @@
         "name": "CrystalDry"
       },
       "switch_extra_dry": {
-        "name": "Extra Dry"
+        "name": "Extra Dry for All Programs"
       },
       "switch_speed_on_demand": {
         "name": "Speed On Demand"
@@ -132,12 +132,6 @@
       },
       "switch_child_lock": {
         "name": "Child lock"
-      },
-      "switch_door_light_ring": {
-        "name": "Door Ring light"
-      },
-      "switch_drum_light": {
-        "name": "Drum light"
       },
       "switch_laundry_end_signal": {
         "name": "End Signal"
@@ -1803,24 +1797,6 @@
           "programabortedbyappliancecriticalerror": "Critical Error"
         }
       },
-      "sensor_interval_time_off": {
-        "name": "Interval Off"
-      },
-      "sensor_interval_time_on": {
-        "name": "Interval On"
-      },
-      "sensor_delayed_shutoff_time": {
-        "name": "Delayed Shutoff"
-      },
-      "sensor_power_state": {
-        "name": "Power state",
-        "state": {
-          "mainsoff": "Mains off",
-          "off": "Off",
-          "on": "On",
-          "standby": "Standby"
-        }
-      },
       "sensor_door_state": {
         "name": "Door",
         "state": {
@@ -1974,24 +1950,6 @@
       },
       "sensor_temperature_memory_freezer": {
         "name": "Memory Temperature Freezer"
-      },
-      "sensor_laundry_spin_speed": {
-        "name": "Spin Speed",
-        "state": {
-          "off": "Off",
-          "rpm400": "400 rpm",
-          "rpm600": "600 rpm",
-          "rpm700": "700 rpm",
-          "rpm800": "800 rpm",
-          "rpm900": "900 rpm",
-          "rpm1000": "1000 rpm",
-          "rpm1200": "1200 rpm",
-          "rpm1400": "1400 rpm",
-          "rpm1500": "1500 rpm",
-          "rpm1600": "1600 rpm",
-          "rinsehold": "Rinse Hold",
-          "auto": "Auto"
-        }
       },
       "sensor_estimated_remaining_program_time": {
         "name": "Estimated total program time"
@@ -2230,7 +2188,7 @@
         }
       },
       "select_rinse_aid": {
-        "name": "Rinse Aid",
+        "name": "Rinse Aid Dosage",
         "state": {
           "off": "Level 0 (Off)",
           "r01": "Level 1 (Lowest)",
@@ -3657,7 +3615,7 @@
         }
       },
       "select_door_light_ring_brightness": {
-        "name": "Door Ring light brightness Level",
+        "name": "Door Ring Light Brightness Level",
         "state": {
           "low": "Low",
           "medium": "Medium",
@@ -4344,7 +4302,7 @@
         "name": "Brightness"
       },
       "number_door_light_ring_brightness": {
-        "name": "Door Ring light brightness"
+        "name": "Door Ring Light Brightness"
       },
       "number_duration": {
         "name": "Duration"

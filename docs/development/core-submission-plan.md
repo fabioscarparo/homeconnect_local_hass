@@ -9,24 +9,23 @@ Nothing here is scheduled yet, so treat this as the order of work, not a timelin
 
 ## Current size
 
-Entity descriptions in `entity_descriptions/`, counted on `dev` on 2026-10-12 (after #171). This number changes with almost every feature PR, so recount before relying on it.
+Entity descriptions in `entity_descriptions/`, counted on `dev` on 2026-10-14 (after #196). This number changes with almost every feature PR, so recount before relying on it.
 
-| Platform | Descriptions | Without repeats |
-| --- | --- | --- |
-| `sensor` | 75 | 73 |
-| `binary_sensor` | 82 | 72 |
-| `switch` | 83 | 74 |
-| `select` | 97 | 97 |
-| `number` | 33 | 31 |
-| `button` | 12 | 12 |
-| `light` | 13 | 7 |
-| `fan` | 1 | 1 |
-| `update` | 2 | 2 |
-| **Total** | **398** | **369** |
+| Platform | Descriptions |
+| --- | --- |
+| `sensor` | 75 |
+| `binary_sensor` | 72 |
+| `switch` | 73 |
+| `select` | 102 |
+| `number` | 33 |
+| `button` | 14 |
+| `light` | 7 |
+| `fan` | 1 |
+| `update` | 2 |
+| **Total** | **379** |
 
-- **Descriptions** is every `HC*EntityDescription(...)` in the code.
-- **Without repeats** counts each key once. Repeats are the same entity described twice: appliance variants (for example the hood lights), Celsius/Fahrenheit pairs, and the old and new names for the same fridge and washer features. Those share a key so existing entities keep their IDs whichever name an appliance uses, and an appliance that reported both would get only the first (#169).
-- Neither is the number of entities one appliance gets. An appliance only gets the descriptions it reports, and a few descriptions (oven cavities, hob zones) create one entity per cavity or zone.
+- **Descriptions** is every `HC*EntityDescription(...)` in the code. Each key is described once (#196): a feature with an old and a new name (for example `Refrigeration.FridgeFreezer.Setting.EcoMode` and `Refrigeration.Common.Setting.EcoMode`) is one description with `alternate_entities`, and a light with or without brightness or color is one description too. Celsius/Fahrenheit pairs have a key each, so they count twice, but an appliance that reports both gets one entity, in Home Assistant's unit (#194).
+- It isn't the number of entities one appliance gets. An appliance only gets the descriptions it reports, and a few descriptions (oven cavities, hob zones) create one entity per cavity or zone.
 
 <details>
 <summary>Recount</summary>
@@ -126,7 +125,7 @@ The first core PR is as small as core allows: **one platform (`sensor`), the con
 | Decision | Recommendation | Why |
 | --- | --- | --- |
 | Setup path | Home Connect sign-in only in the initial PR; the profile ZIP upload can follow later (Phase 3) | Keeps setup inside Home Assistant with no third-party desktop tool. Core `simplisafe` also signs in with its vendor app's client and a pasted redirect. |
-| Initial platform | `sensor` | Read-only, so none of the program/option write rules have to be reviewed in the first PR. Status sensors (operation state, door, remaining time) exist on nearly every appliance type. |
+| Initial platform | `sensor` | Read-only, so none of the program/option write rules have to be reviewed in the first PR. Status sensors (operation state, active program, remaining time) exist on nearly every appliance type. |
 | Domain | Keep `homeconnect_ws` if reviewers accept it, otherwise pick a new one early | Same domain means custom users can switch without re-adding appliances (see [Phase 4](#phase-4-after-everything-is-ported)). A new domain means everyone re-adds their appliances. `ws` is an implementation detail, so expect reviewers to question it. If it has to change, `home_connect_local` follows core's `powerfox` / `powerfox_local` naming ("Powerfox Cloud" and "Powerfox Local", grouped under one Powerfox brand). |
 | Stored profiles | Core only reads entries that store the profile XML (`description_xml` and `feature_mapping_xml`), the format 2.0 writes for new and reconfigured appliances. The conversions from older formats stay out of the initial PR. If the domain stays `homeconnect_ws`, the last custom release before people switch rewrites every entry to XML, so core never sees an older one. Adding the conversions to core in a later PR is the fallback | 2.0 still loads entries saved by 1.x (the parsed profile in the entry) and by upstream chris-mc1 (the parsed profile in separate files), converting them each time without writing back, so going back to 1.9 keeps working. Carrying those conversions into core would mean core migrating a custom integration's storage formats, which isn't essential for the first platform and which reviewers would likely question. With a new domain everyone re-adds their appliances, so no conversion is needed at all |
 | Brand | Add the domain to core's existing Bosch brand (`homeassistant/brands/bosch.json`) | Core lists `home_connect` under Bosch, next to `bosch_alarm` and `bosch_shc`, so the local integration belongs in the same brand. There's no Siemens, Thermador or other BSH brand file to add it to. |
@@ -137,9 +136,10 @@ The first core PR is as small as core allows: **one platform (`sensor`), the con
 - Config flow: the Home Connect sign-in, appliance selection and connection test. Keep the test-before-setup split for washers and dryers, which cut their WiFi when off (see the `quality_scale.yaml` comment).
 - The coordinator and connection handling (push updates, heartbeat, reconnect with backoff).
 - Zeroconf discovery (`_homeconnect._tcp.local.`). Each appliance is its own config entry, so a discovered appliance that's already set up is ignored. The cloud `home_connect` integration listens for the same service type (and for DHCP), so on a fresh install both integrations can show a discovered card for the same appliance. That's accepted in core: `powerfox` (cloud) and `powerfox_local` both discover the same poweropti devices with the same zeroconf matcher, and both mark `discovery` as done. It's still worth saying in the PR description. Removing discovery from the cloud integration is its code owners' decision, not part of this plan.
-- `sensor` entities, without the diagnostic ones. The custom integration has 73 sensor descriptions, and 9 of them are diagnostic: WiFi signal strength, IPv4 and IPv6 address, water and energy forecast, started and completed program counts, the program end trigger and the dishwasher's machine care reminder. Leaving them out also leaves out the WiFi signal sensor, the only entity that polls (`/ni/info`), so the first PR is push-only.
-  - That still leaves 64, spread over every appliance type. The plan is to accept that: entity descriptions are declarative data, so most of the review is the entity classes and the coordinator, not the list.
-  - If reviewers say 64 is too many, cut by file, not by appliance: keep the 11 shared sensors in `common.py` (operation state, door, power state, active program, remaining, elapsed and estimated time, progress, start in, finish in, flex start) plus the 3 in `dishcare.py` (rinse aid, salt, program phase), 14 in total. Every appliance type reports the shared ones, so no appliance loses support, it just gets fewer sensors at first. Dishwashers keep their own because they're the appliance BSH pushes Home Connect hardest on. The other appliance-specific sensors then come back one family per PR (cooking, laundry, refrigeration, coffee makers). Cutting out whole appliance types isn't needed.
+- `sensor` entities, without the diagnostic ones. The custom integration has 75 sensor descriptions, and 9 of them are diagnostic: WiFi signal strength, IPv4 and IPv6 address, water and energy forecast, started and completed program counts, the program end trigger and the dishwasher's machine care reminder. Leaving them out also leaves out the WiFi signal sensor, the only entity that polls (`/ni/info`), so the first PR is push-only.
+  - That still leaves 66, spread over every appliance type. The plan is to accept that: entity descriptions are declarative data, so most of the review is the entity classes and the coordinator, not the list.
+  - Each feature gets one entity, so a sensor-only first PR leaves out what's a control or a binary sensor in the custom integration. Power state is always a switch or a select (#193), so it comes with those platforms. The door is a sensor only when it can also be locked or ajar (#194); a door that's only open or closed is a binary sensor, which comes with `binary_sensor`.
+  - If reviewers say 66 is too many, cut by file, not by appliance: keep the 14 shared sensors in `common.py` (operation state, door, active program, remaining, elapsed and estimated time, progress, start in, finish in, flex start, energy and water consumed, and the last program's energy and water) plus the 3 in `dishcare.py` (rinse aid, salt, program phase), 17 in total. Every appliance type reports the shared ones, so no appliance loses support, it just gets fewer sensors at first. Dishwashers keep their own because they're the appliance BSH pushes Home Connect hardest on. The other appliance-specific sensors then come back one family per PR (cooking, laundry, refrigeration, coffee makers). Cutting out whole appliance types isn't needed.
 - Tests with full config flow coverage, and tests for the sensor platform.
 - The quality scale as far as the initial PR allows. Everything the custom integration already meets stays `done`, except the three rules for features left out of the initial PR: `diagnostics`, `reauthentication-flow` and `reconfiguration-flow` are `todo`. `dynamic-devices` and `stale-devices` stay exempt (one appliance per config entry). Rules about actions (`action-setup`, `docs-actions`) become exempt while there are no integration actions, and the rest are checked against the `sensor` platform alone. Because `reauthentication-flow` is a Silver rule, the manifest still declares **Bronze** at first, even though nearly every Silver, Gold and Platinum rule is already done.
 - The documentation PR on home-assistant.io, opened at the same time.
@@ -199,22 +199,22 @@ Start tracking this once the initial PR is merged, and update it with every foll
 | `update` | 2 | 0 | `░░░░░░░░░░` 0% |
 | **Total** | **389** | **0** | `░░░░░░░░░░` **0%** |
 
-Each `█` is 10%. Take the **Without repeats** count from [Current size](#current-size) at the time, since the custom integration keeps changing while the port runs.
+Each `█` is 10%. Take the count from [Current size](#current-size) at the time, since the custom integration keeps changing while the port runs.
 
 Suggested order (description counts are how many entity descriptions each platform has; one appliance only gets the ones it reports):
 
 1. **Diagnostics** (the `diagnostics` Gold rule).
-2. **The sensors left out of the initial PR:** the 9 diagnostic sensors, and if the 14-sensor fallback was used, the cooking, laundry, refrigeration and coffee maker sensors, one family per PR.
-3. **`binary_sensor`** (74 descriptions), split in two:
-   - shared, dishwasher and laundry (43): remote start allowed, door, dishwasher and laundry problem events;
-   - refrigeration, cooking and coffee makers (31): mostly the fridge and freezer door and alarm sensors.
-4. **`select`** (97 descriptions, each a separate entity; the dropdown values aren't counted): program selection and options, including locked (read-only) entities and filtering unavailable programs.
-5. **`switch`** (83 descriptions), split in two:
-   - shared, dishwasher and laundry (50);
-   - cooking, refrigeration and coffee makers (33).
-6. **`number`** (34): settings and options.
-7. **`button`** (12): Start, Stop, Pause and the rest. After `select`, since starting needs a selected program.
-8. **`light`** (13) and **`fan`** (1): hood lighting and venting.
+2. **The sensors left out of the initial PR:** the 9 diagnostic sensors, and if the 17-sensor fallback was used, the cooking, laundry, refrigeration and coffee maker sensors, one family per PR.
+3. **`binary_sensor`** (72 descriptions), split in two:
+   - shared, dishwasher and laundry (44): remote start allowed, door, dishwasher and laundry problem events;
+   - refrigeration, cooking and coffee makers (28): mostly the fridge and freezer door and alarm sensors.
+4. **`select`** (102 descriptions, each a separate entity; the dropdown values aren't counted): program selection and options, including locked (read-only) entities and filtering unavailable programs.
+5. **`switch`** (73 descriptions), split in two:
+   - shared, dishwasher and laundry (46);
+   - cooking, refrigeration and coffee makers (27).
+6. **`number`** (33): settings and options.
+7. **`button`** (14): Start, Stop, Pause and the rest. After `select`, since starting needs a selected program.
+8. **`light`** (7) and **`fan`** (1): hood lighting and venting.
 9. **`update`** (2): software updates.
 10. **Reconfiguration flow, then reauthentication flow last.** Reconfiguration covers what changes in normal use (the appliance's address, or a new profile after a firmware update adds options). Reauthentication is only needed when the local key changes, which only happens when the appliance is unpaired and paired again, so it's the least urgent. Reauthentication is also the only Silver rule left, so the manifest stays at Bronze until it lands and then goes straight to Platinum: diagnostics and reconfiguration are the only Gold rules left and will already be in, and the Platinum rules are already done.
 11. **Start with delay:** replace the `start_program` / `set_start_in` / `set_finish_in` actions with entities if possible (for example a Start-in / Finish-in entity), since core prefers entities over integration actions. Keep an action only if an entity can't express it.

@@ -60,7 +60,7 @@
         "name": "晶亮烘干"
       },
       "switch_extra_dry": {
-        "name": "额外烘干"
+        "name": "所有程序额外烘干"
       },
       "switch_speed_on_demand": {
         "name": "按需加速"
@@ -76,12 +76,6 @@
       },
       "switch_child_lock": {
         "name": "童锁"
-      },
-      "switch_door_light_ring": {
-        "name": "门环形灯"
-      },
-      "switch_drum_light": {
-        "name": "滚筒灯"
       },
       "switch_laundry_end_signal": {
         "name": "结束提示音"
@@ -642,24 +636,6 @@
           "programabortedbyappliancecriticalerror": "严重错误"
         }
       },
-      "sensor_interval_time_off": {
-        "name": "间隔关闭时间"
-      },
-      "sensor_interval_time_on": {
-        "name": "间隔开启时间"
-      },
-      "sensor_delayed_shutoff_time": {
-        "name": "延时关机"
-      },
-      "sensor_power_state": {
-        "name": "电源状态",
-        "state": {
-          "mainsoff": "断电",
-          "off": "关闭",
-          "on": "开启",
-          "standby": "待机"
-        }
-      },
       "sensor_door_state": {
         "name": "门状态",
         "state": {
@@ -789,24 +765,6 @@
       },
       "sensor_temperature_memory_freezer": {
         "name": "冷冻室记忆温度"
-      },
-      "sensor_laundry_spin_speed": {
-        "name": "脱水转速",
-        "state": {
-          "off": "关闭",
-          "rpm400": "400 转/分",
-          "rpm600": "600 转/分",
-          "rpm700": "700 转/分",
-          "rpm800": "800 转/分",
-          "rpm900": "900 转/分",
-          "rpm1000": "1000 转/分",
-          "rpm1200": "1200 转/分",
-          "rpm1400": "1400 转/分",
-          "rpm1500": "1500 转/分",
-          "rpm1600": "1600 转/分",
-          "rinsehold": "免脱水",
-          "auto": "自动"
-        }
       },
       "sensor_estimated_remaining_program_time": {
         "name": "预计剩余程序时间"
@@ -1021,7 +979,7 @@
         }
       },
       "select_rinse_aid": {
-        "name": "漂洗剂",
+        "name": "漂洗剂用量",
         "state": {
           "off": "关闭",
           "r01": "R01",
@@ -1432,7 +1390,7 @@
         }
       },
       "select_door_light_ring_brightness": {
-        "name": "门环形灯亮度",
+        "name": "门环形灯亮度等级",
         "state": {
           "low": "低",
           "medium": "中",

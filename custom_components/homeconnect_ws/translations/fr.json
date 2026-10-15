@@ -57,7 +57,7 @@
         "name": "Brilliance séchage"
       },
       "switch_extra_dry": {
-        "name": "Extra séchage"
+        "name": "Extra séchage pour tous les programmes"
       },
       "switch_speed_on_demand": {
         "name": "Vitesse à la demande"
@@ -73,12 +73,6 @@
       },
       "switch_child_lock": {
         "name": "Verrouillage enfant"
-      },
-      "switch_door_light_ring": {
-        "name": "Éclairage porte"
-      },
-      "switch_drum_light": {
-        "name": "Éclairage tambour"
       },
       "switch_laundry_end_signal": {
         "name": "Signal de fin"
@@ -674,24 +668,6 @@
           "programabortedbyappliancecriticalerror": "Erreur critique"
         }
       },
-      "sensor_interval_time_off": {
-        "name": "Interval Off"
-      },
-      "sensor_interval_time_on": {
-        "name": "Interval On"
-      },
-      "sensor_delayed_shutoff_time": {
-        "name": "Arrêt programmé"
-      },
-      "sensor_power_state": {
-        "name": "Etat de l'alimentation",
-        "state": {
-          "mainsoff": "Alimentation principale coupée",
-          "off": "Éteint",
-          "on": "Allumé",
-          "standby": "En veille"
-        }
-      },
       "sensor_door_state": {
         "name": "Porte",
         "state": {
@@ -821,24 +797,6 @@
       },
       "sensor_temperature_memory_freezer": {
         "name": "Mémoire de la température du congélateur"
-      },
-      "sensor_laundry_spin_speed": {
-        "name": "Vitesse d'essorage",
-        "state": {
-          "off": "0",
-          "rpm400": "400 tpm",
-          "rpm600": "600 tpm",
-          "rpm700": "700 tpm",
-          "rpm800": "800 tpm",
-          "rpm900": "900 tpm",
-          "rpm1000": "1000 tpm",
-          "rpm1200": "1200 tpm",
-          "rpm1400": "1400 tpm",
-          "rpm1500": "1500 tpm",
-          "rpm1600": "1600 tpm",
-          "rinsehold": "Rinçage",
-          "auto": "Auto"
-        }
       },
       "sensor_estimated_remaining_program_time": {
         "name": "Durée totale estimée"
@@ -1067,7 +1025,7 @@
         }
       },
       "select_rinse_aid": {
-        "name": "Liquide de Rinçage",
+        "name": "Dosage du liquide de rinçage",
         "state": {
           "off": "Niveau 0",
           "r01": "Niveau 1",
@@ -1454,7 +1412,7 @@
         }
       },
       "select_laundry_brightness": {
-        "name": "Luminosité",
+        "name": "Niveau de luminosité",
         "state": {
           "low": "Faible",
           "medium": "Moyen",
@@ -1471,7 +1429,7 @@
         }
       },
       "select_door_light_ring_brightness": {
-        "name": "Luminosité de l'éclairage du hublot",
+        "name": "Niveau de luminosité de l'éclairage du hublot",
         "state": {
           "low": "Faible",
           "medium": "Moyen",

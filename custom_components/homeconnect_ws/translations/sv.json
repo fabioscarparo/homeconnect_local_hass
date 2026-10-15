@@ -60,7 +60,7 @@
         "name": "CrystalDry"
       },
       "switch_extra_dry": {
-        "name": "Extra torrt"
+        "name": "Extra torrt för alla program"
       },
       "switch_speed_on_demand": {
         "name": "Snabbläge vid behov"
@@ -76,12 +76,6 @@
       },
       "switch_child_lock": {
         "name": "Barnlås"
-      },
-      "switch_door_light_ring": {
-        "name": "Dörrljusring"
-      },
-      "switch_drum_light": {
-        "name": "Trumljus"
       },
       "switch_laundry_end_signal": {
         "name": "Slutsignal"
@@ -710,24 +704,6 @@
           "programabortedbyappliancecriticalerror": "Kritiskt fel"
         }
       },
-      "sensor_interval_time_off": {
-        "name": "Intervall – av"
-      },
-      "sensor_interval_time_on": {
-        "name": "Intervall – på"
-      },
-      "sensor_delayed_shutoff_time": {
-        "name": "Fördröjd avstängning"
-      },
-      "sensor_power_state": {
-        "name": "Strömläge",
-        "state": {
-          "mainsoff": "Huvudström av",
-          "off": "Av",
-          "on": "På",
-          "standby": "Vänteläge"
-        }
-      },
       "sensor_door_state": {
         "name": "Dörr",
         "state": {
@@ -857,24 +833,6 @@
       },
       "sensor_temperature_memory_freezer": {
         "name": "Minnestemperatur – frys"
-      },
-      "sensor_laundry_spin_speed": {
-        "name": "Centrifugeringshastighet",
-        "state": {
-          "off": "Av",
-          "rpm400": "400 varv/min",
-          "rpm600": "600 varv/min",
-          "rpm700": "700 varv/min",
-          "rpm800": "800 varv/min",
-          "rpm900": "900 varv/min",
-          "rpm1000": "1000 varv/min",
-          "rpm1200": "1200 varv/min",
-          "rpm1400": "1400 varv/min",
-          "rpm1500": "1500 varv/min",
-          "rpm1600": "1600 varv/min",
-          "rinsehold": "Sköljstopp",
-          "auto": "Auto"
-        }
       },
       "sensor_estimated_remaining_program_time": {
         "name": "Beräknad total programtid"
@@ -1073,6 +1031,24 @@
       }
     },
     "select": {
+      "select_laundry_spin_speed": {
+        "name": "Centrifugeringshastighet",
+        "state": {
+          "off": "Av",
+          "rpm400": "400 varv/min",
+          "rpm600": "600 varv/min",
+          "rpm700": "700 varv/min",
+          "rpm800": "800 varv/min",
+          "rpm900": "900 varv/min",
+          "rpm1000": "1000 varv/min",
+          "rpm1200": "1200 varv/min",
+          "rpm1400": "1400 varv/min",
+          "rpm1500": "1500 varv/min",
+          "rpm1600": "1600 varv/min",
+          "rinsehold": "Sköljstopp",
+          "auto": "Auto"
+        }
+      },
       "select_drying_assistant_all_programs": {
         "name": "Torkassistent – alla program",
         "state": {
@@ -1089,7 +1065,7 @@
         }
       },
       "select_rinse_aid": {
-        "name": "Sköljmedel",
+        "name": "Sköljmedelsdosering",
         "state": {
           "off": "Av",
           "r01": "Nivå 1 (Lägst)",
@@ -1552,7 +1528,7 @@
         }
       },
       "select_laundry_brightness": {
-        "name": "Ljusstyrka",
+        "name": "Ljusstyrkenivå",
         "state": {
           "low": "Låg",
           "medium": "Medel",
@@ -1569,7 +1545,7 @@
         }
       },
       "select_door_light_ring_brightness": {
-        "name": "Dörrljusring – ljusstyrka",
+        "name": "Dörrljusring – ljusstyrkenivå",
         "state": {
           "low": "Låg",
           "medium": "Medel",

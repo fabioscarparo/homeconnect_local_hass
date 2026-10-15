@@ -46,6 +46,14 @@ class HCEntityDescription(EntityDescription, frozen_or_thawed=True):
     # it. Clears to None instead of showing a stale in-progress-looking value
     # once coordinator.expected_offline is true.
     clear_on_expected_offline: bool = False
+    # The same temperature in the other unit (Celsius or Fahrenheit), for an
+    # appliance that reports both. The entity follows the appliance's own
+    # temperature unit setting between the two, see HCEntity.
+    other_unit_entity: str | None = None
+    # The same feature under other names, which some appliances offer instead
+    # of entity depending on the program. The entity follows whichever the
+    # appliance currently offers, see HCEntity.
+    alternate_entities: tuple[str, ...] | None = None
 
 
 class HCSelectEntityDescription(
@@ -70,6 +78,10 @@ class HCSwitchEntityDescription(
     """Description for Switch Entity."""
 
     value_mapping: tuple[str, str] | None = None
+    # The values that show as on; any other value shows as off. Without it, a
+    # value that's neither side of value_mapping shows as unknown. For power
+    # state, whose list of states is longer than the two the switch sets.
+    on_values: tuple[str, ...] | None = None
     available_access: tuple[Access, ...] = (Access.READ_WRITE, Access.WRITE_ONLY)
     # See HCSelectEntityDescription.force_option_when_expected_offline - same
     # race, but for the 2-state (on/off) power switch instead of the select.

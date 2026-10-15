@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import copy
 import json
 import re
 from datetime import datetime
@@ -10,23 +11,31 @@ from typing import TYPE_CHECKING
 from unittest.mock import AsyncMock, MagicMock, Mock, patch
 from zoneinfo import ZoneInfo
 
+import pytest
 from custom_components.homeconnect_ws import HCData, entity_descriptions
 from custom_components.homeconnect_ws.entity_descriptions import (
     HCBinarySensorEntityDescription,
     HCButtonEntityDescription,
     HCLightEntityDescription,
+    HCNumberEntityDescription,
     HCSelectEntityDescription,
     HCSensorEntityDescription,
     HCSwitchEntityDescription,
 )
 from custom_components.homeconnect_ws.entity_descriptions.common import (
     COMMON_ENTITY_DESCRIPTIONS,
+    generate_door_state,
     generate_power_switch,
     generate_program,
     generate_start_button,
+    generate_temperature_unit,
 )
-from custom_components.homeconnect_ws.entity_descriptions.cooking import generate_hood_light
+from custom_components.homeconnect_ws.entity_descriptions.cooking import (
+    generate_hood_light,
+    generate_meatprobe_plugged,
+)
 from custom_components.homeconnect_ws.entity_descriptions.refrigeration import (
+    compartment_door,
     generate_internal_light,
     generate_internal_light_brightness,
 )
@@ -35,11 +44,11 @@ from custom_components.homeconnect_ws.select import HCSelect
 from home_disconnect import Access, Execution
 from homeassistant.components.sensor import SensorDeviceClass
 from homeassistant.components.switch import SwitchDeviceClass
+from homeassistant.const import UnitOfTemperature
 
 from . import update_entity
 
 if TYPE_CHECKING:
-    import pytest
     from home_disconnect import Appliance
 
     from . import MockApplianceFactory
@@ -148,77 +157,95 @@ POWER_SWITCH = {
 
 
 async def test_power_switch(mock_homeconnect_appliance: MockApplianceFactory) -> None:
-    """Test dynamic Power switch."""
-    device_description = POWER_SWITCH.copy()
+    """Power state gets one entity: a switch for two states, a select for more."""
+    device_description = copy.deepcopy(POWER_SWITCH)
 
     # On/Off Switch
     device_description["setting"][0]["min"] = 1
     device_description["setting"][0]["max"] = 2
     appliance = await mock_homeconnect_appliance(description=device_description)
-    switch_description = generate_power_switch(appliance)
+    power_descriptions = generate_power_switch(appliance)
 
-    assert switch_description["switch"][0] == HCSwitchEntityDescription(
-        key="switch_power_state",
-        entity="BSH.Common.Setting.PowerState",
-        device_class=SwitchDeviceClass.SWITCH,
-        value_mapping=("On", "Off"),
-        force_off_when_expected_offline=True,
-    )
-    assert switch_description["select"][0].force_option_when_expected_offline == "off"
-    assert switch_description["sensor"][0].force_option_when_expected_offline == "off"
+    assert power_descriptions == {
+        "switch": [
+            HCSwitchEntityDescription(
+                key="switch_power_state",
+                entity="BSH.Common.Setting.PowerState",
+                device_class=SwitchDeviceClass.SWITCH,
+                value_mapping=("On", "Off"),
+                on_values=("On",),
+                force_off_when_expected_offline=True,
+            )
+        ]
+    }
 
-    # No Switch
+    # More than two states: a select, enabled by default
     device_description["setting"][0]["min"] = 0
     device_description["setting"][0]["max"] = 4
     appliance = await mock_homeconnect_appliance(description=device_description)
-    switch_description = generate_power_switch(appliance)
+    power_descriptions = generate_power_switch(appliance)
 
-    assert "switch" not in switch_description
-    assert switch_description["select"][0].force_option_when_expected_offline == "off"
-    assert switch_description["sensor"][0].force_option_when_expected_offline == "off"
+    assert set(power_descriptions) == {"select"}
+    select = power_descriptions["select"][0]
+    assert select.key == "select_power_state"
+    assert select.options == ["mainsoff", "off", "on", "standby"]
+    assert select.entity_registry_enabled_default
+    assert select.force_option_when_expected_offline == "off"
 
-    # On/MainsOff Switch - "Off" isn't one of this appliance's power states at
-    # all, only "MainsOff" is, so forcing to "off" would return an option
-    # SelectEntity doesn't recognize (confirmed live on fork issue #7 as the
-    # entity's state silently degrading to "Unknown").
+    # On/MainsOff Switch
     device_description["setting"][0]["enumeration"] = {"0": "MainsOff", "2": "On"}
     appliance = await mock_homeconnect_appliance(description=device_description)
-    switch_description = generate_power_switch(appliance)
+    power_descriptions = generate_power_switch(appliance)
 
-    assert switch_description["switch"][0] == HCSwitchEntityDescription(
-        key="switch_power_state",
-        entity="BSH.Common.Setting.PowerState",
-        device_class=SwitchDeviceClass.SWITCH,
-        value_mapping=("On", "MainsOff"),
-        force_off_when_expected_offline=True,
-    )
-    assert switch_description["select"][0].force_option_when_expected_offline == "mainsoff"
-    assert switch_description["sensor"][0].force_option_when_expected_offline == "mainsoff"
+    assert set(power_descriptions) == {"switch"}
+    assert power_descriptions["switch"][0].value_mapping == ("On", "MainsOff")
 
     # Standby/Off Switch
     device_description["setting"][0]["enumeration"] = {"1": "Off", "3": "Standby"}
     appliance = await mock_homeconnect_appliance(description=device_description)
-    switch_description = generate_power_switch(appliance)
+    power_descriptions = generate_power_switch(appliance)
 
-    assert switch_description["switch"][0] == HCSwitchEntityDescription(
-        key="switch_power_state",
-        entity="BSH.Common.Setting.PowerState",
-        device_class=SwitchDeviceClass.SWITCH,
-        value_mapping=("Standby", "Off"),
-        force_off_when_expected_offline=True,
-    )
-    assert switch_description["select"][0].force_option_when_expected_offline == "off"
-    assert switch_description["sensor"][0].force_option_when_expected_offline == "off"
+    assert set(power_descriptions) == {"switch"}
+    assert power_descriptions["switch"][0].value_mapping == ("Standby", "Off")
+    assert power_descriptions["switch"][0].on_values == ("On", "Standby")
+
+    # Two states that aren't an on/off pair: a select
+    device_description["setting"][0]["enumeration"] = {"1": "Off", "2": "MainsOff"}
+    appliance = await mock_homeconnect_appliance(description=device_description)
+    power_descriptions = generate_power_switch(appliance)
+
+    assert set(power_descriptions) == {"select"}
+    assert power_descriptions["select"][0].force_option_when_expected_offline == "off"
 
     # Neither "Off" nor "MainsOff" is a valid state for this appliance at all -
     # nothing to force to, so it should fall back to None rather than an
     # invalid option.
-    device_description["setting"][0]["enumeration"] = {"2": "On", "3": "Standby"}
+    device_description["setting"][0]["enumeration"] = {"2": "On", "3": "Standby", "4": "Eco"}
     appliance = await mock_homeconnect_appliance(description=device_description)
-    switch_description = generate_power_switch(appliance)
+    power_descriptions = generate_power_switch(appliance)
 
-    assert switch_description["select"][0].force_option_when_expected_offline is None
-    assert switch_description["sensor"][0].force_option_when_expected_offline is None
+    assert set(power_descriptions) == {"select"}
+    assert power_descriptions["select"][0].force_option_when_expected_offline is None
+
+
+async def test_power_select_when_profile_says_read(
+    mock_homeconnect_appliance: MockApplianceFactory,
+) -> None:
+    """
+    A power state the profile marks "read" still gets a select, not a sensor.
+
+    Fork issue #7's Bosch WAU28PEHSN washer has access="read" with min 0 and
+    max 3 in its profile, and was turned off through its power state select.
+    """
+    device_description = copy.deepcopy(POWER_SWITCH)
+    device_description["setting"][0]["access"] = "read"
+    device_description["setting"][0]["min"] = 0
+    device_description["setting"][0]["max"] = 3
+    appliance = await mock_homeconnect_appliance(description=device_description)
+    power_descriptions = generate_power_switch(appliance)
+
+    assert set(power_descriptions) == {"select"}
+    assert sorted(power_descriptions["select"][0].options) == ["mainsoff", "off", "on", "standby"]
 
 
 async def test_power_switch_present_on_venting_hood(
@@ -260,6 +287,7 @@ async def test_power_switch_present_on_venting_hood(
         entity="BSH.Common.Setting.PowerState",
         device_class=SwitchDeviceClass.SWITCH,
         value_mapping=("On", "Off"),
+        on_values=("On",),
         force_off_when_expected_offline=True,
     )
 
@@ -588,6 +616,13 @@ async def test_internal_light(mock_homeconnect_appliance: MockApplianceFactory) 
         entity="Refrigeration.Common.Setting.Light.Internal.Power",
     )
 
+    # Fixed power: the light can't be switched
+    fixed = copy.deepcopy(INTERNAL_LIGHT)
+    fixed["setting"][0]["access"] = Access.READ_STATIC
+    appliance = await mock_homeconnect_appliance(description=fixed)
+    assert generate_internal_light(appliance) is None
+    assert generate_internal_light_brightness(appliance).entity_registry_enabled_default
+
     # No internal light
     appliance = await mock_homeconnect_appliance(description={})
     assert generate_internal_light(appliance) is None
@@ -741,3 +776,238 @@ async def test_sync_time_button_sets_the_clock_to_local_time() -> None:
     ):
         await description.press_fn(appliance)
     appliance.set_datetime.assert_awaited_once_with(local_now)
+
+
+DOOR_STATE = {
+    "status": [
+        {
+            "access": "read",
+            "available": True,
+            "enumeration": {"0": "Open", "1": "Closed"},
+            "uid": 256,
+            "name": "BSH.Common.Status.DoorState",
+        },
+    ]
+}
+
+
+async def test_door_binary_sensor_when_open_or_closed(
+    mock_homeconnect_appliance: MockApplianceFactory,
+) -> None:
+    """A door that's only open or closed gets a binary sensor only."""
+    appliance = await mock_homeconnect_appliance(description=copy.deepcopy(DOOR_STATE))
+    door_descriptions = generate_door_state(appliance)
+
+    assert set(door_descriptions) == {"binary_sensor"}
+    assert door_descriptions["binary_sensor"][0].key == "binary_sensor_door_state"
+
+
+async def test_door_sensor_when_more_states(
+    mock_homeconnect_appliance: MockApplianceFactory,
+) -> None:
+    """A door that can also be locked or ajar gets an enum sensor only."""
+    device_description = copy.deepcopy(DOOR_STATE)
+    device_description["status"][0]["enumeration"] = {
+        "0": "Open",
+        "1": "Closed",
+        "2": "Locked",
+        "3": "Ajar",
+    }
+    appliance = await mock_homeconnect_appliance(description=device_description)
+    door_descriptions = generate_door_state(appliance)
+
+    assert set(door_descriptions) == {"sensor"}
+    assert door_descriptions["sensor"][0].key == "sensor_door_state"
+
+
+@pytest.mark.parametrize(
+    ("temperature_unit", "expected"),
+    [
+        (UnitOfTemperature.CELSIUS, ["number_setpoint_freezer", "number_oven_alarm"]),
+        (
+            UnitOfTemperature.FAHRENHEIT,
+            ["number_setpoint_freezer_fahrenheit", "number_oven_alarm"],
+        ),
+    ],
+)
+def test_one_temperature_unit(temperature_unit: str, expected: list[str]) -> None:
+    """A temperature reported in both units keeps the one in Home Assistant's unit."""
+    descriptions = [
+        HCNumberEntityDescription(key="number_setpoint_freezer", entity="Test.Setpoint"),
+        HCNumberEntityDescription(
+            key="number_setpoint_freezer_fahrenheit", entity="Test.SetpointFahrenheit"
+        ),
+        HCNumberEntityDescription(key="number_oven_alarm", entity="Test.Alarm"),
+    ]
+
+    kept = entity_descriptions._one_temperature_unit(descriptions, temperature_unit)
+
+    assert [description.key for description in kept] == expected
+    # The kept one can still follow the appliance to the other unit's entity
+    assert kept[0].other_unit_entity == (
+        "Test.SetpointFahrenheit"
+        if temperature_unit == UnitOfTemperature.CELSIUS
+        else "Test.Setpoint"
+    )
+    assert kept[1].other_unit_entity is None
+
+
+@pytest.mark.parametrize(
+    "temperature_unit", [UnitOfTemperature.CELSIUS, UnitOfTemperature.FAHRENHEIT]
+)
+def test_one_temperature_unit_keeps_the_only_one(temperature_unit: str) -> None:
+    """A temperature reported in one unit only keeps it, whatever Home Assistant's unit."""
+    descriptions = [
+        HCNumberEntityDescription(key="number_setpoint_freezer_fahrenheit"),
+        HCNumberEntityDescription(key="number_setpoint_refrigerator"),
+    ]
+
+    kept = entity_descriptions._one_temperature_unit(descriptions, temperature_unit)
+
+    assert kept == descriptions
+
+
+async def test_temperature_unit_select_with_celsius_and_fahrenheit(
+    mock_homeconnect_appliance: MockApplianceFactory,
+) -> None:
+    """An appliance that switches between Celsius and Fahrenheit gets a unit select."""
+    appliance = await mock_homeconnect_appliance(
+        description={
+            "setting": [
+                {
+                    "access": "readwrite",
+                    "available": True,
+                    "enumeration": {"0": "Celsius", "1": "Fahrenheit"},
+                    "uid": 4153,
+                    "name": "BSH.Common.Setting.TemperatureUnit",
+                },
+            ]
+        }
+    )
+    description = generate_temperature_unit(appliance)
+
+    assert description is not None
+    assert description.key == "select_temperature_unit"
+
+
+async def test_no_temperature_unit_select_when_fixed(
+    mock_homeconnect_appliance: MockApplianceFactory,
+) -> None:
+    """An appliance whose unit can never change (readstatic) gets no unit select."""
+    appliance = await mock_homeconnect_appliance(
+        description={
+            "setting": [
+                {
+                    "access": "readstatic",
+                    "available": True,
+                    "enumeration": {"0": "Celsius", "1": "Fahrenheit"},
+                    "uid": 4153,
+                    "name": "BSH.Common.Setting.TemperatureUnit",
+                },
+            ]
+        }
+    )
+
+    assert generate_temperature_unit(appliance) is None
+
+
+def _status(uid: int, name: str, enumeration: dict[str, str] | None = None) -> dict:
+    status: dict = {"access": "read", "available": True, "uid": uid, "name": name}
+    if enumeration is not None:
+        status["enumeration"] = enumeration
+    return status
+
+
+async def test_meatprobe_plugged_left_out_when_per_cavity(
+    mock_homeconnect_appliance: MockApplianceFactory,
+) -> None:
+    """An oven reporting the probe per cavity gets no appliance-wide probe sensor."""
+    appliance = await mock_homeconnect_appliance(
+        description={
+            "status": [
+                _status(1, "Cooking.Oven.Status.MeatprobePlugged"),
+                _status(2, "Cooking.Oven.Status.Cavity.340.MeatprobePlugged"),
+            ]
+        }
+    )
+    assert generate_meatprobe_plugged(appliance) is None
+
+    appliance = await mock_homeconnect_appliance(
+        description={"status": [_status(1, "Cooking.Oven.Status.MeatprobePlugged")]}
+    )
+    description = generate_meatprobe_plugged(appliance)
+    assert description is not None
+    assert description.key == "binary_sensor_oven_meatprobe_plugged"
+
+
+DOOR_ENUM = {"0": "Open", "1": "Closed", "2": "Locked", "3": "Ajar"}
+COMPARTMENT_ENUM = {"0": "Closed", "1": "Open"}
+
+
+async def test_compartment_door_left_out_when_only_door(
+    mock_homeconnect_appliance: MockApplianceFactory,
+) -> None:
+    """A single-door freezer's compartment door is the same door as its Door entity."""
+    freezer_door = compartment_door(
+        "binary_sensor_freezer_door_state", "Refrigeration.Common.Status.Door.Freezer"
+    )
+    appliance = await mock_homeconnect_appliance(
+        description={
+            "status": [
+                _status(1, "BSH.Common.Status.DoorState", DOOR_ENUM),
+                _status(2, "Refrigeration.Common.Status.Door.Freezer", COMPARTMENT_ENUM),
+            ]
+        }
+    )
+    assert freezer_door(appliance) is None
+
+
+async def test_compartment_doors_kept_with_more_doors(
+    mock_homeconnect_appliance: MockApplianceFactory,
+) -> None:
+    """A fridge-freezer keeps a door entity per compartment."""
+    freezer_door = compartment_door(
+        "binary_sensor_freezer_door_state", "Refrigeration.Common.Status.Door.Freezer"
+    )
+    appliance = await mock_homeconnect_appliance(
+        description={
+            "status": [
+                _status(1, "BSH.Common.Status.DoorState", DOOR_ENUM),
+                _status(2, "Refrigeration.Common.Status.Door.Freezer", COMPARTMENT_ENUM),
+                _status(3, "Refrigeration.Common.Status.Door.Refrigerator", COMPARTMENT_ENUM),
+            ]
+        }
+    )
+    description = freezer_door(appliance)
+    assert description is not None
+    assert description.key == "binary_sensor_freezer_door_state"
+
+
+@pytest.mark.parametrize(
+    ("known", "entity", "alternates"),
+    [
+        ({"Test.OldName"}, "Test.OldName", None),
+        ({"Test.NewName"}, "Test.NewName", None),
+        ({"Test.OldName", "Test.NewName"}, "Test.OldName", ("Test.NewName",)),
+    ],
+)
+def test_with_known_names(known: set[str], entity: str, alternates: tuple[str, ...] | None) -> None:
+    """A feature under an old and a new name uses the ones the appliance knows."""
+    description = HCSwitchEntityDescription(
+        key="switch_test", entity="Test.OldName", alternate_entities=("Test.NewName",)
+    )
+
+    available = entity_descriptions._available_description("switch", description, known)
+
+    assert available is not None
+    assert available.entity == entity
+    assert available.alternate_entities == alternates
+
+
+def test_with_no_known_names() -> None:
+    """A feature under names the appliance doesn't know gets no entity."""
+    description = HCSwitchEntityDescription(
+        key="switch_test", entity="Test.OldName", alternate_entities=("Test.NewName",)
+    )
+
+    assert entity_descriptions._available_description("switch", description, {"Other"}) is None

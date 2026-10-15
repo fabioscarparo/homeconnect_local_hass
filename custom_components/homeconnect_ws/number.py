@@ -66,6 +66,10 @@ class HCNumber(HCEntity, NumberEntity):
         return value if isinstance(value, int | float) and not isinstance(value, bool) else None
 
     @property
+    def native_unit_of_measurement(self) -> str | None:
+        return self._temperature_unit or super().native_unit_of_measurement
+
+    @property
     def native_min_value(self) -> float:
         if (
             self._entity is not None

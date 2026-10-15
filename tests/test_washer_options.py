@@ -3,8 +3,11 @@
 from __future__ import annotations
 
 from typing import TYPE_CHECKING, Any
+from unittest.mock import MagicMock
 
+import pytest
 from custom_components.homeconnect_ws.entity_descriptions import get_available_entities
+from custom_components.homeconnect_ws.entity_descriptions.laundry_care import generate_speed_perfect
 from home_disconnect import Access
 
 if TYPE_CHECKING:
@@ -128,3 +131,28 @@ async def test_remote_control_entities(mock_homeconnect_appliance: MockAppliance
     assert "button_deactivate_remote_control" not in descriptions
     event = descriptions["binary_sensor_confirm_permanent_remote_start"]
     assert event.value_on == {"Present", "Confirmed"}
+
+
+@pytest.mark.parametrize(
+    ("names", "key", "alternates"),
+    [
+        (
+            ["LaundryCare.Common.Option.SpeedPerfect", "LaundryCare.Washer.Option.SpeedPerfect"],
+            "switch_laundry_common_speed_perfect",
+            ("LaundryCare.Washer.Option.SpeedPerfect",),
+        ),
+        (["LaundryCare.Common.Option.SpeedPerfect"], "switch_laundry_common_speed_perfect", None),
+        (["LaundryCare.Washer.Option.SpeedPerfect"], "switch_laundry_speed_perfect", None),
+    ],
+)
+def test_one_speed_perfect_switch(
+    names: list[str], key: str, alternates: tuple[str, ...] | None
+) -> None:
+    """Speed Perfect under either or both names gets one switch."""
+    appliance = MagicMock()
+    appliance.entities = dict.fromkeys(names, MagicMock())
+    description = generate_speed_perfect(appliance)
+
+    assert description is not None
+    assert description.key == key
+    assert description.alternate_entities == alternates

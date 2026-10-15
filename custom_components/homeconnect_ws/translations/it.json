@@ -57,7 +57,7 @@
         "name": "Brilliance Dry"
       },
       "switch_extra_dry": {
-        "name": "Asciugatura Extra"
+        "name": "Asciugatura Extra per tutti i programmi"
       },
       "switch_speed_on_demand": {
         "name": "Velocità su richiesta"
@@ -73,12 +73,6 @@
       },
       "switch_child_lock": {
         "name": "Blocco bambini"
-      },
-      "switch_door_light_ring": {
-        "name": "Door Ring light"
-      },
-      "switch_drum_light": {
-        "name": "Drum light"
       },
       "switch_laundry_end_signal": {
         "name": "Segnale di fine"
@@ -618,24 +612,6 @@
           "programabortedbyappliancecriticalerror": "Errore critico"
         }
       },
-      "sensor_interval_time_off": {
-        "name": "Intervallo spento"
-      },
-      "sensor_interval_time_on": {
-        "name": "Intervallo acceso"
-      },
-      "sensor_delayed_shutoff_time": {
-        "name": "Spegnimento ritardato"
-      },
-      "sensor_power_state": {
-        "name": "Stato alimentazione",
-        "state": {
-          "mainsoff": "Alimentazione spenta",
-          "off": "Spento",
-          "on": "Acceso",
-          "standby": "In attesa"
-        }
-      },
       "sensor_door_state": {
         "name": "Porta",
         "state": {
@@ -763,24 +739,6 @@
       "sensor_temperature_memory_freezer": {
         "name": "Temperatura Freezer Memoria"
       },
-      "sensor_laundry_spin_speed": {
-        "name": "Velocità di rotazione",
-        "state": {
-          "off": "Spento",
-          "rpm400": "400 giri",
-          "rpm600": "600 giri",
-          "rpm700": "700 giri",
-          "rpm800": "800 giri",
-          "rpm900": "900 giri",
-          "rpm1000": "1000 giri",
-          "rpm1200": "1200 giri",
-          "rpm1400": "1400 giri",
-          "rpm1500": "1500 giri",
-          "rpm1600": "1600 giri",
-          "rinsehold": "Attesa risciacquo",
-          "auto": "Auto"
-        }
-      },
       "sensor_estimated_remaining_program_time": {
         "name": "Tempo totale programma stimato"
       },
@@ -850,7 +808,7 @@
         }
       },
       "select_rinse_aid": {
-        "name": "Brillantante"
+        "name": "Dosaggio brillantante"
       },
       "select_sound_level_signal": {
         "name": "Livello suono segnale",
@@ -1580,7 +1538,7 @@
         "name": "Luminosità"
       },
       "number_door_light_ring_brightness": {
-        "name": "luminosità luce anello porta"
+        "name": "Luminosità luce anello porta"
       },
       "number_duration": {
         "name": "Durata"

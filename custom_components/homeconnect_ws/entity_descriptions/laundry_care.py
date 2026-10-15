@@ -27,7 +27,40 @@ from .descriptions_definitions import (
 )
 
 if TYPE_CHECKING:
+    from home_disconnect import Appliance
+
     from .descriptions_definitions import _EntityDescriptionsDefinitionsType
+
+
+def generate_speed_perfect(appliance: Appliance) -> HCSwitchEntityDescription | None:
+    """
+    Get the Speed Perfect switch description.
+
+    Washers have it under two names, LaundryCare.Common.Option.SpeedPerfect and
+    LaundryCare.Washer.Option.SpeedPerfect, both in the profile. A WGB244A0BY's
+    debug log (fork issue #59) only ever used the Common one, but a WGB256ABSN
+    profile has a few programs with only the Washer one. So one switch backs
+    both and follows whichever the program offers. Keeps each one's own key
+    when it's the only one, so existing entities keep their IDs.
+    """
+    common = "LaundryCare.Common.Option.SpeedPerfect"
+    washer = "LaundryCare.Washer.Option.SpeedPerfect"
+    if common in appliance.entities:
+        return HCSwitchEntityDescription(
+            key="switch_laundry_common_speed_perfect",
+            entity=common,
+            alternate_entities=(washer,) if washer in appliance.entities else None,
+            device_class=SwitchDeviceClass.SWITCH,
+            translation_key="switch_laundry_speed_perfect",
+        )
+    if washer in appliance.entities:
+        return HCSwitchEntityDescription(
+            key="switch_laundry_speed_perfect",
+            entity=washer,
+            device_class=SwitchDeviceClass.SWITCH,
+        )
+    return None
+
 
 LAUNDRY_ENTITY_DESCRIPTIONS: _EntityDescriptionsDefinitionsType = {
     "sensor": [
@@ -48,16 +81,6 @@ LAUNDRY_ENTITY_DESCRIPTIONS: _EntityDescriptionsDefinitionsType = {
             entity="LaundryCare.Dryer.Option.ProcessPhase",
             device_class=SensorDeviceClass.ENUM,
             has_state_translation=True,
-        ),
-        HCSensorEntityDescription(
-            key="sensor_laundry_spin_speed",
-            entity="LaundryCare.Washer.Option.SpinSpeed",
-            device_class=SensorDeviceClass.ENUM,
-            has_state_translation=True,
-            # Otherwise stays frozen on the last active spin speed (e.g.
-            # RPM1400) while the appliance is off, misleadingly implying it's
-            # still running - confirmed live on fork issue #7.
-            force_option_when_expected_offline="off",
         ),
         HCSensorEntityDescription(
             key="sensor_laundry_load_recommendation",
@@ -388,14 +411,10 @@ LAUNDRY_ENTITY_DESCRIPTIONS: _EntityDescriptionsDefinitionsType = {
         HCSelectEntityDescription(
             key="select_laundry_hygienic_steam_intensity",
             entity="LaundryCare.Common.Option.HygienicSteamIntensity",
+            alternate_entities=("LaundryCare.Washer.Option.HygienicSteamIntensity",),
             has_state_translation=True,
         ),
         # The same option, under the Washer name a Bosch WGH24400IT uses
-        HCSelectEntityDescription(
-            key="select_laundry_hygienic_steam_intensity",
-            entity="LaundryCare.Washer.Option.HygienicSteamIntensity",
-            has_state_translation=True,
-        ),
         HCSelectEntityDescription(
             key="select_laundry_pretreatment",
             entity="LaundryCare.Washer.Option.PreTreatment",
@@ -487,18 +506,6 @@ LAUNDRY_ENTITY_DESCRIPTIONS: _EntityDescriptionsDefinitionsType = {
     ],
     "switch": [
         HCSwitchEntityDescription(
-            key="switch_door_light_ring",
-            entity="LaundryCare.Common.Setting.DoorLightRing.Active",
-            device_class=SwitchDeviceClass.SWITCH,
-            entity_registry_enabled_default=False,
-        ),
-        HCSwitchEntityDescription(
-            key="switch_drum_light",
-            entity="LaundryCare.Common.Setting.DrumLight.Active",
-            device_class=SwitchDeviceClass.SWITCH,
-            entity_registry_enabled_default=False,
-        ),
-        HCSwitchEntityDescription(
             key="switch_laundry_end_signal",
             entity="LaundryCare.Common.Setting.EndSignal",
             device_class=SwitchDeviceClass.SWITCH,
@@ -527,12 +534,7 @@ LAUNDRY_ENTITY_DESCRIPTIONS: _EntityDescriptionsDefinitionsType = {
             entity="LaundryCare.Common.Option.SilentMode",
             device_class=SwitchDeviceClass.SWITCH,
         ),
-        HCSwitchEntityDescription(
-            key="switch_laundry_common_speed_perfect",
-            entity="LaundryCare.Common.Option.SpeedPerfect",
-            device_class=SwitchDeviceClass.SWITCH,
-            translation_key="switch_laundry_speed_perfect",
-        ),
+        generate_speed_perfect,
         HCSwitchEntityDescription(
             key="switch_laundry_low_temperature_hygiene",
             entity="LaundryCare.Common.Option.LowTemperatureHygiene",
@@ -544,11 +546,6 @@ LAUNDRY_ENTITY_DESCRIPTIONS: _EntityDescriptionsDefinitionsType = {
             device_class=SwitchDeviceClass.SWITCH,
         ),
         HCSwitchEntityDescription(
-            key="switch_half_load",
-            entity="LaundryCare.Dryer.Option.HalfLoad",
-            device_class=SwitchDeviceClass.SWITCH,
-        ),
-        HCSwitchEntityDescription(
             key="switch_laundry_hygiene",
             entity="LaundryCare.Dryer.Option.Hygiene",
             device_class=SwitchDeviceClass.SWITCH,
@@ -556,21 +553,13 @@ LAUNDRY_ENTITY_DESCRIPTIONS: _EntityDescriptionsDefinitionsType = {
         HCSwitchEntityDescription(
             key="switch_laundry_idos1_active",
             entity="LaundryCare.Washer.Option.IDos1Active",
+            alternate_entities=("LaundryCare.Washer.Option.IDos1.Active",),
             device_class=SwitchDeviceClass.SWITCH,
         ),
         HCSwitchEntityDescription(
             key="switch_laundry_idos2_active",
             entity="LaundryCare.Washer.Option.IDos2Active",
-            device_class=SwitchDeviceClass.SWITCH,
-        ),
-        HCSwitchEntityDescription(
-            key="switch_laundry_idos1_active",
-            entity="LaundryCare.Washer.Option.IDos1.Active",
-            device_class=SwitchDeviceClass.SWITCH,
-        ),
-        HCSwitchEntityDescription(
-            key="switch_laundry_idos2_active",
-            entity="LaundryCare.Washer.Option.IDos2.Active",
+            alternate_entities=("LaundryCare.Washer.Option.IDos2.Active",),
             device_class=SwitchDeviceClass.SWITCH,
         ),
         HCSwitchEntityDescription(
@@ -591,11 +580,6 @@ LAUNDRY_ENTITY_DESCRIPTIONS: _EntityDescriptionsDefinitionsType = {
         HCSwitchEntityDescription(
             key="switch_laundry_silent_wash",
             entity="LaundryCare.Washer.Option.SilentWash",
-            device_class=SwitchDeviceClass.SWITCH,
-        ),
-        HCSwitchEntityDescription(
-            key="switch_laundry_speed_perfect",
-            entity="LaundryCare.Washer.Option.SpeedPerfect",
             device_class=SwitchDeviceClass.SWITCH,
         ),
         HCSwitchEntityDescription(
