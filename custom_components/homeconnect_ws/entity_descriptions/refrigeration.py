@@ -22,6 +22,8 @@ from .descriptions_definitions import (
 )
 
 if TYPE_CHECKING:
+    from collections.abc import Callable
+
     from home_disconnect import Appliance
 
 
@@ -64,6 +66,45 @@ def generate_internal_light_brightness(
     )
 
 
+# Per-compartment door sensors, in both naming schemes. The chiller's count
+# as a compartment here, but always get their (disabled by default) entity.
+_COMPARTMENT_DOORS = (
+    "Refrigeration.Common.Status.Door.Freezer",
+    "Refrigeration.Common.Status.Door.Refrigerator",
+    "Refrigeration.Common.Status.Door.ChillerCommon",
+    "Refrigeration.FridgeFreezer.Status.DoorFreezer",
+    "Refrigeration.FridgeFreezer.Status.DoorRefrigerator",
+    "Refrigeration.FridgeFreezer.Status.ChillerCommon",
+)
+
+
+def compartment_door(
+    key: str, entity: str
+) -> Callable[[Appliance], HCBinarySensorEntityDescription | None]:
+    """
+    Get a compartment door description, unless it's the appliance's only door.
+
+    A freezer or fridge with one door reports it both as the compartment's door
+    and as BSH.Common.Status.DoorState, which already gets a Door entity (see
+    generate_door_state). The compartment door only tells doors apart when the
+    appliance has more than one.
+    """
+
+    def generate(appliance: Appliance) -> HCBinarySensorEntityDescription | None:
+        compartments = [door for door in _COMPARTMENT_DOORS if door in appliance.entities]
+        if compartments == [entity] and "BSH.Common.Status.DoorState" in appliance.entities:
+            return None
+        return HCBinarySensorEntityDescription(
+            key=key,
+            entity=entity,
+            device_class=BinarySensorDeviceClass.DOOR,
+            value_on={"Open"},
+            value_off={"Closed"},
+        )
+
+    return generate
+
+
 REFRIGERATION_ENTITY_DESCRIPTIONS: _EntityDescriptionsDefinitionsType = {
     "binary_sensor": [
         HCBinarySensorEntityDescription(
@@ -74,19 +115,11 @@ REFRIGERATION_ENTITY_DESCRIPTIONS: _EntityDescriptionsDefinitionsType = {
             value_on={"Open"},
             value_off={"Closed"},
         ),
-        HCBinarySensorEntityDescription(
-            key="binary_sensor_freezer_door_state",
-            entity="Refrigeration.Common.Status.Door.Freezer",
-            device_class=BinarySensorDeviceClass.DOOR,
-            value_on={"Open"},
-            value_off={"Closed"},
+        compartment_door(
+            "binary_sensor_freezer_door_state", "Refrigeration.Common.Status.Door.Freezer"
         ),
-        HCBinarySensorEntityDescription(
-            key="binary_sensor_fridge_door_state",
-            entity="Refrigeration.Common.Status.Door.Refrigerator",
-            device_class=BinarySensorDeviceClass.DOOR,
-            value_on={"Open"},
-            value_off={"Closed"},
+        compartment_door(
+            "binary_sensor_fridge_door_state", "Refrigeration.Common.Status.Door.Refrigerator"
         ),
         HCBinarySensorEntityDescription(
             key="binary_sensor_chiller_common_door_state",
@@ -96,19 +129,11 @@ REFRIGERATION_ENTITY_DESCRIPTIONS: _EntityDescriptionsDefinitionsType = {
             value_on={"Open"},
             value_off={"Closed"},
         ),
-        HCBinarySensorEntityDescription(
-            key="binary_sensor_freezer_door_state",
-            entity="Refrigeration.FridgeFreezer.Status.DoorFreezer",
-            device_class=BinarySensorDeviceClass.DOOR,
-            value_on={"Open"},
-            value_off={"Closed"},
+        compartment_door(
+            "binary_sensor_freezer_door_state", "Refrigeration.FridgeFreezer.Status.DoorFreezer"
         ),
-        HCBinarySensorEntityDescription(
-            key="binary_sensor_fridge_door_state",
-            entity="Refrigeration.FridgeFreezer.Status.DoorRefrigerator",
-            device_class=BinarySensorDeviceClass.DOOR,
-            value_on={"Open"},
-            value_off={"Closed"},
+        compartment_door(
+            "binary_sensor_fridge_door_state", "Refrigeration.FridgeFreezer.Status.DoorRefrigerator"
         ),
         HCBinarySensorEntityDescription(
             key="binary_sensor_door_alarm_chiller_common",

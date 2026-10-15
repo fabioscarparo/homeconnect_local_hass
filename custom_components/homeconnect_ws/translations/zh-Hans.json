@@ -60,7 +60,7 @@
         "name": "晶亮烘干"
       },
       "switch_extra_dry": {
-        "name": "额外烘干"
+        "name": "所有程序额外烘干"
       },
       "switch_speed_on_demand": {
         "name": "按需加速"
@@ -979,7 +979,7 @@
         }
       },
       "select_rinse_aid": {
-        "name": "漂洗剂",
+        "name": "漂洗剂用量",
         "state": {
           "off": "关闭",
           "r01": "R01",
@@ -1390,7 +1390,7 @@
         }
       },
       "select_door_light_ring_brightness": {
-        "name": "门环形灯亮度",
+        "name": "门环形灯亮度等级",
         "state": {
           "low": "低",
           "medium": "中",

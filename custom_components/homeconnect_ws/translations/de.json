@@ -107,7 +107,7 @@
         "name": "Glanz Trocknen"
       },
       "switch_extra_dry": {
-        "name": "Extra Trocken"
+        "name": "Extra Trocken für alle Programme"
       },
       "switch_speed_on_demand": {
         "name": "Schnell auf Knopfdruck"
@@ -2363,7 +2363,7 @@
         }
       },
       "select_rinse_aid": {
-        "name": "Klarspüler",
+        "name": "Klarspülerdosierung",
         "state": {
           "off": "Stufe 0 (Aus)",
           "r01": "Stufe 1 (Niedrigste)",
@@ -3859,7 +3859,7 @@
         }
       },
       "select_laundry_brightness": {
-        "name": "Helligkeit",
+        "name": "Helligkeitsstufe",
         "state": {
           "low": "Dunkel",
           "medium": "Mittel",
@@ -3876,7 +3876,7 @@
         }
       },
       "select_door_light_ring_brightness": {
-        "name": "Tür Ringlicht Helligkeit",
+        "name": "Tür Ringlicht Helligkeitsstufe",
         "state": {
           "low": "Dunkel",
           "medium": "Mittel",

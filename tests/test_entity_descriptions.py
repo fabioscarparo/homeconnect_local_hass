@@ -30,8 +30,12 @@ from custom_components.homeconnect_ws.entity_descriptions.common import (
     generate_start_button,
     generate_temperature_unit,
 )
-from custom_components.homeconnect_ws.entity_descriptions.cooking import generate_hood_light
+from custom_components.homeconnect_ws.entity_descriptions.cooking import (
+    generate_hood_light,
+    generate_meatprobe_plugged,
+)
 from custom_components.homeconnect_ws.entity_descriptions.refrigeration import (
+    compartment_door,
     generate_internal_light,
     generate_internal_light_brightness,
 )
@@ -898,3 +902,75 @@ async def test_no_temperature_unit_select_when_fixed(
     )
 
     assert generate_temperature_unit(appliance) is None
+
+
+def _status(uid: int, name: str, enumeration: dict[str, str] | None = None) -> dict:
+    status: dict = {"access": "read", "available": True, "uid": uid, "name": name}
+    if enumeration is not None:
+        status["enumeration"] = enumeration
+    return status
+
+
+async def test_meatprobe_plugged_left_out_when_per_cavity(
+    mock_homeconnect_appliance: MockApplianceFactory,
+) -> None:
+    """An oven reporting the probe per cavity gets no appliance-wide probe sensor."""
+    appliance = await mock_homeconnect_appliance(
+        description={
+            "status": [
+                _status(1, "Cooking.Oven.Status.MeatprobePlugged"),
+                _status(2, "Cooking.Oven.Status.Cavity.340.MeatprobePlugged"),
+            ]
+        }
+    )
+    assert generate_meatprobe_plugged(appliance) is None
+
+    appliance = await mock_homeconnect_appliance(
+        description={"status": [_status(1, "Cooking.Oven.Status.MeatprobePlugged")]}
+    )
+    description = generate_meatprobe_plugged(appliance)
+    assert description is not None
+    assert description.key == "binary_sensor_oven_meatprobe_plugged"
+
+
+DOOR_ENUM = {"0": "Open", "1": "Closed", "2": "Locked", "3": "Ajar"}
+COMPARTMENT_ENUM = {"0": "Closed", "1": "Open"}
+
+
+async def test_compartment_door_left_out_when_only_door(
+    mock_homeconnect_appliance: MockApplianceFactory,
+) -> None:
+    """A single-door freezer's compartment door is the same door as its Door entity."""
+    freezer_door = compartment_door(
+        "binary_sensor_freezer_door_state", "Refrigeration.Common.Status.Door.Freezer"
+    )
+    appliance = await mock_homeconnect_appliance(
+        description={
+            "status": [
+                _status(1, "BSH.Common.Status.DoorState", DOOR_ENUM),
+                _status(2, "Refrigeration.Common.Status.Door.Freezer", COMPARTMENT_ENUM),
+            ]
+        }
+    )
+    assert freezer_door(appliance) is None
+
+
+async def test_compartment_doors_kept_with_more_doors(
+    mock_homeconnect_appliance: MockApplianceFactory,
+) -> None:
+    """A fridge-freezer keeps a door entity per compartment."""
+    freezer_door = compartment_door(
+        "binary_sensor_freezer_door_state", "Refrigeration.Common.Status.Door.Freezer"
+    )
+    appliance = await mock_homeconnect_appliance(
+        description={
+            "status": [
+                _status(1, "BSH.Common.Status.DoorState", DOOR_ENUM),
+                _status(2, "Refrigeration.Common.Status.Door.Freezer", COMPARTMENT_ENUM),
+                _status(3, "Refrigeration.Common.Status.Door.Refrigerator", COMPARTMENT_ENUM),
+            ]
+        }
+    )
+    description = freezer_door(appliance)
+    assert description is not None
+    assert description.key == "binary_sensor_freezer_door_state"

@@ -118,7 +118,7 @@
         "name": "EfficientDry"
       },
       "switch_extra_dry": {
-        "name": "Dodatkowe suszenie"
+        "name": "Dodatkowe suszenie we wszystkich programach"
       },
       "switch_speed_on_demand": {
         "name": "Prędkość na żądanie"
@@ -1987,7 +1987,7 @@
         }
       },
       "select_rinse_aid": {
-        "name": "Nabłyszczacz",
+        "name": "Dozowanie nabłyszczacza",
         "state": {
           "off": "poziom 0 (wyłączone)",
           "r01": "poziom 1 (najniższy)",

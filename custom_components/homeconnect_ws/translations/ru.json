@@ -57,7 +57,7 @@
         "name": "Brilliance Dry"
       },
       "switch_extra_dry": {
-        "name": "Extra Dry"
+        "name": "Дополнительная сушка для всех программ"
       },
       "switch_speed_on_demand": {
         "name": "Скорость по требованию"
@@ -912,7 +912,7 @@
         }
       },
       "select_rinse_aid": {
-        "name": "Ополаскиватель"
+        "name": "Дозировка ополаскивателя"
       },
       "select_sound_level_signal": {
         "name": "Уровень звукового сигнала",

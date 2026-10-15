@@ -50,6 +50,10 @@ class HCEntityDescription(EntityDescription, frozen_or_thawed=True):
     # appliance that reports both. The entity follows the appliance's own
     # temperature unit setting between the two, see HCEntity.
     other_unit_entity: str | None = None
+    # The same feature under other names, which some appliances offer instead
+    # of entity depending on the program. The entity follows whichever the
+    # appliance currently offers, see HCEntity.
+    alternate_entities: tuple[str, ...] | None = None
 
 
 class HCSelectEntityDescription(

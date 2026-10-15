@@ -110,7 +110,7 @@
         "name": "CrystalDry"
       },
       "switch_extra_dry": {
-        "name": "Extra Dry"
+        "name": "Extra Dry for All Programs"
       },
       "switch_speed_on_demand": {
         "name": "Speed On Demand"
@@ -2188,7 +2188,7 @@
         }
       },
       "select_rinse_aid": {
-        "name": "Rinse Aid",
+        "name": "Rinse Aid Dosage",
         "state": {
           "off": "Level 0 (Off)",
           "r01": "Level 1 (Lowest)",
@@ -3615,7 +3615,7 @@
         }
       },
       "select_door_light_ring_brightness": {
-        "name": "Door Ring light brightness Level",
+        "name": "Door Ring Light Brightness Level",
         "state": {
           "low": "Low",
           "medium": "Medium",
@@ -4302,7 +4302,7 @@
         "name": "Brightness"
       },
       "number_door_light_ring_brightness": {
-        "name": "Door Ring light brightness"
+        "name": "Door Ring Light Brightness"
       },
       "number_duration": {
         "name": "Duration"

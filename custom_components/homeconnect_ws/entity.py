@@ -54,6 +54,8 @@ class HCEntity(CoordinatorEntity[HomeConnectCoordinator], Entity):
     # The unit of the backing entity _follow_temperature_unit picked, if any.
     # The number and sensor entities show their value in it.
     _temperature_unit: str | None = None
+    # For a feature under several names: the backing entity per name, in order.
+    _alternates: list[HcEntity] | None = None
 
     def __init__(
         self,
@@ -74,6 +76,7 @@ class HCEntity(CoordinatorEntity[HomeConnectCoordinator], Entity):
             self._entity = self._runtime_data.appliance.entities[entity_description.entity]
             self._entities.append(self._runtime_data.appliance.entities[entity_description.entity])
         self._set_up_unit_entities()
+        self._set_up_alternate_entities()
         if entity_description.entities:
             for entity_name in entity_description.entities:
                 self._entities.append(self._runtime_data.appliance.entities[entity_name])
@@ -172,8 +175,36 @@ class HCEntity(CoordinatorEntity[HomeConnectCoordinator], Entity):
         self._entity = self._unit_entities[unit]
         self._temperature_unit = unit
 
+    def _set_up_alternate_entities(self) -> None:
+        """Back a feature under several names by all of them, see _follow_alternate."""
+        entities = self._runtime_data.appliance.entities
+        names = self.entity_description.alternate_entities or ()
+        alternates = [entities[name] for name in names if name in entities]
+        if self._entity is None or not alternates:
+            return
+        self._alternates = [self._entity, *alternates]
+        self._entities.extend(alternates)
+        self._follow_alternate()
+
+    def _follow_alternate(self) -> None:
+        """
+        Read and write the name the appliance currently offers.
+
+        Some appliances offer one feature under different names in different
+        programs (e.g. a washer's LaundryCare.Common.Option.SpeedPerfect and
+        LaundryCare.Washer.Option.SpeedPerfect), marking the others Access.NONE.
+        Keeps the current one while none is offered.
+        """
+        if self._alternates is None:
+            return
+        for entity in self._alternates:
+            if entity.access not in (None, Access.NONE) and entity.available is not False:
+                self._entity = entity
+                return
+
     async def callback(self, _: HcEntity) -> None:
         self._follow_temperature_unit()
+        self._follow_alternate()
         if not self._has_callback:
             self._has_callback = True
             try:
