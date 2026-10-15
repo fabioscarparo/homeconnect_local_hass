@@ -71,7 +71,19 @@ class HCSelect(HCEntity, SelectEntity):
         # list here is safe either way: current_option already treats
         # anything not in this list as unavailable/None.
         if self.entity_description.options:
-            return self.entity_description.options
+            if not self._rev_options:
+                return self.entity_description.options
+            # Options generated from the profile can include values outside the
+            # range the appliance reports once connected (fork issue #202: a
+            # washer's PowerState offers Standby, but only accepts 0 to 2). The
+            # current value always stays, so the select never shows a value
+            # that isn't in its own list.
+            current_value = str(self._entity.value).lower() if self._entity else None
+            return [
+                option
+                for option in self.entity_description.options
+                if option in self._rev_options or option == current_value
+            ]
         if self._entity is not None and self._entity.enum:
             enum_values = self._settable_enum_values()
             if self.entity_description.has_state_translation:
