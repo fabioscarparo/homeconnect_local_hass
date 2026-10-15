@@ -89,12 +89,36 @@ def _available_description(
     """Return the description if this appliance can back it, else None."""
     if description_type == "event_sensor":
         return keep_known_events(cast("HCSensorEntityDescription", description), appliance_entities)
+    description = _with_known_names(description, appliance_entities)
     subscribed: set[str] = set()
     if description.entity:
         subscribed.add(description.entity)
     if description.entities:
         subscribed.update(description.entities)
     return description if appliance_entities.issuperset(subscribed) else None
+
+
+def _with_known_names(
+    description: HCEntityDescription, appliance_entities: set[str]
+) -> HCEntityDescription:
+    """
+    Reduce a feature under several names to the ones this appliance knows.
+
+    Many features have an old and a new name (e.g.
+    Refrigeration.FridgeFreezer.Setting.EcoMode and
+    Refrigeration.Common.Setting.EcoMode), and an appliance usually knows only
+    one. The first known name becomes entity, the rest stay alternates.
+    """
+    if not description.alternate_entities:
+        return description
+    names = [
+        name
+        for name in (description.entity, *description.alternate_entities)
+        if name in appliance_entities
+    ]
+    if not names:
+        return description
+    return replace(description, entity=names[0], alternate_entities=tuple(names[1:]) or None)
 
 
 def get_available_entities(

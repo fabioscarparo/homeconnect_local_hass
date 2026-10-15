@@ -411,14 +411,10 @@ LAUNDRY_ENTITY_DESCRIPTIONS: _EntityDescriptionsDefinitionsType = {
         HCSelectEntityDescription(
             key="select_laundry_hygienic_steam_intensity",
             entity="LaundryCare.Common.Option.HygienicSteamIntensity",
+            alternate_entities=("LaundryCare.Washer.Option.HygienicSteamIntensity",),
             has_state_translation=True,
         ),
         # The same option, under the Washer name a Bosch WGH24400IT uses
-        HCSelectEntityDescription(
-            key="select_laundry_hygienic_steam_intensity",
-            entity="LaundryCare.Washer.Option.HygienicSteamIntensity",
-            has_state_translation=True,
-        ),
         HCSelectEntityDescription(
             key="select_laundry_pretreatment",
             entity="LaundryCare.Washer.Option.PreTreatment",
@@ -562,21 +558,13 @@ LAUNDRY_ENTITY_DESCRIPTIONS: _EntityDescriptionsDefinitionsType = {
         HCSwitchEntityDescription(
             key="switch_laundry_idos1_active",
             entity="LaundryCare.Washer.Option.IDos1Active",
+            alternate_entities=("LaundryCare.Washer.Option.IDos1.Active",),
             device_class=SwitchDeviceClass.SWITCH,
         ),
         HCSwitchEntityDescription(
             key="switch_laundry_idos2_active",
             entity="LaundryCare.Washer.Option.IDos2Active",
-            device_class=SwitchDeviceClass.SWITCH,
-        ),
-        HCSwitchEntityDescription(
-            key="switch_laundry_idos1_active",
-            entity="LaundryCare.Washer.Option.IDos1.Active",
-            device_class=SwitchDeviceClass.SWITCH,
-        ),
-        HCSwitchEntityDescription(
-            key="switch_laundry_idos2_active",
-            entity="LaundryCare.Washer.Option.IDos2.Active",
+            alternate_entities=("LaundryCare.Washer.Option.IDos2.Active",),
             device_class=SwitchDeviceClass.SWITCH,
         ),
         HCSwitchEntityDescription(
