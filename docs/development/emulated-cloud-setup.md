@@ -201,6 +201,16 @@ Phone --(shares home WiFi creds via appliance's own hotspot)--> Appliance
 
 After the software is developed and thoroughly tested, to simplify setup, the app could also go in a pairing mode. During this pairing mode Home Assistant can connect to the computer which has the profile file, and take it and then connect to the appliance.
 
+### A home for what the integration leaves out
+
+Once the app has the appliance's keys, it can also hold the features this integration leaves out on purpose, because they're dangerous, rarely needed, or not useful as Home Assistant entities:
+
+- **Dangerous commands:** factory reset, network reset and turning off WiFi. A mistake with any of these can leave the appliance unreachable, so they don't belong as Home Assistant buttons, but an app can put each one behind a real confirmation screen.
+- **Network settings:** changing the WiFi network (`POST /ni/config`, see [Potential network commands](#potential-network-commands)), and probably static IPs. The app already has to hand the appliance WiFi credentials during pairing, so this is the same feature used again later.
+- **Read-only appliance info:** values the appliance reports as fixed (`readStatic`), like an oven's cavity layout or a dishwasher's process technology. None of them get an entity in Home Assistant, but an info screen in the app could show them for setup and troubleshooting.
+
+This doesn't get in the way of Home Assistant: an appliance accepts several local connections at the same time (see [Known Limitations](../integration/support-and-troubleshooting.md#known-limitations)), so the app can connect while Home Assistant stays connected. The commands themselves should live in the shared library, so the app and this integration use the same code.
+
 ## Prior work
 
 - [rethink](https://github.com/anszom/rethink): the LG ThinQ equivalent. Their situation is actually harder than BSH's: LG appliances have no local API at all, so rethink has to keep a fake cloud running permanently to handle ongoing control. Here, the fake cloud would only ever need to run for the few minutes of initial pairing, everything after that is already native and local.
