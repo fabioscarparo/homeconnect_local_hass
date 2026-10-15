@@ -11,20 +11,24 @@ from typing import TYPE_CHECKING
 from unittest.mock import AsyncMock, MagicMock, Mock, patch
 from zoneinfo import ZoneInfo
 
+import pytest
 from custom_components.homeconnect_ws import HCData, entity_descriptions
 from custom_components.homeconnect_ws.entity_descriptions import (
     HCBinarySensorEntityDescription,
     HCButtonEntityDescription,
     HCLightEntityDescription,
+    HCNumberEntityDescription,
     HCSelectEntityDescription,
     HCSensorEntityDescription,
     HCSwitchEntityDescription,
 )
 from custom_components.homeconnect_ws.entity_descriptions.common import (
     COMMON_ENTITY_DESCRIPTIONS,
+    generate_door_state,
     generate_power_switch,
     generate_program,
     generate_start_button,
+    generate_temperature_unit,
 )
 from custom_components.homeconnect_ws.entity_descriptions.cooking import generate_hood_light
 from custom_components.homeconnect_ws.entity_descriptions.refrigeration import (
@@ -36,11 +40,11 @@ from custom_components.homeconnect_ws.select import HCSelect
 from home_disconnect import Access, Execution
 from homeassistant.components.sensor import SensorDeviceClass
 from homeassistant.components.switch import SwitchDeviceClass
+from homeassistant.const import UnitOfTemperature
 
 from . import update_entity
 
 if TYPE_CHECKING:
-    import pytest
     from home_disconnect import Appliance
 
     from . import MockApplianceFactory
@@ -761,3 +765,136 @@ async def test_sync_time_button_sets_the_clock_to_local_time() -> None:
     ):
         await description.press_fn(appliance)
     appliance.set_datetime.assert_awaited_once_with(local_now)
+
+
+DOOR_STATE = {
+    "status": [
+        {
+            "access": "read",
+            "available": True,
+            "enumeration": {"0": "Open", "1": "Closed"},
+            "uid": 256,
+            "name": "BSH.Common.Status.DoorState",
+        },
+    ]
+}
+
+
+async def test_door_binary_sensor_when_open_or_closed(
+    mock_homeconnect_appliance: MockApplianceFactory,
+) -> None:
+    """A door that's only open or closed gets a binary sensor only."""
+    appliance = await mock_homeconnect_appliance(description=copy.deepcopy(DOOR_STATE))
+    door_descriptions = generate_door_state(appliance)
+
+    assert set(door_descriptions) == {"binary_sensor"}
+    assert door_descriptions["binary_sensor"][0].key == "binary_sensor_door_state"
+
+
+async def test_door_sensor_when_more_states(
+    mock_homeconnect_appliance: MockApplianceFactory,
+) -> None:
+    """A door that can also be locked or ajar gets an enum sensor only."""
+    device_description = copy.deepcopy(DOOR_STATE)
+    device_description["status"][0]["enumeration"] = {
+        "0": "Open",
+        "1": "Closed",
+        "2": "Locked",
+        "3": "Ajar",
+    }
+    appliance = await mock_homeconnect_appliance(description=device_description)
+    door_descriptions = generate_door_state(appliance)
+
+    assert set(door_descriptions) == {"sensor"}
+    assert door_descriptions["sensor"][0].key == "sensor_door_state"
+
+
+@pytest.mark.parametrize(
+    ("temperature_unit", "expected"),
+    [
+        (UnitOfTemperature.CELSIUS, ["number_setpoint_freezer", "number_oven_alarm"]),
+        (
+            UnitOfTemperature.FAHRENHEIT,
+            ["number_setpoint_freezer_fahrenheit", "number_oven_alarm"],
+        ),
+    ],
+)
+def test_one_temperature_unit(temperature_unit: str, expected: list[str]) -> None:
+    """A temperature reported in both units keeps the one in Home Assistant's unit."""
+    descriptions = [
+        HCNumberEntityDescription(key="number_setpoint_freezer", entity="Test.Setpoint"),
+        HCNumberEntityDescription(
+            key="number_setpoint_freezer_fahrenheit", entity="Test.SetpointFahrenheit"
+        ),
+        HCNumberEntityDescription(key="number_oven_alarm", entity="Test.Alarm"),
+    ]
+
+    kept = entity_descriptions._one_temperature_unit(descriptions, temperature_unit)
+
+    assert [description.key for description in kept] == expected
+    # The kept one can still follow the appliance to the other unit's entity
+    assert kept[0].other_unit_entity == (
+        "Test.SetpointFahrenheit"
+        if temperature_unit == UnitOfTemperature.CELSIUS
+        else "Test.Setpoint"
+    )
+    assert kept[1].other_unit_entity is None
+
+
+@pytest.mark.parametrize(
+    "temperature_unit", [UnitOfTemperature.CELSIUS, UnitOfTemperature.FAHRENHEIT]
+)
+def test_one_temperature_unit_keeps_the_only_one(temperature_unit: str) -> None:
+    """A temperature reported in one unit only keeps it, whatever Home Assistant's unit."""
+    descriptions = [
+        HCNumberEntityDescription(key="number_setpoint_freezer_fahrenheit"),
+        HCNumberEntityDescription(key="number_setpoint_refrigerator"),
+    ]
+
+    kept = entity_descriptions._one_temperature_unit(descriptions, temperature_unit)
+
+    assert kept == descriptions
+
+
+async def test_temperature_unit_select_with_celsius_and_fahrenheit(
+    mock_homeconnect_appliance: MockApplianceFactory,
+) -> None:
+    """An appliance that switches between Celsius and Fahrenheit gets a unit select."""
+    appliance = await mock_homeconnect_appliance(
+        description={
+            "setting": [
+                {
+                    "access": "readwrite",
+                    "available": True,
+                    "enumeration": {"0": "Celsius", "1": "Fahrenheit"},
+                    "uid": 4153,
+                    "name": "BSH.Common.Setting.TemperatureUnit",
+                },
+            ]
+        }
+    )
+    description = generate_temperature_unit(appliance)
+
+    assert description is not None
+    assert description.key == "select_temperature_unit"
+
+
+async def test_no_temperature_unit_select_when_fixed(
+    mock_homeconnect_appliance: MockApplianceFactory,
+) -> None:
+    """An appliance whose unit can never change (readstatic) gets no unit select."""
+    appliance = await mock_homeconnect_appliance(
+        description={
+            "setting": [
+                {
+                    "access": "readstatic",
+                    "available": True,
+                    "enumeration": {"0": "Celsius", "1": "Fahrenheit"},
+                    "uid": 4153,
+                    "name": "BSH.Common.Setting.TemperatureUnit",
+                },
+            ]
+        }
+    )
+
+    assert generate_temperature_unit(appliance) is None

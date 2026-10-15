@@ -4,7 +4,7 @@ from __future__ import annotations
 
 from typing import TYPE_CHECKING
 
-from home_disconnect.entities import Execution
+from home_disconnect.entities import Access, Execution
 from homeassistant.components.binary_sensor.const import BinarySensorDeviceClass
 from homeassistant.components.number import NumberDeviceClass, NumberMode
 from homeassistant.components.sensor import (
@@ -200,17 +200,38 @@ def _power_off_option(states: set[str]) -> str | None:
     return next((name.lower() for name in POWER_OFF_STATE_NAMES if name in states), None)
 
 
-def generate_door_state(appliance: Appliance) -> HCSensorEntityDescription | None:
-    """Get Door sensor description."""
+def generate_door_state(appliance: Appliance) -> EntityDescriptions:
+    """
+    Get the Door entity description: one binary sensor or sensor.
+
+    A binary sensor when the door is only open or closed, and an enum sensor
+    when it has more states (e.g. locked or ajar), which a binary sensor can't
+    tell apart.
+    """
+    entity_descriptions = EntityDescriptions()
     entity = appliance.entities.get("BSH.Common.Status.DoorState")
-    if entity and len(entity.enum or {}) > 2:
-        return HCSensorEntityDescription(
-            key="sensor_door_state",
-            entity="BSH.Common.Status.DoorState",
-            device_class=SensorDeviceClass.ENUM,
-            has_state_translation=True,
-        )
-    return None
+    if entity is None:
+        return entity_descriptions
+    if len(entity.enum or {}) > 2:
+        entity_descriptions["sensor"] = [
+            HCSensorEntityDescription(
+                key="sensor_door_state",
+                entity="BSH.Common.Status.DoorState",
+                device_class=SensorDeviceClass.ENUM,
+                has_state_translation=True,
+            )
+        ]
+    else:
+        entity_descriptions["binary_sensor"] = [
+            HCBinarySensorEntityDescription(
+                key="binary_sensor_door_state",
+                entity="BSH.Common.Status.DoorState",
+                device_class=BinarySensorDeviceClass.DOOR,
+                value_on={"Open", "Ajar"},
+                value_off={"Closed", "Locked"},
+            )
+        ]
+    return entity_descriptions
 
 
 def generate_program(appliance: Appliance) -> EntityDescriptions:
@@ -379,9 +400,15 @@ def generate_ipv6(appliance: Appliance) -> HCSensorEntityDescription:  # noqa: A
 
 
 def generate_temperature_unit(appliance: Appliance) -> HCSelectEntityDescription | None:
-    """Get Temperature unit description."""
+    """
+    Get Temperature unit description.
+
+    Left out when the appliance's unit is fixed (Access.READ_STATIC, e.g. some
+    ovens), where the select could never be changed. Temperature entities still
+    follow the unit either way (see HCEntity).
+    """
     entity = appliance.entities.get("BSH.Common.Setting.TemperatureUnit")
-    if entity and len(entity.enum or {}) > 2:
+    if entity and entity.access is not Access.READ_STATIC and len(entity.enum or {}) >= 2:
         return HCSelectEntityDescription(
             key="select_temperature_unit",
             entity="BSH.Common.Setting.TemperatureUnit",
@@ -470,13 +497,6 @@ COMMON_ENTITY_DESCRIPTIONS: _EntityDescriptionsDefinitionsType = {
         ),
     ],
     "binary_sensor": [
-        HCBinarySensorEntityDescription(
-            key="binary_sensor_door_state",
-            entity="BSH.Common.Status.DoorState",
-            device_class=BinarySensorDeviceClass.DOOR,
-            value_on={"Open", "Ajar"},
-            value_off={"Closed", "Locked"},
-        ),
         HCBinarySensorEntityDescription(
             key="binary_sensor_aqua_stop",
             device_class=BinarySensorDeviceClass.PROBLEM,
@@ -715,7 +735,6 @@ COMMON_ENTITY_DESCRIPTIONS: _EntityDescriptionsDefinitionsType = {
             suggested_unit_of_measurement=UnitOfTime.HOURS,
             clear_on_expected_offline=True,
         ),
-        generate_door_state,
     ],
     "start_button": [generate_start_button],
     "delay_start": [generate_delay_start],
@@ -770,5 +789,10 @@ COMMON_ENTITY_DESCRIPTIONS: _EntityDescriptionsDefinitionsType = {
     "ipv4": [generate_ipv4],
     "ipv6": [generate_ipv6],
     "update": [generate_software_download_update, generate_software_update],
-    "dynamic": [generate_power_switch, generate_program, generate_last_program_consumption],
+    "dynamic": [
+        generate_power_switch,
+        generate_door_state,
+        generate_program,
+        generate_last_program_consumption,
+    ],
 }
