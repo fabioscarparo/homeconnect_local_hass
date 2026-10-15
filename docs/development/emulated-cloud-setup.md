@@ -18,6 +18,16 @@ Combined with the fact that ongoing operation is already 100% local, this would 
 
 Since the web socket is the exact same regardless of whether it was setup with the fake or real cloud, this means that this integration can still cover both setup methods. It also benefits other Home Connect Local integrations like the ones for [Homey](https://homey.app/en-us/app/codes.lucasvdh.homeconnect/Home-Connect-(Local)/test/) or [OpenHab](https://www.openhab.org/addons/bindings/homeconnectdirect/).
 
+## A home for what the integration leaves out
+
+With a real Home Connect account, the official app covers the features this integration leaves out on purpose, because they're dangerous, rarely needed, or not useful as Home Assistant entities. An appliance paired with a fake account has no official app to fall back on, so a pairing app like this, which already has the appliance's keys, would be the place for them:
+
+- **Dangerous commands:** factory reset, network reset and turning off WiFi. A mistake with any of these can leave the appliance unreachable, so they don't belong as Home Assistant buttons, but an app can put each one behind a real confirmation screen.
+- **Network settings:** changing the WiFi network (`POST /ni/config`, see [Potential network commands](#potential-network-commands)), and probably static IPs. The app already has to hand the appliance WiFi credentials during pairing, so this is the same feature used again later.
+- **Read-only appliance info:** values the appliance reports as fixed (`readStatic`), like an oven's cavity layout or a dishwasher's process technology. None of them get an entity in Home Assistant, but an info screen in the app could show them for setup and troubleshooting.
+
+This doesn't get in the way of Home Assistant: an appliance accepts several local connections at the same time (see [Known Limitations](../integration/support-and-troubleshooting.md#known-limitations)), so the app can connect while Home Assistant stays connected. The commands themselves should live in the shared library, so the app and this integration use the same code.
+
 ## Why "Allow Cloud Connection" may still matter
 
 >[!important]
