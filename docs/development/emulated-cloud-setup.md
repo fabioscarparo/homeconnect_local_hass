@@ -20,7 +20,7 @@ Since the web socket is the exact same regardless of whether it was setup with t
 
 ## A home for what the integration leaves out
 
-Once a pairing app like this has the appliance's keys, it can also hold the features this integration leaves out on purpose, because they're dangerous, rarely needed, or not useful as Home Assistant entities:
+With a real Home Connect account, the official app covers the features this integration leaves out on purpose, because they're dangerous, rarely needed, or not useful as Home Assistant entities. An appliance paired with a fake account has no official app to fall back on, so a pairing app like this, which already has the appliance's keys, would be the place for them:
 
 - **Dangerous commands:** factory reset, network reset and turning off WiFi. A mistake with any of these can leave the appliance unreachable, so they don't belong as Home Assistant buttons, but an app can put each one behind a real confirmation screen.
 - **Network settings:** changing the WiFi network (`POST /ni/config`, see [Potential network commands](#potential-network-commands)), and probably static IPs. The app already has to hand the appliance WiFi credentials during pairing, so this is the same feature used again later.
