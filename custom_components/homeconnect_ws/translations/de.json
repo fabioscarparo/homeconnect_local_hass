@@ -459,14 +459,14 @@
           "off": "OK"
         }
       },
-      "binary_sensor_drainingnotpossible": {
+      "binary_sensor_draining_not_possible": {
         "name": "Abpumpen nicht möglich",
         "state": {
           "on": "Wartung erforderlich",
           "off": "OK"
         }
       },
-      "binary_sensor_drainpumpblocked": {
+      "binary_sensor_drain_pump_blocked": {
         "name": "Ablaufpumpe blockiert",
         "state": {
           "on": "Wartung erforderlich",
@@ -642,8 +642,8 @@
           "condensate_container_full": "Kondensatbehälter voll",
           "door_not_lockable": "Tür nicht verriegelbar",
           "door_not_unlockable": "Tür nicht entriegelbar",
-          "drainingnotpossible": "Abpumpen nicht möglich",
-          "drainpumpblocked": "Ablaufpumpe blockiert",
+          "draining_not_possible": "Abpumpen nicht möglich",
+          "drain_pump_blocked": "Ablaufpumpe blockiert",
           "fatal_error_occurred": "Schwerwiegender Fehler",
           "flexspray_error_blocked": "FlexSpray blockiert",
           "flexspray_error_general": "FlexSpray Fehler",

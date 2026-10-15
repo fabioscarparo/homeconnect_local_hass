@@ -359,14 +359,14 @@
           "off": "OK"
         }
       },
-      "binary_sensor_drainingnotpossible": {
+      "binary_sensor_draining_not_possible": {
         "name": "Drenaggio non possibile",
         "state": {
           "on": "Manutenzione necessaria",
           "off": "OK"
         }
       },
-      "binary_sensor_drainpumpblocked": {
+      "binary_sensor_drain_pump_blocked": {
         "name": "Pompa di drenaggio bloccata",
         "state": {
           "on": "Manutenzione necessaria",
@@ -410,8 +410,8 @@
           "bean_container_empty": "Contenitore chicchi vuoto",
           "door_not_lockable": "Porta non bloccabile",
           "door_not_unlockable": "Porta non sbloccabile",
-          "drainingnotpossible": "Drenaggio non possibile",
-          "drainpumpblocked": "Pompa di drenaggio bloccata",
+          "draining_not_possible": "Drenaggio non possibile",
+          "drain_pump_blocked": "Pompa di drenaggio bloccata",
           "fatal_error_occurred": "Errore generale",
           "idos_open_tray": "Cassetto detersivo aperto",
           "idos_unit_defect": "Difetto unità i-DOS",

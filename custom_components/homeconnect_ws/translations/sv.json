@@ -304,14 +304,14 @@
           "off": "OK"
         }
       },
-      "binary_sensor_drainingnotpossible": {
+      "binary_sensor_draining_not_possible": {
         "name": "Tömning ej möjlig",
         "state": {
           "on": "Underhåll krävs",
           "off": "OK"
         }
       },
-      "binary_sensor_drainpumpblocked": {
+      "binary_sensor_drain_pump_blocked": {
         "name": "Avloppspump blockerad",
         "state": {
           "on": "Underhåll krävs",
@@ -430,8 +430,8 @@
           "bean_container_empty": "Bönbehållare tom",
           "door_not_lockable": "Dörr kan inte låsas",
           "door_not_unlockable": "Dörr kan inte låsas upp",
-          "drainingnotpossible": "Tömning ej möjlig",
-          "drainpumpblocked": "Avloppspump blockerad",
+          "draining_not_possible": "Tömning ej möjlig",
+          "drain_pump_blocked": "Avloppspump blockerad",
           "fatal_error_occurred": "Kritiskt fel",
           "flexspray_error_blocked": "FlexSpray blockerad",
           "flexspray_error_general": "FlexSpray fel",

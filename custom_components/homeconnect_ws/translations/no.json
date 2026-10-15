@@ -294,14 +294,14 @@
           "off": "OK"
         }
       },
-      "binary_sensor_drainingnotpossible": {
+      "binary_sensor_draining_not_possible": {
         "name": "Tømming ikke mulig",
         "state": {
           "on": "Vedlikehold påkrevd",
           "off": "OK"
         }
       },
-      "binary_sensor_drainpumpblocked": {
+      "binary_sensor_drain_pump_blocked": {
         "name": "Tømmepumpe blokkert",
         "state": {
           "on": "Vedlikehold påkrevd",
@@ -393,8 +393,8 @@
           "bean_container_empty": "Bønnebeholder tom",
           "door_not_lockable": "Dør kan ikke låses",
           "door_not_unlockable": "Dør kan ikke låses opp",
-          "drainingnotpossible": "Tømming ikke mulig",
-          "drainpumpblocked": "Tømmepumpe blokkert",
+          "draining_not_possible": "Tømming ikke mulig",
+          "drain_pump_blocked": "Tømmepumpe blokkert",
           "fatal_error_occurred": "Kritisk feil",
           "idos_unit_defect": "i-DOS defekt",
           "low_voltage": "Lav spenning",

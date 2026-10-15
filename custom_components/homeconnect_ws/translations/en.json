@@ -428,14 +428,14 @@
           "off": "OK"
         }
       },
-      "binary_sensor_drainingnotpossible": {
+      "binary_sensor_draining_not_possible": {
         "name": "Draining Not Possible",
         "state": {
           "on": "Maintenance Required",
           "off": "OK"
         }
       },
-      "binary_sensor_drainpumpblocked": {
+      "binary_sensor_drain_pump_blocked": {
         "name": "Drain Pump Blocked",
         "state": {
           "on": "Maintenance Required",
@@ -638,8 +638,8 @@
           "condensate_container_full": "Condensate container full",
           "door_not_lockable": "Door can't be locked",
           "door_not_unlockable": "Door can't be unlocked",
-          "drainingnotpossible": "Draining not possible",
-          "drainpumpblocked": "Drain pump blocked",
+          "draining_not_possible": "Draining not possible",
+          "drain_pump_blocked": "Drain pump blocked",
           "fatal_error_occurred": "Fatal error",
           "flexspray_error_blocked": "FlexSpray blocked",
           "flexspray_error_general": "FlexSpray error",
