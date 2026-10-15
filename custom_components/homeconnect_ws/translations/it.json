@@ -57,7 +57,7 @@
         "name": "Brilliance Dry"
       },
       "switch_extra_dry": {
-        "name": "Asciugatura Extra"
+        "name": "Asciugatura Extra per tutti i programmi"
       },
       "switch_speed_on_demand": {
         "name": "Velocità su richiesta"
@@ -808,7 +808,7 @@
         }
       },
       "select_rinse_aid": {
-        "name": "Brillantante"
+        "name": "Dosaggio brillantante"
       },
       "select_sound_level_signal": {
         "name": "Livello suono segnale",

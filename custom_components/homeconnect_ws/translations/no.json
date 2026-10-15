@@ -57,7 +57,7 @@
         "name": "Brilliance Tørr"
       },
       "switch_extra_dry": {
-        "name": "Ekstra tørr"
+        "name": "Ekstra tørr for alle programmer"
       },
       "switch_speed_on_demand": {
         "name": "Hastighet på krav"
@@ -1004,7 +1004,7 @@
         }
       },
       "select_rinse_aid": {
-        "name": "Skyllemiddel",
+        "name": "Skyllemiddeldosering",
         "state": {
           "off": "Nivå 0",
           "r01": "Nivå 1",

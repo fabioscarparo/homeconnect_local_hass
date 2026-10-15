@@ -60,7 +60,7 @@
         "name": "CrystalDry"
       },
       "switch_extra_dry": {
-        "name": "Extra torrt"
+        "name": "Extra torrt för alla program"
       },
       "switch_speed_on_demand": {
         "name": "Snabbläge vid behov"
@@ -1065,7 +1065,7 @@
         }
       },
       "select_rinse_aid": {
-        "name": "Sköljmedel",
+        "name": "Sköljmedelsdosering",
         "state": {
           "off": "Av",
           "r01": "Nivå 1 (Lägst)",

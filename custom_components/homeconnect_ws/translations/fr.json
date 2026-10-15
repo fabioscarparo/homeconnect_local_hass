@@ -57,7 +57,7 @@
         "name": "Brilliance séchage"
       },
       "switch_extra_dry": {
-        "name": "Extra séchage"
+        "name": "Extra séchage pour tous les programmes"
       },
       "switch_speed_on_demand": {
         "name": "Vitesse à la demande"
@@ -1025,7 +1025,7 @@
         }
       },
       "select_rinse_aid": {
-        "name": "Liquide de Rinçage",
+        "name": "Dosage du liquide de rinçage",
         "state": {
           "off": "Niveau 0",
           "r01": "Niveau 1",

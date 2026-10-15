@@ -256,6 +256,27 @@ def generate_oven_settings(appliance: Appliance) -> EntityDescriptions:
     return descriptions
 
 
+def generate_meatprobe_plugged(appliance: Appliance) -> HCBinarySensorEntityDescription | None:
+    """
+    Get the appliance-wide Meat probe plugged description.
+
+    Left out when the oven also reports it per cavity (generate_oven_status
+    adds those), which some ovens (e.g. the Thermador PRG486WDH) do for the
+    same probe.
+    """
+    if "Cooking.Oven.Status.MeatprobePlugged" not in appliance.entities or any(
+        f"Cooking.Oven.Status.Cavity.{group}.MeatprobePlugged" in appliance.entities
+        for group in appliance.group_ids("Cooking.Oven.Status.Cavity")
+    ):
+        return None
+    return HCBinarySensorEntityDescription(
+        key="binary_sensor_oven_meatprobe_plugged",
+        entity="Cooking.Oven.Status.MeatprobePlugged",
+        device_class=BinarySensorDeviceClass.PLUG,
+        entity_category=EntityCategory.DIAGNOSTIC,
+    )
+
+
 HOOD_FAN_ENTITIES = [
     "Cooking.Common.Option.Hood.VentingLevel",
     "Cooking.Common.Option.Hood.IntensiveLevel",
@@ -906,12 +927,5 @@ COOKING_ENTITY_DESCRIPTIONS: _EntityDescriptionsDefinitionsType = {
             entity_category=EntityCategory.CONFIG,
         ),
     ],
-    "binary_sensor": [
-        HCBinarySensorEntityDescription(
-            key="binary_sensor_oven_meatprobe_plugged",
-            entity="Cooking.Oven.Status.MeatprobePlugged",
-            device_class=BinarySensorDeviceClass.PLUG,
-            entity_category=EntityCategory.DIAGNOSTIC,
-        ),
-    ],
+    "binary_sensor": [generate_meatprobe_plugged],
 }
