@@ -5,6 +5,8 @@ from __future__ import annotations
 import logging
 from typing import TYPE_CHECKING, cast
 
+from homeassistant.const import UnitOfTemperature
+
 from custom_components.homeconnect_ws.helpers import merge_dicts
 
 from .common import COMMON_ENTITY_DESCRIPTIONS
@@ -37,6 +39,8 @@ if TYPE_CHECKING:
 
 
 _LOGGER = logging.getLogger(__name__)
+
+FAHRENHEIT_KEY_SUFFIX = "_fahrenheit"
 
 ALL_ENTITY_DESCRIPTIONS: _EntityDescriptionsDefinitionsType | None = None
 
@@ -92,8 +96,15 @@ def _available_description(
     return description if appliance_entities.issuperset(subscribed) else None
 
 
-def get_available_entities(appliance: Appliance) -> _EntityDescriptionsType:
-    """Get all available Entity descriptions."""
+def get_available_entities(
+    appliance: Appliance, temperature_unit: str = UnitOfTemperature.CELSIUS
+) -> _EntityDescriptionsType:
+    """
+    Get all available Entity descriptions.
+
+    temperature_unit is Home Assistant's unit system, which picks Celsius or
+    Fahrenheit for a temperature the appliance reports in both.
+    """
     available_entities: _EntityDescriptionsType = {
         "button": [],
         "active_program": [],
@@ -138,8 +149,36 @@ def get_available_entities(appliance: Appliance) -> _EntityDescriptionsType:
             if available_description is not None:
                 available_entities[description_type].append(available_description)
     for available_type, available in available_entities.items():
-        available_entities[available_type] = _first_per_key(available)
+        available_entities[available_type] = _one_temperature_unit(
+            _first_per_key(available), temperature_unit
+        )
     return available_entities
+
+
+def _one_temperature_unit(
+    descriptions: list[HCEntityDescription], temperature_unit: str
+) -> list[HCEntityDescription]:
+    """
+    Keep one of a Celsius and a Fahrenheit description for the same temperature.
+
+    Some appliances (e.g. Thermador fridges and ovens) report a setpoint in both
+    units, as two entities. Keeps the one in Home Assistant's unit, so a setpoint
+    steps in whole degrees of the unit the user sees; Home Assistant converts the
+    shown value either way. A Fahrenheit description's key is the Celsius one's
+    with FAHRENHEIT_KEY_SUFFIX.
+    """
+    keys = {description.key for description in descriptions}
+    keep_fahrenheit = temperature_unit == UnitOfTemperature.FAHRENHEIT
+    kept = []
+    for description in descriptions:
+        if description.key.endswith(FAHRENHEIT_KEY_SUFFIX):
+            celsius_key = description.key.removesuffix(FAHRENHEIT_KEY_SUFFIX)
+            if celsius_key in keys and not keep_fahrenheit:
+                continue
+        elif keep_fahrenheit and description.key + FAHRENHEIT_KEY_SUFFIX in keys:
+            continue
+        kept.append(description)
+    return kept
 
 
 def _first_per_key(descriptions: list[HCEntityDescription]) -> list[HCEntityDescription]:

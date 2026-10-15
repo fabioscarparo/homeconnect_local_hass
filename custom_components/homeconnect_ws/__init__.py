@@ -282,7 +282,7 @@ async def async_setup_entry(
     if (type_ := appliance.info.get("type")) and brand:
         device_info["name"] = f"{brand.capitalize()} {type_}"
 
-    available_entities = get_available_entities(appliance)
+    available_entities = get_available_entities(appliance, hass.config.units.temperature_unit)
 
     config_entry.runtime_data = HCData(
         appliance=appliance,
