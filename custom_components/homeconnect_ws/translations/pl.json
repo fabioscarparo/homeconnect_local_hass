@@ -376,14 +376,14 @@
           "off": "ok"
         }
       },
-      "binary_sensor_drainingnotpossible": {
+      "binary_sensor_draining_not_possible": {
         "name": "Odprowadzanie niemożliwe",
         "state": {
           "on": "wymagana konserwacja",
           "off": "ok"
         }
       },
-      "binary_sensor_drainpumpblocked": {
+      "binary_sensor_drain_pump_blocked": {
         "name": "Pompa odpływowa zablokowana",
         "state": {
           "on": "wymagana konserwacja",
@@ -505,8 +505,8 @@
           "bean_container_empty": "Pojemnik na ziarna pusty",
           "door_not_lockable": "Nie można zablokować drzwi",
           "door_not_unlockable": "Nie można odblokować drzwi",
-          "drainingnotpossible": "Odprowadzanie niemożliwe",
-          "drainpumpblocked": "Pompa odpływowa zablokowana",
+          "draining_not_possible": "Odprowadzanie niemożliwe",
+          "drain_pump_blocked": "Pompa odpływowa zablokowana",
           "fatal_error_occurred": "Błąd krytyczny",
           "flexspray_error_blocked": "FlexSpray zablokowany",
           "flexspray_error_general": "Błąd FlexSpray",

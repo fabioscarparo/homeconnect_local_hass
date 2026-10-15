@@ -294,14 +294,14 @@
           "off": "OK"
         }
       },
-      "binary_sensor_drainingnotpossible": {
+      "binary_sensor_draining_not_possible": {
         "name": "Draining Not Possible",
         "state": {
           "on": "Maintenance requise",
           "off": "OK"
         }
       },
-      "binary_sensor_drainpumpblocked": {
+      "binary_sensor_drain_pump_blocked": {
         "name": "Drain Pump Blocked",
         "state": {
           "on": "Maintenance requise",
@@ -393,8 +393,8 @@
           "bean_container_empty": "Bac à grains vide",
           "door_not_lockable": "Porte non verrouillable",
           "door_not_unlockable": "Porte non deverrouiable",
-          "drainingnotpossible": "Draining Not Possible",
-          "drainpumpblocked": "Drain Pump Blocked",
+          "draining_not_possible": "Draining Not Possible",
+          "drain_pump_blocked": "Drain Pump Blocked",
           "fatal_error_occurred": "Erreur fatale",
           "idos_unit_defect": "i-DOS Defect",
           "low_voltage": "Faible Voltage",

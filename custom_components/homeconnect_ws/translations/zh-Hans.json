@@ -303,14 +303,14 @@
           "off": "正常"
         }
       },
-      "binary_sensor_drainingnotpossible": {
+      "binary_sensor_draining_not_possible": {
         "name": "无法排水",
         "state": {
           "on": "无法排水",
           "off": "正常"
         }
       },
-      "binary_sensor_drainpumpblocked": {
+      "binary_sensor_drain_pump_blocked": {
         "name": "排水泵堵塞",
         "state": {
           "on": "排水泵堵塞",
@@ -432,8 +432,8 @@
           "bean_container_empty": "豆仓已空",
           "door_not_lockable": "门无法上锁",
           "door_not_unlockable": "门无法解锁",
-          "drainingnotpossible": "无法排水",
-          "drainpumpblocked": "排水泵堵塞",
+          "draining_not_possible": "无法排水",
+          "drain_pump_blocked": "排水泵堵塞",
           "fatal_error_occurred": "严重故障",
           "flexspray_error_blocked": "FlexSpray堵塞",
           "flexspray_error_general": "FlexSpray故障",

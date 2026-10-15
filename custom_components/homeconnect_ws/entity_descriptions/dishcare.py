@@ -81,6 +81,7 @@ DISHCARE_ENTITY_DESCRIPTIONS: _EntityDescriptionsDefinitionsType = {
         ),
         HCBinarySensorEntityDescription(
             key="binary_sensor_drainingnotpossible",
+            translation_key="binary_sensor_draining_not_possible",
             entity="Dishcare.Dishwasher.Event.DrainingNotPossible",
             entity_category=EntityCategory.DIAGNOSTIC,
             device_class=BinarySensorDeviceClass.PROBLEM,
@@ -90,6 +91,7 @@ DISHCARE_ENTITY_DESCRIPTIONS: _EntityDescriptionsDefinitionsType = {
         ),
         HCBinarySensorEntityDescription(
             key="binary_sensor_drainpumpblocked",
+            translation_key="binary_sensor_drain_pump_blocked",
             entity="Dishcare.Dishwasher.Event.DrainPumpBlocked",
             entity_category=EntityCategory.DIAGNOSTIC,
             device_class=BinarySensorDeviceClass.PROBLEM,
