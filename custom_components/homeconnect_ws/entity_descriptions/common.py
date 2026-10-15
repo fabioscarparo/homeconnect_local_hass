@@ -151,17 +151,16 @@ def generate_power_switch(appliance: Appliance) -> EntityDescriptions:
 
     entity_min = getattr(entity, "min", None)
     entity_max = getattr(entity, "max", None)
-    if entity_min is not None and entity_max is not None:
-        # has min/max
-        settable_states = set()
-        for key, value in (entity.enum or {}).items():
-            if int(key) >= entity_min and int(key) <= entity_max:
-                settable_states.add(value)
-    else:
-        settable_states = set((entity.enum or {}).values())
+    # In the appliance's own order, so the select's options don't reorder
+    # between restarts
+    settable_states = [
+        value
+        for key, value in sorted((entity.enum or {}).items(), key=lambda item: int(item[0]))
+        if entity_min is None or entity_max is None or entity_min <= int(key) <= entity_max
+    ]
 
     for mapping in POWER_SWITCH_VALUE_MAPINGS:
-        if settable_states == set(mapping):
+        if set(settable_states) == set(mapping):
             entity_descriptions["switch"] = [
                 HCSwitchEntityDescription(
                     key="switch_power_state",
@@ -188,7 +187,7 @@ def generate_power_switch(appliance: Appliance) -> EntityDescriptions:
     return entity_descriptions
 
 
-def _power_off_option(states: set[str]) -> str | None:
+def _power_off_option(states: list[str]) -> str | None:
     """
     Return the option for powered off, if the appliance has one.
 
@@ -739,6 +738,13 @@ COMMON_ENTITY_DESCRIPTIONS: _EntityDescriptionsDefinitionsType = {
     "start_button": [generate_start_button],
     "delay_start": [generate_delay_start],
     "switch": [
+        # Dishwashers and dryers both have Half load, under their own names
+        HCSwitchEntityDescription(
+            key="switch_half_load",
+            entity="Dishcare.Dishwasher.Option.HalfLoad",
+            alternate_entities=("LaundryCare.Dryer.Option.HalfLoad",),
+            device_class=SwitchDeviceClass.SWITCH,
+        ),
         HCSwitchEntityDescription(
             key="switch_child_lock",
             entity="BSH.Common.Setting.ChildLock",

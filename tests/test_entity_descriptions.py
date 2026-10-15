@@ -188,7 +188,7 @@ async def test_power_switch(mock_homeconnect_appliance: MockApplianceFactory) ->
     assert set(power_descriptions) == {"select"}
     select = power_descriptions["select"][0]
     assert select.key == "select_power_state"
-    assert sorted(select.options) == ["mainsoff", "off", "on", "standby"]
+    assert select.options == ["mainsoff", "off", "on", "standby"]
     assert select.entity_registry_enabled_default
     assert select.force_option_when_expected_offline == "off"
 
@@ -974,3 +974,33 @@ async def test_compartment_doors_kept_with_more_doors(
     description = freezer_door(appliance)
     assert description is not None
     assert description.key == "binary_sensor_freezer_door_state"
+
+
+@pytest.mark.parametrize(
+    ("known", "entity", "alternates"),
+    [
+        ({"Test.OldName"}, "Test.OldName", None),
+        ({"Test.NewName"}, "Test.NewName", None),
+        ({"Test.OldName", "Test.NewName"}, "Test.OldName", ("Test.NewName",)),
+    ],
+)
+def test_with_known_names(known: set[str], entity: str, alternates: tuple[str, ...] | None) -> None:
+    """A feature under an old and a new name uses the ones the appliance knows."""
+    description = HCSwitchEntityDescription(
+        key="switch_test", entity="Test.OldName", alternate_entities=("Test.NewName",)
+    )
+
+    available = entity_descriptions._available_description("switch", description, known)
+
+    assert available is not None
+    assert available.entity == entity
+    assert available.alternate_entities == alternates
+
+
+def test_with_no_known_names() -> None:
+    """A feature under names the appliance doesn't know gets no entity."""
+    description = HCSwitchEntityDescription(
+        key="switch_test", entity="Test.OldName", alternate_entities=("Test.NewName",)
+    )
+
+    assert entity_descriptions._available_description("switch", description, {"Other"}) is None
