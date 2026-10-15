@@ -4,7 +4,7 @@ from __future__ import annotations
 
 from typing import TYPE_CHECKING
 
-from home_disconnect.entities import Execution
+from home_disconnect.entities import Access, Execution
 from homeassistant.components.binary_sensor.const import BinarySensorDeviceClass
 from homeassistant.components.number import NumberDeviceClass, NumberMode
 from homeassistant.components.sensor import (
@@ -400,9 +400,15 @@ def generate_ipv6(appliance: Appliance) -> HCSensorEntityDescription:  # noqa: A
 
 
 def generate_temperature_unit(appliance: Appliance) -> HCSelectEntityDescription | None:
-    """Get Temperature unit description."""
+    """
+    Get Temperature unit description.
+
+    Left out when the appliance's unit is fixed (Access.READ_STATIC, e.g. some
+    ovens), where the select could never be changed. Temperature entities still
+    follow the unit either way (see HCEntity).
+    """
     entity = appliance.entities.get("BSH.Common.Setting.TemperatureUnit")
-    if entity and len(entity.enum or {}) >= 2:
+    if entity and entity.access is not Access.READ_STATIC and len(entity.enum or {}) >= 2:
         return HCSelectEntityDescription(
             key="select_temperature_unit",
             entity="BSH.Common.Setting.TemperatureUnit",

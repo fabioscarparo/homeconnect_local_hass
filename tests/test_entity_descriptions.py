@@ -877,3 +877,24 @@ async def test_temperature_unit_select_with_celsius_and_fahrenheit(
 
     assert description is not None
     assert description.key == "select_temperature_unit"
+
+
+async def test_no_temperature_unit_select_when_fixed(
+    mock_homeconnect_appliance: MockApplianceFactory,
+) -> None:
+    """An appliance whose unit can never change (readstatic) gets no unit select."""
+    appliance = await mock_homeconnect_appliance(
+        description={
+            "setting": [
+                {
+                    "access": "readstatic",
+                    "available": True,
+                    "enumeration": {"0": "Celsius", "1": "Fahrenheit"},
+                    "uid": 4153,
+                    "name": "BSH.Common.Setting.TemperatureUnit",
+                },
+            ]
+        }
+    )
+
+    assert generate_temperature_unit(appliance) is None
