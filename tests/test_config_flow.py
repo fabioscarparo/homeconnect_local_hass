@@ -15,8 +15,10 @@ from custom_components.homeconnect_ws.const import (
     CONF_FEATURE_MAPPING_XML,
     CONF_FILE,
     CONF_MANUAL_HOST,
+    CONF_POWER_STATE_RANGE,
     CONF_PSK,
     DOMAIN,
+    POWER_STATE,
 )
 from home_disconnect import AuthenticationError, HandshakeError, ProfileError, parse_profile
 from homeassistant.config_entries import SOURCE_IGNORE, SOURCE_USER
@@ -102,6 +104,8 @@ async def test_user_tls(
 ) -> None:
     """Test config flow compleate for TLS Appliance."""
     appliance = MockAppliance(MOCK_TLS_DEVICE_INFO)
+    # The live PowerState range gets saved, for when the profile has none (fork issue #202)
+    appliance.entities = {POWER_STATE: Mock(min=0, max=2)}
     monkeypatch.setattr(config_flow, "Appliance", appliance)
 
     randbytes = Mock()
@@ -157,6 +161,7 @@ async def test_user_tls(
     assert CONF_AES_IV not in result["data"]
     assert result["data"][CONF_NAME] == "Test_Brand Test_TLS"
     assert result["data"][CONF_DEVICE_ID] == "01020304"
+    assert result["data"][CONF_POWER_STATE_RANGE] == [0, 2]
 
     mock_setup_entry.assert_awaited_once()
 
@@ -224,6 +229,8 @@ async def test_user_aes(
     assert result["data"][CONF_AES_IV] == MOCK_AES_DEVICE_INFO["iv"]
     assert result["data"][CONF_NAME] == "Test_Brand Test_AES"
     assert result["data"][CONF_DEVICE_ID] == "01020304"
+    # No PowerState, so no range
+    assert result["data"][CONF_POWER_STATE_RANGE] is None
 
     mock_setup_entry.assert_awaited_once()
 
