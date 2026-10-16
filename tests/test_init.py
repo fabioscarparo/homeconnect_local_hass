@@ -15,7 +15,9 @@ from custom_components.homeconnect_ws.const import (
     CONF_APPLIANCE_INFO,
     CONF_DESCRIPTION_FILENAME,
     CONF_FEATURE_FILENAME,
+    CONF_POWER_STATE_RANGE,
     DOMAIN,
+    POWER_STATE,
 )
 from home_disconnect import (
     AccessError,
@@ -26,6 +28,7 @@ from home_disconnect import (
     ResponseError,
     serialize_legacy_description,
 )
+from home_disconnect.entities import Access
 from home_disconnect.session import RECONNECT_MAX_DELAY
 from homeassistant.config_entries import SOURCE_ZEROCONF, ConfigEntryState
 from homeassistant.const import CONF_DESCRIPTION, CONF_HOST
@@ -688,3 +691,52 @@ async def test_start_program_remote_start_not_allowed(
             DOMAIN, "start_program", {"device_id": device_id}, blocking=True
         )
     assert exc_info.value.translation_key == "remote_start_not_allowed"
+
+
+@pytest.mark.parametrize(
+    ("power_state_range", "platform"),
+    [(None, "select"), ([0, 2], "switch")],
+)
+async def test_saved_power_state_range(
+    hass: HomeAssistant,
+    monkeypatch: pytest.MonkeyPatch,
+    power_state_range: list[int] | None,
+    platform: str,
+) -> None:
+    """
+    The power state range saved at setup decides between the power switch and select.
+
+    Fork issue #202: the profile had no range, so the washer got a select with Standby,
+    which it doesn't accept. With the range it reported at setup, it gets the switch.
+    """
+    description = deepcopy(DEVICE_DESCRIPTION)
+    description["setting"].append(
+        {
+            "uid": 539,
+            "name": POWER_STATE,
+            "available": True,
+            "access": Access.READ_WRITE,
+            "enumeration": {"0": "MainsOff", "2": "On", "3": "Standby"},
+        }
+    )
+    monkeypatch.setattr(coordinator, "Appliance", appliance_class(make_appliance(description)))
+    entry = MockConfigEntry(
+        domain=DOMAIN,
+        data={
+            **MOCK_CONFIG_DATA,
+            CONF_DESCRIPTION: description,
+            CONF_POWER_STATE_RANGE: power_state_range,
+        },
+        unique_id=MOCK_TLS_DEVICE_ID,
+    )
+    entry.add_to_hass(hass)
+
+    await hass.config_entries.async_setup(entry.entry_id)
+    await hass.async_block_till_done()
+
+    keys = {
+        description.key
+        for descriptions in entry.runtime_data.available_entity_descriptions.values()
+        for description in descriptions
+    }
+    assert {"select_power_state", "switch_power_state"} & keys == {f"{platform}_power_state"}

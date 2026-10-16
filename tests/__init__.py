@@ -130,6 +130,7 @@ class MockAppliance:
 
     def __init__(self, info: dict) -> None:
         self.info = info
+        self.entities: dict[str, Any] = {}
         self._connect = AsyncMock()
         self._close = AsyncMock()
 

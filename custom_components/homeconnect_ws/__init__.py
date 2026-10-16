@@ -25,8 +25,10 @@ from .const import (
     CONF_DEV_OVERRIDE_PSK,
     CONF_DEV_SETUP_FROM_DUMP,
     CONF_FEATURE_FILENAME,
+    CONF_POWER_STATE_RANGE,
     DOMAIN,
     PLATFORMS,
+    POWER_STATE,
 )
 from .coordinator import HomeConnectCoordinator
 from .entity_descriptions import get_available_entities
@@ -282,6 +284,10 @@ async def async_setup_entry(
     if (type_ := appliance.info.get("type")) and brand:
         device_info["name"] = f"{brand.capitalize()} {type_}"
 
+    if power_state_range := config_entry.data.get(CONF_POWER_STATE_RANGE):
+        # So the power switch or select matches what the appliance accepts, before it connects
+        entity_min, entity_max = power_state_range
+        appliance.entities[POWER_STATE].update({"min": entity_min, "max": entity_max})
     available_entities = get_available_entities(appliance, hass.config.units.temperature_unit)
 
     config_entry.runtime_data = HCData(
