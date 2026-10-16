@@ -42,5 +42,5 @@ async def async_get_config_entry_diagnostics(
         "device_description_xml": device_description_xml,
         "feature_mapping_xml": feature_mapping_xml,
         "entry_data": async_redact_data(entry.data, TO_REDACT),
-        "appliance_state": entry.runtime_data.appliance.dump(),
+        "appliance_state": async_redact_data(entry.runtime_data.appliance.dump(), TO_REDACT),
     }

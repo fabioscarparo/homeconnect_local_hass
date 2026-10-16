@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 from typing import TYPE_CHECKING
+from unittest.mock import Mock
 
 from custom_components.homeconnect_ws.diagnostics import async_get_config_entry_diagnostics
 
@@ -57,3 +58,31 @@ async def test_diagnostics_still_includes_redacted_entry_data_and_live_state(
 
     assert result["entry_data"]["psk"] == "**REDACTED**"
     assert "appliance_state" in result
+
+
+async def test_diagnostics_redacts_appliance_state(
+    hass: HomeAssistant,
+    mock_appliance: Appliance,
+    patch_entity_description: None,
+) -> None:
+    """The live state's info has the same identifiers as entry_data, so it's redacted too."""
+    assert await setup_config_entry(hass, MOCK_CONFIG_DATA)
+    entry = hass.config_entries.async_entries("homeconnect_ws")[0]
+    mock_appliance.dump = Mock(
+        return_value={
+            "info": {
+                "vib": "Fake_vib",
+                "deviceID": "BRAND-MODEL-AABBCCDDEEFF",
+                "mac": "AA-BB-CC-DD-EE-FF",
+                "serialNumber": "123456789",
+                "shipSki": "SHIP_SKI",
+            }
+        }
+    )
+
+    result = await async_get_config_entry_diagnostics(hass, entry)
+
+    info = result["appliance_state"]["info"]
+    assert info["vib"] == "Fake_vib"
+    for key in ("deviceID", "mac", "serialNumber", "shipSki"):
+        assert info[key] == "**REDACTED**"
