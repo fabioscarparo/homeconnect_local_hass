@@ -18,6 +18,7 @@ from custom_components.homeconnect_ws.sensor import (
     HCSensor,
     HCWiFI,
 )
+from home_disconnect.entities import Access
 from homeassistant.components.sensor import ATTR_OPTIONS
 from homeassistant.const import ATTR_FRIENDLY_NAME
 from homeassistant.helpers.entity import Entity as HAEntity
@@ -793,3 +794,78 @@ async def test_elapsed_time_sensor_listens_to_active_program() -> None:
     entity = HCSensor(entity.entity_description, entity._runtime_data)
 
     assert active_program_entity in entity._entities
+
+
+def _progress_sensor(
+    *, active_program: object, remaining_time: int | None, remaining_available: bool = True
+) -> HCSensor:
+    """Build a progress sensor whose Option the appliance reports as unavailable."""
+    appliance = MagicMock()
+    appliance.info = {"deviceID": "test_device_id"}
+    appliance.active_program = active_program
+    appliance.connected = True
+    appliance.entities = {
+        "BSH.Common.Option.ProgramProgress": MagicMock(
+            value=84, enum=None, available=False, access=Access.NONE
+        ),
+        "BSH.Common.Option.RemainingProgramTime": MagicMock(
+            value=remaining_time, enum=None, available=remaining_available, access=Access.READ
+        ),
+        "BSH.Common.Setting.PowerState": MagicMock(value="On"),
+    }
+    runtime_data = HCData(
+        appliance=appliance,
+        device_info=MagicMock(),
+        available_entity_descriptions=MagicMock(),
+        coordinator=MagicMock(expected_offline=False),
+    )
+    entity_description = HCSensorEntityDescription(
+        key="sensor_program_progress",
+        entity="BSH.Common.Option.ProgramProgress",
+        available_with_remaining_time=True,
+    )
+    return HCSensor(entity_description, runtime_data)
+
+
+async def test_progress_available_with_remaining_time() -> None:
+    """
+    Shown while a program with a remaining time runs, even though it's flagged unavailable.
+
+    A Bosch WTX87E40 dryer reports ProgramProgress as available=false, access=none while its
+    value keeps going up (fork issue #206).
+    """
+    entity = _progress_sensor(active_program=MagicMock(), remaining_time=1800)
+
+    assert entity.available is True
+    assert entity.native_value == 84
+
+
+@pytest.mark.parametrize(
+    ("active_program", "remaining_time", "remaining_available"),
+    [
+        # An oven with no timer set: progress stuck at 100%, no remaining time.
+        (MagicMock(), None, True),
+        (MagicMock(), 1800, False),
+        (None, 1800, True),
+    ],
+)
+async def test_progress_follows_appliance_flag_without_remaining_time(
+    *, active_program: object, remaining_time: int | None, remaining_available: bool
+) -> None:
+    """Without a running program that has a remaining time, the appliance's flag applies."""
+    entity = _progress_sensor(
+        active_program=active_program,
+        remaining_time=remaining_time,
+        remaining_available=remaining_available,
+    )
+
+    assert entity.available is False
+
+
+async def test_progress_sensor_listens_to_remaining_time() -> None:
+    """It has to re-evaluate when remaining time comes or goes, not only on its own updates."""
+    entity = _progress_sensor(active_program=MagicMock(), remaining_time=1800)
+
+    assert entity._runtime_data.appliance.entities["BSH.Common.Option.RemainingProgramTime"] in (
+        entity._entities
+    )
