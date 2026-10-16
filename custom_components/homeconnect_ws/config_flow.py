@@ -67,9 +67,11 @@ from .const import (
     CONF_FEATURE_MAPPING_XML,
     CONF_FILE,
     CONF_MANUAL_HOST,
+    CONF_POWER_STATE_RANGE,
     CONF_PSK,
     CONF_REGION,
     DOMAIN,
+    POWER_STATE,
     AppliancePayload,
 )
 from .profile_storage import profile_from_entry_data, profile_xml_from_entry_data
@@ -470,6 +472,14 @@ class HomeConnectConfigFlow(ConfigFlow, domain=DOMAIN):
             async with asyncio.timeout(20):
                 await appliance.connect()
             self.data[CONF_DESCRIPTION]["info"].update(appliance.info)
+            power_state = appliance.entities.get(POWER_STATE)
+            self.data[CONF_POWER_STATE_RANGE] = (
+                [power_state.min, power_state.max]
+                if power_state is not None
+                and power_state.min is not None
+                and power_state.max is not None
+                else None
+            )
             if self.unique_id is None:
                 # The setup-from-dump path skips async_step_device_select,
                 # the only other place a unique_id gets set.

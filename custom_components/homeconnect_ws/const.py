@@ -37,6 +37,10 @@ CONF_REGION: Final = "region"
 CONF_DEV_SETUP_FROM_DUMP: Final = "setup_from_dump_enabled"
 CONF_DEV_OVERRIDE_HOST: Final = "override_host"
 CONF_DEV_OVERRIDE_PSK: Final = "override_psk"
+# The PowerState range the appliance reported when setup last connected, or None. Profiles
+# don't always have it, and entities are created before the appliance connects (fork #202).
+CONF_POWER_STATE_RANGE: Final = "power_state_range"
+POWER_STATE: Final = "BSH.Common.Setting.PowerState"
 
 # Matches upstream chris-mc1/homeconnect_local_hass's v2 config entry schema
 # exactly (same key strings, same storage_dir/{deviceID}/*.xml layout) so a
