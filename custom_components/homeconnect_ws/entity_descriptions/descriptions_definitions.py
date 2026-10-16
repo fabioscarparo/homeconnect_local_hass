@@ -120,6 +120,11 @@ class HCSensorEntityDescription(
     # going up. Shows the value anyway while a program is active (and there
     # is a value), falling back to the appliance's own flag otherwise.
     available_while_program_active: bool = False
+    # Same, but only while RemainingProgramTime is also available with a value, since
+    # these only mean something for a program with an end. A dryer flags ProgramProgress
+    # unavailable while counting it (fork issue #206); an oven with no timer set reports
+    # progress stuck at 100% and no remaining time.
+    available_with_remaining_time: bool = False
     # Converts the appliance's value before it's shown, for a unit HA's
     # device class doesn't accept (water in mL) or a value that means
     # "not measured yet".

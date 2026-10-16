@@ -632,6 +632,7 @@ COMMON_ENTITY_DESCRIPTIONS: _EntityDescriptionsDefinitionsType = {
             native_unit_of_measurement=PERCENTAGE,
             clear_on_expected_offline=True,
             unavailable_when_no_active_program=True,
+            available_with_remaining_time=True,
         ),
         HCSensorEntityDescription(
             key="sensor_water_forecast",
@@ -733,6 +734,7 @@ COMMON_ENTITY_DESCRIPTIONS: _EntityDescriptionsDefinitionsType = {
             native_unit_of_measurement=UnitOfTime.SECONDS,
             suggested_unit_of_measurement=UnitOfTime.HOURS,
             clear_on_expected_offline=True,
+            available_with_remaining_time=True,
         ),
     ],
     "start_button": [generate_start_button],

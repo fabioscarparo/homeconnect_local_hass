@@ -6,7 +6,7 @@ import logging
 from datetime import timedelta
 from typing import TYPE_CHECKING, Any, ClassVar, cast
 
-from home_disconnect.entities import Program
+from home_disconnect.entities import Access, Program
 from homeassistant.components.binary_sensor.const import BinarySensorDeviceClass
 from homeassistant.components.sensor import SensorDeviceClass, SensorEntity
 
@@ -15,7 +15,7 @@ from .entity_descriptions.descriptions_definitions import (
     HCBinarySensorEntityDescription,
     HCSensorEntityDescription,
 )
-from .helpers import binary_is_on, create_entities
+from .helpers import binary_is_on, create_entities, entity_is_available
 
 _LOGGER = logging.getLogger(__name__)
 
@@ -35,6 +35,7 @@ PARALLEL_UPDATES = 0
 _POWER_OFF_STATE_NAMES = ("Off", "MainsOff")
 _POWER_STATE_ENTITY = "BSH.Common.Setting.PowerState"
 _ACTIVE_PROGRAM_ENTITY = "BSH.Common.Root.ActiveProgram"
+_REMAINING_PROGRAM_TIME_ENTITY = "BSH.Common.Option.RemainingProgramTime"
 _NO_ACTIVE_PROGRAM_TRIGGER_ENTITIES = (_ACTIVE_PROGRAM_ENTITY, _POWER_STATE_ENTITY)
 
 
@@ -128,6 +129,7 @@ class HCSensor(HCEntity, SensorEntity):
             entity_description.force_value_when_no_active_program is not None
             or entity_description.unavailable_when_no_active_program
             or entity_description.available_while_program_active
+            or entity_description.available_with_remaining_time
         ):
             # This sensor's own backing entity (e.g. program_phase) is
             # exactly the one that stops getting fresh NOTIFYs once idle -
@@ -140,6 +142,10 @@ class HCSensor(HCEntity, SensorEntity):
                 trigger_entity = runtime_data.appliance.entities.get(name)
                 if trigger_entity is not None and trigger_entity not in self._entities:
                     self._entities.append(trigger_entity)
+        if entity_description.available_with_remaining_time:
+            remaining_time = runtime_data.appliance.entities.get(_REMAINING_PROGRAM_TIME_ENTITY)
+            if remaining_time is not None and remaining_time not in self._entities:
+                self._entities.append(remaining_time)
 
     @property
     def native_unit_of_measurement(self) -> str | None:
@@ -188,13 +194,27 @@ class HCSensor(HCEntity, SensorEntity):
         ):
             return False
         if (
-            self.entity_description.available_while_program_active
-            and self._runtime_data.appliance.active_program is not None
+            self._runtime_data.appliance.active_program is not None
             and self._entity is not None
             and self._entity.value is not None
+            and (
+                self.entity_description.available_while_program_active
+                or (
+                    self.entity_description.available_with_remaining_time
+                    and self._has_remaining_time()
+                )
+            )
         ):
             return self._runtime_data.appliance.connected
         return super().available
+
+    def _has_remaining_time(self) -> bool:
+        remaining_time = self._runtime_data.appliance.entities.get(_REMAINING_PROGRAM_TIME_ENTITY)
+        return (
+            remaining_time is not None
+            and remaining_time.value is not None
+            and entity_is_available(remaining_time, (Access.READ, Access.READ_WRITE))
+        )
 
 
 class HCEventSensor(HCEntity, SensorEntity):
