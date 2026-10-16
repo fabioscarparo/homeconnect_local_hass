@@ -16,6 +16,7 @@ from . import setup_config_entry
 from .const import MOCK_CONFIG_DATA
 
 if TYPE_CHECKING:
+    import pytest
     from home_disconnect import Appliance
     from homeassistant.core import HomeAssistant
 
@@ -119,3 +120,19 @@ def test_troubleshooting_url_points_at_a_real_heading() -> None:
         if line.startswith("#")
     }
     assert url.fragment in headings
+
+
+async def test_connection_lost_warning_has_close_code(
+    hass: HomeAssistant,
+    mock_appliance: Appliance,
+    patch_entity_description: None,
+    caplog: pytest.LogCaptureFixture,
+) -> None:
+    """The lost-connection warning says how the connection closed."""
+    assert await setup_config_entry(hass, MOCK_CONFIG_DATA)
+    coordinator = hass.config_entries.async_entries(DOMAIN)[0].runtime_data.coordinator
+    mock_appliance.session.close_code = 1006
+
+    await coordinator._connection_state_callback(ConnectionState.RECONNECTING)
+
+    assert "lost (WebSocket close code 1006)" in caplog.text
