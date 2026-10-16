@@ -708,6 +708,42 @@ async def test_current_option_not_forced_when_value_not_a_real_option() -> None:
     assert entity.current_option is None
 
 
+async def test_options_follow_live_range() -> None:
+    """
+    Generated options outside the appliance's live min and max are left out.
+
+    Fork issue #202: a washer's power state select was generated with
+    Standby, but once connected the appliance only accepts 0 to 2.
+    """
+    appliance = MagicMock()
+    appliance.info = {"deviceID": "test_device_id"}
+    power_state = appliance.entities["BSH.Common.Setting.PowerState"]
+    power_state.enum = {0: "MainsOff", 2: "On", 3: "Standby"}
+    power_state.min = 0
+    power_state.max = 2
+    power_state.value = "On"
+    runtime_data = HCData(
+        appliance=appliance,
+        device_info=MagicMock(),
+        available_entity_descriptions=MagicMock(),
+        coordinator=MagicMock(expected_offline=False),
+    )
+    entity_description = HCSelectEntityDescription(
+        key="select_power_state",
+        entity="BSH.Common.Setting.PowerState",
+        options=["mainsoff", "on", "standby"],
+        has_state_translation=True,
+    )
+    entity = HCSelect(entity_description, runtime_data)
+
+    assert entity.options == ["mainsoff", "on"]
+
+    # The current value stays, even outside the range
+    power_state.value = "Standby"
+    assert entity.options == ["mainsoff", "on", "standby"]
+    assert entity.current_option == "standby"
+
+
 async def test_options_does_not_crash_when_enum_not_yet_populated() -> None:
     """
     Confirmed live on fork issue #17.
