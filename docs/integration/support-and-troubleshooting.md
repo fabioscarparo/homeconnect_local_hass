@@ -67,6 +67,15 @@ There are three ways to resolve a websocket shutdown:
 2. Power cycle the appliance: Cutting the power from your appliance for 1-5 minutes, then reapplying it, can help resolve the issue.
 3. Re-pair the appliance (not recommended): Resetting the device's network settings and re-pairing it to the Home Connect App resolves the issue. However, doing that is time consuming, and you'll need to get a new profile file and apply it via the [Update Profile File](other-stuff.md#reconfiguring-an-appliance) reconfigure option, since re-pairing changes the appliance's encryption key.
 
+### What the close code in "Connection lost" means
+
+When an appliance's connection drops, the log shows a warning like `Connection to PRG486WDH lost (WebSocket close code 1006)`. Washers, dryers and combos don't get this warning, since they go offline whenever they're switched off. The code says how the connection ended:
+
+- **1006**: the connection broke without the appliance closing it. Either the network dropped, or the appliance stopped answering: Home Assistant pings it after 20 seconds without traffic and gives up when no answer comes back. This code can't tell a Wi-Fi drop from an appliance that hung or crashed.
+- **1000**: the appliance closed the connection normally.
+- **none**: no code was recorded.
+- **Any other code**: the appliance closed the connection on purpose, with an error. No appliance has been seen doing this yet, so please [report it](#reporting-issues-and-bugs) with a debug log if you see one.
+
 ### Reporting Issues and Bugs
 
 - A full debug log of at least reloading the config entry and any actions leading to an error

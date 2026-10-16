@@ -221,9 +221,13 @@ class HomeConnectCoordinator(DataUpdateCoordinator[None]):
 
         elif event in (ConnectionState.RECONNECTING, ConnectionState.DISCONNECTED):
             if self.connected and self._escalate_connectivity_logging:
+                # 1006 is a dropped connection or a missed heartbeat, without the appliance
+                # closing it; any other code is the appliance closing it on purpose.
+                close_code = self.appliance.session.close_code
                 self.logger.warning(
-                    "Connection to %s lost",
+                    "Connection to %s lost (WebSocket close code %s)",
                     self.config_entry.data[CONF_DESCRIPTION]["info"].get("vib"),
+                    "none" if close_code is None else close_code,
                 )
             self.connected = False
 
