@@ -665,7 +665,6 @@ COMMON_ENTITY_DESCRIPTIONS: _EntityDescriptionsDefinitionsType = {
             device_class=SensorDeviceClass.DURATION,
             native_unit_of_measurement=UnitOfTime.SECONDS,
             suggested_unit_of_measurement=UnitOfTime.HOURS,
-            available_with_remaining_time=True,
         ),
         HCSensorEntityDescription(
             key="sensor_count_started",
