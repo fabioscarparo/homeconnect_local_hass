@@ -107,6 +107,12 @@ There are two ways to add an appliance. Signing in is quicker and doesn't requir
 > [!TIP]
 >If you want to, once you have connected the appliance to Home Assistant you can disable its cloud access.
 >
+>With the cloud off, the appliance only talks to devices on your own network, like Home Assistant and the Home Connect app while you're home, so nothing on the manufacturer's side can reach it: not a cloud outage, an account problem or a bad update. [home-disconnect's docs](https://github.com/vemboy200/home-disconnect#disconnecting-from-the-cloud) explain what stops working.
+>
+>### Incidents of internet/cloud connected appliances
+>
+>Connected fridges have already been hit by a bad update and by an attack. In September 2026, Samsung accidentally pushed a test build to some of its smart fridges in South Korea through a cloud update, and some of them stopped cooling ([Fortune](https://fortune.com/2026/09/25/samsung-customers-complain-spoiled-food-after-update-bricked-ai-smart-fridges/), [TechRadar](https://www.techradar.com/home/smart-home/the-problem-with-smart-appliances-some-of-samsungs-ai-fridges-have-shut-down-and-lost-their-cool-after-a-bad-update-was-accidentally-pushed-to-them)). In October 2026, attackers forced the refrigeration units of hundreds of French supermarkets into defrost, through controllers that were reachable from the internet and no longer got security updates ([France 24](https://www.france24.com/en/france/20261012-french-supermarket-chains-say-cyberattack-shut-down-refrigerators), [Wikipedia](https://en.wikipedia.org/wiki/2026_French_supermarket_refrigerator_hack)). Home Connect appliances aren't exposed the way those controllers were: they only connect out to the Home Connect cloud, and their local API is only reachable on your own network. Turning the cloud off removes that last outside connection.
+>
 > ### Through Home Assistant
 >
 >1. (OPTIONAL) Before starting, in the Home Connect app, make sure the bottom line (direct connection between your phone and device) is green in case if something goes wrong.
@@ -124,6 +130,15 @@ There are two ways to add an appliance. Signing in is quicker and doesn't requir
 >6. Then save
 >
 >You'll know if you have successfully done it if you see the line between your appliance and their cloud is grayed out and disconnected.
+>
+>### Through your router
+>
+>This is the strongest option, since it doesn't rely on the appliance respecting its own setting.
+>
+>1. In your router's settings, block internet access for the appliance by its IP or MAC address. Every router does this differently, so look for something like parental controls, access control or firewall rules.
+>2. Leave local network access open so Home Assistant can still reach the appliance. If you move the appliance to a separate network or VLAN, allow Home Assistant to reach it there, and add it by IP address since discovery may not work across networks.
+>
+>Only block it after setup, since getting the appliance's profile needs the cloud once. Without internet access the appliance's clock also drifts by a few seconds a day, which [this automation](use-cases-and-automation-examples.md#keep-the-appliance-clock-right-without-internet-access) fixes.
 
 >[!NOTE]
->Do note that your device will **not** get firmware updates once disconnected, if you want to, you can occasionally (once every 1-3 months) reenable the cloud connection for 1-2 days so the device can check for an update.
+>Do note that your device will **not** get firmware updates once disconnected, if you want to, you can occasionally (once every 1-3 months) reenable the cloud connection for 1-2 days so the device can check for an update. If you blocked it at your router, lift the block for those days instead, since the "Allow Cloud Connection" switch can't get past it.
