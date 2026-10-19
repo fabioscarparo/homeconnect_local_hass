@@ -662,6 +662,17 @@
           "water_level_too_high": "Water level too high"
         }
       },
+      "sensor_stopwatch_time": {
+        "name": "Stopwatch time"
+      },
+      "sensor_stopwatch_state": {
+        "name": "Stopwatch state",
+        "state": {
+          "off": "Off",
+          "running": "Running",
+          "paused": "Paused"
+        }
+      },
       "sensor_remaining_program_time": {
         "name": "Remaining Program Time"
       },
@@ -4143,6 +4154,14 @@
           "12hours": "12 Hours"
         }
       },
+      "select_cooking_button_tone_type": {
+        "name": "Button tone",
+        "state": {
+          "off": "Off",
+          "tone01": "Tone 1",
+          "tone02": "Tone 2"
+        }
+      },
       "select_oven_clock_display": {
         "name": "Clock Display",
         "state": {
@@ -4251,6 +4270,12 @@
       }
     },
     "button": {
+      "button_stopwatch_start_pause_resume": {
+        "name": "Stopwatch start/pause/resume"
+      },
+      "button_stopwatch_reset": {
+        "name": "Stopwatch reset"
+      },
       "button_abort_program": {
         "name": "Abort"
       },
@@ -4366,6 +4391,12 @@
       },
       "number_refrigerator_sabbath_mode_duration": {
         "name": "Sabbath Mode Duration"
+      },
+      "number_cooking_button_tone_volume": {
+        "name": "Button tone volume"
+      },
+      "number_cooking_signal_volume": {
+        "name": "Signal volume"
       },
       "number_oven_sound_volume": {
         "name": "Volume"
