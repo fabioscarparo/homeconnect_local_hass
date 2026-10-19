@@ -626,6 +626,27 @@ COMMON_ENTITY_DESCRIPTIONS: _EntityDescriptionsDefinitionsType = {
             entity_registry_enabled_default=False,
             has_state_translation=True,
         ),
+        HCSelectEntityDescription(
+            key="select_date_format",
+            entity="BSH.Common.Setting.DateFormat",
+            entity_category=EntityCategory.CONFIG,
+            entity_registry_enabled_default=False,
+            has_state_translation=True,
+        ),
+        HCSelectEntityDescription(
+            key="select_weight_unit",
+            entity="BSH.Common.Setting.WeightUnit",
+            entity_category=EntityCategory.CONFIG,
+            entity_registry_enabled_default=False,
+            has_state_translation=True,
+        ),
+        # The languages differ per appliance, so their names are shown as the appliance reports them
+        HCSelectEntityDescription(
+            key="select_language",
+            entity="BSH.Common.Setting.Language",
+            entity_category=EntityCategory.CONFIG,
+            entity_registry_enabled_default=False,
+        ),
         generate_temperature_unit,
     ],
     "sensor": [
