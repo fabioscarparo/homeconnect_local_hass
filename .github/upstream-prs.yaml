@@ -13,7 +13,6 @@ ignore_authors:
 ported:
   387: Hood fan state and turn off (the fork's fan has its own fixes)
   391: Hood start-only programs
-  460: Version 2 config entry setup (upstream's path, the fork's setup differs)
   490: Connect retry backoff (the fork already backs off between reconnects)
   495: Backoff for unreachable appliances (the fork already backs off between reconnects)
   499: Select programs without the current option set (the fork's select_program does this)
@@ -30,3 +29,4 @@ ported:
 # without being merged for more than a day.
 excluded:
   278: Remaining program time as a timestamp sensor (declined)
+  460: Version 2 config entry setup fixes (upstream's setup path, which the fork doesn't use)
