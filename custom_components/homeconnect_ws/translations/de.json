@@ -175,6 +175,18 @@
       "switch_oven_fast_pre_heat": {
         "name": "Schnelles Vorheizen"
       },
+      "switch_oven_rotary_spit": {
+        "name": "Drehspieß"
+      },
+      "switch_oven_quick_roast": {
+        "name": "Schnellbraten"
+      },
+      "switch_oven_heating_signal": {
+        "name": "Aufheizsignal"
+      },
+      "switch_oven_door_opener_delay": {
+        "name": "Türöffner-Verzögerung"
+      },
       "switch_oven_button_tones": {
         "name": "Tastentöne"
       },
@@ -4581,6 +4593,50 @@
         "state": {
           "24hours": "24 Hours",
           "12hours": "12 Hours"
+        }
+      },
+      "select_date_format": {
+        "name": "Datumsformat",
+        "state": {
+          "dddotmmdotyy": "TT.MM.JJ",
+          "ddslashmmslashyy": "TT/MM/JJ",
+          "mmslashddslashyy": "MM/TT/JJ"
+        }
+      },
+      "select_weight_unit": {
+        "name": "Gewichtseinheit",
+        "state": {
+          "gram": "Gramm",
+          "ounces": "Unzen"
+        }
+      },
+      "select_language": {
+        "name": "Sprache"
+      },
+      "select_oven_idle_screen": {
+        "name": "Ruhebildschirm",
+        "state": {
+          "standard": "Standard",
+          "reduced": "Reduziert"
+        }
+      },
+      "select_oven_touchkey_color": {
+        "name": "Farbe der Sensortasten",
+        "state": {
+          "grey": "Grau",
+          "white": "Weiß"
+        }
+      },
+      "select_oven_standby_display": {
+        "name": "Standby-Anzeige",
+        "state": {
+          "off": "Aus",
+          "clock": "Uhr",
+          "clockandlogo": "Uhr und Logo",
+          "date": "Datum",
+          "dateandlogo": "Datum und Logo",
+          "clockanddate": "Uhr und Datum",
+          "clockanddateandlogo": "Uhr, Datum und Logo"
         }
       },
       "select_oven_clock_display": {

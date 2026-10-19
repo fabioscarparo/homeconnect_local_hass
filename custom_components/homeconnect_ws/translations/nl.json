@@ -119,6 +119,18 @@
       "switch_oven_fast_pre_heat": {
         "name": "Snel voorverwarmen"
       },
+      "switch_oven_rotary_spit": {
+        "name": "Draaispit"
+      },
+      "switch_oven_quick_roast": {
+        "name": "Snelbraden"
+      },
+      "switch_oven_heating_signal": {
+        "name": "Verwarmingssignaal"
+      },
+      "switch_oven_door_opener_delay": {
+        "name": "Vertraging deuropener"
+      },
       "switch_oven_button_tones": {
         "name": "Geluid van knop"
       },
@@ -1066,6 +1078,50 @@
       }
     },
     "select": {
+      "select_date_format": {
+        "name": "Datumnotatie",
+        "state": {
+          "dddotmmdotyy": "DD.MM.JJ",
+          "ddslashmmslashyy": "DD/MM/JJ",
+          "mmslashddslashyy": "MM/DD/JJ"
+        }
+      },
+      "select_weight_unit": {
+        "name": "Gewichtseenheid",
+        "state": {
+          "gram": "Gram",
+          "ounces": "Ounce"
+        }
+      },
+      "select_language": {
+        "name": "Taal"
+      },
+      "select_oven_idle_screen": {
+        "name": "Rustscherm",
+        "state": {
+          "standard": "Standaard",
+          "reduced": "Gedimd"
+        }
+      },
+      "select_oven_touchkey_color": {
+        "name": "Kleur aanraaktoetsen",
+        "state": {
+          "grey": "Grijs",
+          "white": "Wit"
+        }
+      },
+      "select_oven_standby_display": {
+        "name": "Weergave in stand-by",
+        "state": {
+          "off": "Uit",
+          "clock": "Klok",
+          "clockandlogo": "Klok en logo",
+          "date": "Datum",
+          "dateandlogo": "Datum en logo",
+          "clockanddate": "Klok en datum",
+          "clockanddateandlogo": "Klok, datum en logo"
+        }
+      },
       "select_laundry_spin_speed": {
         "name": "Centrifugetoerental",
         "state": {

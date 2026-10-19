@@ -1,6 +1,18 @@
 {
     "entity": {
         "switch": {
+            "switch_oven_rotary_spit": {
+                "default": "mdi:rotate-right"
+            },
+            "switch_oven_quick_roast": {
+                "default": "mdi:fire"
+            },
+            "switch_oven_heating_signal": {
+                "default": "mdi:bell-ring-outline"
+            },
+            "switch_oven_door_opener_delay": {
+                "default": "mdi:door-open"
+            },
             "switch_power_state": {
                 "default": "mdi:power"
             },
@@ -479,6 +491,24 @@
             }
         },
         "select": {
+            "select_date_format": {
+                "default": "mdi:calendar"
+            },
+            "select_weight_unit": {
+                "default": "mdi:scale"
+            },
+            "select_language": {
+                "default": "mdi:translate"
+            },
+            "select_oven_idle_screen": {
+                "default": "mdi:monitor"
+            },
+            "select_oven_touchkey_color": {
+                "default": "mdi:palette"
+            },
+            "select_oven_standby_display": {
+                "default": "mdi:monitor-dashboard"
+            },
             "select_drying_assistant_all_programs": {},
             "select_hot_water": {
                 "default": "mdi:water-thermometer-outline"
