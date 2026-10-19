@@ -191,6 +191,9 @@ class HCLight(HCEntity, LightEntity):
         """Turn on an ambient light; the library waits for its color Settings (upstream #477)."""
         brightness = kwargs.get(ATTR_BRIGHTNESS, self.brightness)
         rgb = kwargs.get(ATTR_RGB_COLOR, self.rgb_color)
+        if brightness is None and ATTR_RGB_COLOR in kwargs:
+            # No brightness known (no custom color stored yet): set the color as given.
+            brightness = 255
         change: dict[str, Any] = {}
         if ATTR_RGB_COLOR not in kwargs and ATTR_BRIGHTNESS in kwargs and self._preset_active:
             # A preset color has its own brightness Setting. Switching to CustomColor here would
