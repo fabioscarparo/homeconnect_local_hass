@@ -29,3 +29,4 @@ ported:
 # upstream-tracker/exclusions branch) for PRs closed upstream, or closed in the fork,
 # without being merged for more than a day.
 excluded:
+  278: Remaining program time as a timestamp sensor (declined)
