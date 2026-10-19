@@ -584,6 +584,23 @@ COMMON_ENTITY_DESCRIPTIONS: _EntityDescriptionsDefinitionsType = {
             entity_category=EntityCategory.DIAGNOSTIC,
             entity_registry_enabled_default=False,
         ),
+        HCBinarySensorEntityDescription(
+            key="binary_sensor_software_update_successful",
+            entity="BSH.Common.Event.SoftwareUpdateSuccessful",
+            entity_category=EntityCategory.DIAGNOSTIC,
+            entity_registry_enabled_default=False,
+            value_on={"Present", "Confirmed"},
+            value_off={"Off"},
+        ),
+        HCBinarySensorEntityDescription(
+            key="binary_sensor_customer_service_request",
+            entity="BSH.Common.Event.CustomerServiceRequest",
+            device_class=BinarySensorDeviceClass.PROBLEM,
+            in_problem_sensor=False,
+            entity_category=EntityCategory.DIAGNOSTIC,
+            value_on={"Present", "Confirmed"},
+            value_off={"Off"},
+        ),
     ],
     "select": [
         HCSelectEntityDescription(

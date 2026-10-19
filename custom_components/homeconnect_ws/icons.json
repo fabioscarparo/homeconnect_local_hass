@@ -133,6 +133,21 @@
             }
         },
         "binary_sensor": {
+            "binary_sensor_software_update_successful": {
+                "default": "mdi:update"
+            },
+            "binary_sensor_oven_lock_while_cooling_down": {
+                "default": "mdi:lock-clock"
+            },
+            "binary_sensor_oven_user_interaction_required": {
+                "default": "mdi:gesture-tap"
+            },
+            "binary_sensor_oven_cavity_heatup": {
+                "default": "mdi:thermometer-chevron-up"
+            },
+            "binary_sensor_oven_operating_time_limit_reached": {
+                "default": "mdi:timer-alert-outline"
+            },
             "connection": {},
             "binary_sensor_door_state": {},
             "binary_sensor_confirm_permanent_remote_start": {
