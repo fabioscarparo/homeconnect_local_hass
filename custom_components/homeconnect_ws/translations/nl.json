@@ -202,6 +202,9 @@
       "binary_sensor_cooking_appliance_module_error": {
         "name": "Fout in apparaatmodule"
       },
+      "binary_sensor_oven_preheat_finished": {
+        "name": "Voorverwarmen gereed"
+      },
       "connection": {
         "name": "Verbinding"
       },
@@ -300,6 +303,17 @@
           "customer_service_request": "Verzoek klantenservice",
           "oven_water_supply_closed": "Watertoevoer afgesloten",
           "cooking_appliance_module_error": "Fout in apparaatmodule"
+        }
+      },
+      "sensor_stopwatch_time": {
+        "name": "Stopwatchtijd"
+      },
+      "sensor_stopwatch_state": {
+        "name": "Stopwatchstatus",
+        "state": {
+          "off": "Uit",
+          "running": "Loopt",
+          "paused": "Gepauzeerd"
         }
       },
       "sensor_remaining_program_time": {
@@ -1105,6 +1119,14 @@
       }
     },
     "select": {
+      "select_cooking_button_tone_type": {
+        "name": "Toetstoon",
+        "state": {
+          "off": "Uit",
+          "tone01": "Toon 1",
+          "tone02": "Toon 2"
+        }
+      },
       "select_laundry_spin_speed": {
         "name": "Centrifugetoerental",
         "state": {
@@ -2074,6 +2096,12 @@
       }
     },
     "button": {
+      "button_stopwatch_start_pause_resume": {
+        "name": "Stopwatch starten/pauzeren/hervatten"
+      },
+      "button_stopwatch_reset": {
+        "name": "Stopwatch resetten"
+      },
       "button_abort_program": {
         "name": "Stop"
       },
@@ -2088,6 +2116,12 @@
       }
     },
     "number": {
+      "number_cooking_button_tone_volume": {
+        "name": "Volume toetstoon"
+      },
+      "number_cooking_signal_volume": {
+        "name": "Signaalvolume"
+      },
       "number_fill_quantity": {
         "name": "Vul hoeveelheid"
       },

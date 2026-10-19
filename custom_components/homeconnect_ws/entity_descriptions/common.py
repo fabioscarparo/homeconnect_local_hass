@@ -494,6 +494,14 @@ COMMON_ENTITY_DESCRIPTIONS: _EntityDescriptionsDefinitionsType = {
             entity_registry_enabled_default=False,
             press_fn=lambda appliance: appliance.set_datetime(dt_util.now()),
         ),
+        HCButtonEntityDescription(
+            key="button_stopwatch_start_pause_resume",
+            entity="BSH.Common.Command.StopWatchStartPauseResume",
+        ),
+        HCButtonEntityDescription(
+            key="button_stopwatch_reset",
+            entity="BSH.Common.Command.StopWatchReset",
+        ),
     ],
     "binary_sensor": [
         HCBinarySensorEntityDescription(
@@ -621,6 +629,19 @@ COMMON_ENTITY_DESCRIPTIONS: _EntityDescriptionsDefinitionsType = {
         generate_temperature_unit,
     ],
     "sensor": [
+        # Gaggenau BO470112 and BS474112 (upstream #513)
+        HCSensorEntityDescription(
+            key="sensor_stopwatch_time",
+            entity="BSH.Common.Status.StopWatchTime",
+            device_class=SensorDeviceClass.DURATION,
+            native_unit_of_measurement=UnitOfTime.SECONDS,
+        ),
+        HCSensorEntityDescription(
+            key="sensor_stopwatch_state",
+            entity="BSH.Common.Status.StopWatchState",
+            device_class=SensorDeviceClass.ENUM,
+            has_state_translation=True,
+        ),
         HCSensorEntityDescription(
             key="sensor_remaining_program_time",
             entity="BSH.Common.Option.RemainingProgramTime",
