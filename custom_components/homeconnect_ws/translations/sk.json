@@ -81,12 +81,6 @@
       "switch_child_lock": {
         "name": "Detská poistka"
       },
-      "switch_door_light_ring": {
-        "name": "Svetlo okolo dverí"
-      },
-      "switch_drum_light": {
-        "name": "Svetlo bubna"
-      },
       "switch_laundry_end_signal": {
         "name": "Signál konca"
       },
@@ -194,9 +188,6 @@
       },
       "switch_refrigerator_door_assistant_freezer": {
         "name": "Asistent dverí mrazničky"
-      },
-      "switch_refrigeration_light_internal": {
-        "name": "Vnútorné svetlo"
       },
       "switch_refrigeration_light_theater_mode": {
         "name": "Vnútorné svetlo TheaterMode"
@@ -314,20 +305,6 @@
       },
       "binary_sensor_checkfiltersystem": {
         "name": "Skontrolujte filtračný systém",
-        "state": {
-          "on": "Vyžaduje údržbu",
-          "off": "OK"
-        }
-      },
-      "binary_sensor_drainingnotpossible": {
-        "name": "Vyprázdnenie nie je možné",
-        "state": {
-          "on": "Vyžaduje údržbu",
-          "off": "OK"
-        }
-      },
-      "binary_sensor_drainpumpblocked": {
-        "name": "Čerpadlo odtoku zablokované",
         "state": {
           "on": "Vyžaduje údržbu",
           "off": "OK"
@@ -1456,24 +1433,6 @@
           "programabortedbyappliancecriticalerror": "Kritická chyba"
         }
       },
-      "sensor_interval_time_off": {
-        "name": "Interval vypnutý"
-      },
-      "sensor_interval_time_on": {
-        "name": "Interval zapnutý"
-      },
-      "sensor_delayed_shutoff_time": {
-        "name": "Odložené vypnutie"
-      },
-      "sensor_power_state": {
-        "name": "Stav napájania",
-        "state": {
-          "mainsoff": "Odpojené od siete",
-          "off": "Vypnuté",
-          "on": "Zapnuté",
-          "standby": "Pohotovostný režim"
-        }
-      },
       "sensor_door_state": {
         "name": "Dvere",
         "state": {
@@ -1606,24 +1565,6 @@
       },
       "sensor_temperature_memory_freezer": {
         "name": "Pamäť Teplota Mraznička"
-      },
-      "sensor_laundry_spin_speed": {
-        "name": "Rýchlosť odstreďovania",
-        "state": {
-          "off": "Vypnuté",
-          "rpm400": "400 ot./min",
-          "rpm600": "600 ot./min",
-          "rpm700": "700 ot./min",
-          "rpm800": "800 ot./min",
-          "rpm900": "900 ot./min",
-          "rpm1000": "1000 ot./min",
-          "rpm1200": "1200 ot./min",
-          "rpm1400": "1400 ot./min",
-          "rpm1500": "1500 ot./min",
-          "rpm1600": "1600 ot./min",
-          "rinsehold": "Zastavenie pri oplachovaní",
-          "auto": "Automaticky"
-        }
       },
       "sensor_estimated_remaining_program_time": {
         "name": "Odhadovaný celkový čas programu"
@@ -1833,9 +1774,6 @@
           "poor": "Slabé",
           "filled": "Naplnené"
         }
-      },
-      "sensor_machinecare_remaining_runs": {
-        "name": "MachineCare zostávajúce cykly"
       }
     },
     "select": {
@@ -3568,12 +3506,6 @@
       },
       "number_hood_sensor_sensitivity": {
         "name": "Citlivosť automatického senzora"
-      },
-      "number_start_in": {
-        "name": "Štart o"
-      },
-      "number_finish_in": {
-        "name": "Dokončenie o"
       },
       "number_setting_alarm_clock": {
         "name": "Budík"
