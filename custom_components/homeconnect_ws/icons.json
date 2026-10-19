@@ -133,6 +133,9 @@
             }
         },
         "binary_sensor": {
+            "binary_sensor_oven_preheat_finished": {
+                "default": "mdi:thermometer-check"
+            },
             "connection": {},
             "binary_sensor_door_state": {},
             "binary_sensor_confirm_permanent_remote_start": {
