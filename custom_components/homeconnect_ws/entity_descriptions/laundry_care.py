@@ -384,6 +384,21 @@ LAUNDRY_ENTITY_DESCRIPTIONS: _EntityDescriptionsDefinitionsType = {
             has_state_translation=True,
         ),
         HCSelectEntityDescription(
+            key="select_laundry_activity_after_washing",
+            entity="LaundryCare.WasherDryer.Option.ActivityAfterWashing",
+            has_state_translation=True,
+        ),
+        HCSelectEntityDescription(
+            key="select_laundry_refresh_intensity",
+            entity="LaundryCare.WasherDryer.Option.RefreshIntensity",
+            has_state_translation=True,
+        ),
+        HCSelectEntityDescription(
+            key="select_laundry_refresh_textile_type",
+            entity="LaundryCare.WasherDryer.Option.RefreshTextileType",
+            has_state_translation=True,
+        ),
+        HCSelectEntityDescription(
             key="select_laundry_refresher",
             entity="LaundryCare.Dryer.Option.Refresher",
             has_state_translation=True,
@@ -538,6 +553,12 @@ LAUNDRY_ENTITY_DESCRIPTIONS: _EntityDescriptionsDefinitionsType = {
         HCSwitchEntityDescription(
             key="switch_laundry_low_temperature_hygiene",
             entity="LaundryCare.Common.Option.LowTemperatureHygiene",
+            alternate_entities=("LaundryCare.WasherDryer.Option.LowTemperatureHygiene",),
+            device_class=SwitchDeviceClass.SWITCH,
+        ),
+        HCSwitchEntityDescription(
+            key="switch_laundry_wrinkle_guard_boost",
+            entity="LaundryCare.WasherDryer.Option.WrinkleGuardBoost",
             device_class=SwitchDeviceClass.SWITCH,
         ),
         HCSwitchEntityDescription(

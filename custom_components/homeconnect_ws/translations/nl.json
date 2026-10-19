@@ -83,6 +83,9 @@
       "switch_laundry_time_light": {
         "name": "TimeLight"
       },
+      "switch_laundry_wrinkle_guard_boost": {
+        "name": "Kreukbescherming boost"
+      },
       "switch_laundry_wrinkle_guard": {
         "name": "Minder strijken"
       },
@@ -1930,6 +1933,35 @@
           "rpm1500": "1500 tpm",
           "rpm1600": "1600 tpm",
           "auto": "Auto"
+        }
+      },
+      "select_laundry_activity_after_washing": {
+        "name": "Actie na het wassen",
+        "state": {
+          "programoverview": "Programmaoverzicht",
+          "continuedrying": "Doorgaan met drogen",
+          "drumdry": "Trommel drogen"
+        }
+      },
+      "select_laundry_refresh_intensity": {
+        "name": "Opfrisintensiteit",
+        "state": {
+          "light": "Licht",
+          "normal": "Normaal",
+          "intensive": "Intensief"
+        }
+      },
+      "select_laundry_refresh_textile_type": {
+        "name": "Textielsoort opfrissen",
+        "state": {
+          "cotton": "Katoen",
+          "down": "Dons",
+          "suit": "Kostuum",
+          "cashmere": "Kasjmier",
+          "shirt": "Overhemd",
+          "silk": "Zijde",
+          "waterproof": "Waterdicht",
+          "woolcoat": "Wollen jas"
         }
       },
       "select_laundry_drying_target": {
