@@ -778,6 +778,27 @@ async def test_sync_time_button_sets_the_clock_to_local_time() -> None:
     appliance.set_datetime.assert_awaited_once_with(local_now)
 
 
+async def test_sync_time_button_with_local_time(
+    mock_homeconnect_appliance: MockApplianceFactory,
+) -> None:
+    """An appliance with LocalTime instead of ApplianceDateTime gets the clock button too."""
+    appliance = await mock_homeconnect_appliance(
+        description={
+            "setting": [
+                {
+                    "uid": 1,
+                    "name": "BSH.Common.Setting.LocalTime",
+                    "available": True,
+                    "access": Access.READ_WRITE,
+                }
+            ]
+        }
+    )
+    buttons = entity_descriptions.get_available_entities(appliance)["button"]
+    sync_time = next(button for button in buttons if button.key == "button_sync_time")
+    assert sync_time.entity == "BSH.Common.Setting.LocalTime"
+
+
 DOOR_STATE = {
     "status": [
         {
