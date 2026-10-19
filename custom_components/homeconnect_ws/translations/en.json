@@ -4549,7 +4549,7 @@
   "services": {
     "start_program": {
       "name": "Start Program",
-      "description": "Start the selected Program",
+      "description": "Start the selected Program, or a named one",
       "fields": {
         "device_id": {
           "name": "Appliance",
@@ -4562,6 +4562,14 @@
         "finish_in": {
           "name": "Finish in",
           "description": "Time the Program should be finished in"
+        },
+        "program": {
+          "name": "Program",
+          "description": "Start this Program instead of the selected one, with only the given options. Also starts Programs that can't be selected, like a hood's venting"
+        },
+        "options": {
+          "name": "Options",
+          "description": "Program options to start with, by name, for example Cooking.Common.Option.Hood.VentingLevel: 3"
         }
       }
     },
@@ -4604,6 +4612,12 @@
     },
     "finish_in_not_available": {
       "message": "'Finish in' is not available on this Appliance"
+    },
+    "program_not_available": {
+      "message": "This Program is not available on this Appliance"
+    },
+    "option_not_available": {
+      "message": "This option is not available on this Appliance"
     },
     "finish_in_not_writable": {
       "message": "Appliance did not open a writable window for 'Finish in' in time - try again"

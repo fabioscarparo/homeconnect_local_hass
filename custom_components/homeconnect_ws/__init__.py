@@ -45,6 +45,7 @@ if TYPE_CHECKING:
 
     from home_disconnect import Appliance
     from home_disconnect.account import Region
+    from home_disconnect.entities import Program
     from homeassistant.core import Event, HomeAssistant, ServiceCall, ServiceResponse
     from homeassistant.helpers.typing import ConfigType
 
@@ -121,6 +122,19 @@ def _get_entity_or_raise(appliance: Appliance, key: str, error_key: str) -> Enti
     return entity
 
 
+def _program_to_start(appliance: Appliance, name: str | None) -> Program | None:
+    """Get the program start_program starts: the named one, or else the selected one."""
+    if name is None:
+        return appliance.selected_program
+    program = appliance.programs.get(name)
+    if program is None:
+        raise ServiceValidationError(
+            translation_domain=DOMAIN,
+            translation_key="program_not_available",
+        )
+    return program
+
+
 def _duration_to_seconds(data: dict[str, Any]) -> int:
     return (
         int(data.get("hours", 0)) * 3600
@@ -162,11 +176,19 @@ async def async_setup(hass: HomeAssistant, config: ConfigType) -> bool:
             )
             options[entity] = _duration_to_seconds(call.data["finish_in"])
 
-        if appliance.selected_program:
+        for name, value in call.data.get("options", {}).items():
+            options[_get_entity_or_raise(appliance, name, "option_not_available")] = value
+
+        program = _program_to_start(appliance, call.data.get("program"))
+        if program:
             try:
-                # The library adds the program's known option values (or a
-                # full set, for appliances that want one) under these.
-                await appliance.start_program(options=options)
+                # The library adds the program's known option values (or a full set, for
+                # appliances that want one) under these. A named program gets only the given
+                # options: that's how start-only programs start, and a hood's VentingLevel is
+                # ignored when written to a running program (upstream #496).
+                await appliance.start_program(
+                    program, options=options, include_current_options="program" not in call.data
+                )
             except RemoteStartNotAllowedError:
                 raise remote_start_error(config_entry.runtime_data) from None
             except ResponseError as exc:
