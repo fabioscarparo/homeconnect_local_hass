@@ -1009,6 +1009,54 @@ async def test_turn_on_sends_power_and_color_as_separate_messages(
     )
 
 
+async def test_turn_on_with_color_when_brightness_has_no_value(
+    hass: HomeAssistant,
+    mock_appliance: Appliance,
+    patch_entity_description: None,
+) -> None:
+    """A color is set as given when no custom color or brightness is stored yet."""
+    assert await setup_config_entry(hass, MOCK_CONFIG_DATA)
+    await update_entity(
+        mock_appliance.entities["BSH.Common.Setting.AmbientLightEnabled"], {"value": False}
+    )
+    await update_entity(
+        mock_appliance.entities["BSH.Common.Setting.AmbientLightColor"], {"value": 1}
+    )
+    # Clear them the way a never-received value leaves them
+    mock_appliance.entities["BSH.Common.Setting.AmbientLightCustomColor"]._value = None
+    mock_appliance.entities["BSH.Common.Setting.AmbientLightBrightness"]._value = None
+    await hass.async_block_till_done()
+
+    await hass.services.async_call(
+        LIGHT_DOMAIN,
+        SERVICE_TURN_ON,
+        {
+            ATTR_ENTITY_ID: "light.fake_brand_homeappliance_light_4",
+            ATTR_RGB_COLOR: (0, 255, 0),
+        },
+        blocking=True,
+    )
+
+    mock_appliance.session.request.assert_has_awaits(
+        [
+            call(
+                Message(
+                    resource="/ro/values",
+                    action=Action.POST,
+                    data=[{"uid": 114, "value": True}],
+                )
+            ),
+            call(
+                Message(
+                    resource="/ro/values",
+                    action=Action.POST,
+                    data=[{"uid": 111, "value": "#00ff00"}],
+                )
+            ),
+        ]
+    )
+
+
 async def test_turn_on_writes_color_once_available_after_power_on(
     hass: HomeAssistant,
     mock_appliance: Appliance,
