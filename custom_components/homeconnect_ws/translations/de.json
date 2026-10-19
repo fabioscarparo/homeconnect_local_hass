@@ -4583,6 +4583,14 @@
           "12hours": "12 Hours"
         }
       },
+      "select_cooking_button_tone_type": {
+        "name": "Tastenton",
+        "state": {
+          "off": "Aus",
+          "tone01": "Ton 1",
+          "tone02": "Ton 2"
+        }
+      },
       "select_oven_clock_display": {
         "name": "Uhranzeige",
         "state": {
@@ -4701,6 +4709,12 @@
       },
       "number_oven_weight": {
         "name": "Gewicht"
+      },
+      "number_cooking_button_tone_volume": {
+        "name": "Tastentonlautstärke"
+      },
+      "number_cooking_signal_volume": {
+        "name": "Signallautstärke"
       },
       "number_oven_sound_volume": {
         "name": "Lautstärke"

@@ -479,6 +479,9 @@
             }
         },
         "select": {
+            "select_cooking_button_tone_type": {
+                "default": "mdi:music-note"
+            },
             "select_drying_assistant_all_programs": {},
             "select_hot_water": {
                 "default": "mdi:water-thermometer-outline"
@@ -655,6 +658,12 @@
             }
         },
         "number": {
+            "number_cooking_button_tone_volume": {
+                "default": "mdi:volume-high"
+            },
+            "number_cooking_signal_volume": {
+                "default": "mdi:volume-high"
+            },
             "number_delay_start": {
                 "default": "mdi:timer-play-outline"
             },
