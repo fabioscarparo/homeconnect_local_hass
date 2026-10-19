@@ -1,7 +1,7 @@
 name: Upstream tracker
 
 # Lists upstream PRs that aren't in the fork yet in one issue, and pushes the ones that
-# cherry-pick cleanly onto dev as upstream/pr-<number> branches. See
+# cherry-pick cleanly onto beta as upstream/pr-<number> branches. See
 # .github/scripts/upstream_tracker.py and .github/upstream-prs.yaml.
 
 on:
@@ -23,8 +23,6 @@ jobs:
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
         with:
-          # Scheduled runs start on the default branch; the list and the script live on dev
-          ref: dev
           fetch-depth: 0
       - uses: astral-sh/setup-uv@c771a70e6277c0a99b617c7a806ffedaca235ff9
       - run: |

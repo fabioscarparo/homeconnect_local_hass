@@ -4,7 +4,7 @@ Track upstream pull requests that the fork hasn't taken yet.
 
 Run daily by .github/workflows/upstream-tracker.yaml. For each open upstream PR (and each
 PR merged upstream since the date in .github/upstream-prs.yaml) that isn't ported or
-excluded there, it cherry-picks the PR's commits onto dev and pushes the result to
+excluded there, it cherry-picks the PR's commits onto beta and pushes the result to
 upstream/pr-<number>. One issue lists what applies cleanly, what needs a manual port and
 which PRs are proposed for exclusion.
 
@@ -32,7 +32,7 @@ import yaml
 
 UPSTREAM = "chris-mc1/homeconnect_local_hass"
 UPSTREAM_GIT = f"https://github.com/{UPSTREAM}.git"
-BASE = "dev"
+BASE = "beta"
 CONFIG = Path(".github/upstream-prs.yaml")
 BRANCH_PREFIX = "upstream/pr-"
 EXCLUSIONS_BRANCH = "upstream-tracker/exclusions"
@@ -175,7 +175,7 @@ def resolve_translation(path: str, worktree: Path) -> bool:
 
 
 def replicate(pr: dict[str, Any], worktree: Path, *, dry_run: bool) -> Result:
-    """Cherry-pick an upstream PR onto dev and push it to its branch."""
+    """Cherry-pick an upstream PR onto beta and push it to its branch."""
     number = pr["number"]
     branch = f"{BRANCH_PREFIX}{number}"
     head = f"refs/upstream/pr/{number}"
