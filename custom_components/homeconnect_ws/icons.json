@@ -145,6 +145,9 @@
             }
         },
         "binary_sensor": {
+            "binary_sensor_oven_preheat_finished": {
+                "default": "mdi:thermometer-check"
+            },
             "connection": {},
             "binary_sensor_door_state": {},
             "binary_sensor_confirm_permanent_remote_start": {
@@ -332,6 +335,12 @@
             "binary_sensor_coffee_close_door": {}
         },
         "sensor": {
+            "sensor_stopwatch_time": {
+                "default": "mdi:timer-outline"
+            },
+            "sensor_stopwatch_state": {
+                "default": "mdi:timer-outline"
+            },
             "sensor_problem": {
                 "default": "mdi:alert-circle-outline",
                 "state": {
@@ -509,6 +518,9 @@
             "select_oven_standby_display": {
                 "default": "mdi:monitor-dashboard"
             },
+            "select_cooking_button_tone_type": {
+                "default": "mdi:music-note"
+            },
             "select_drying_assistant_all_programs": {},
             "select_hot_water": {
                 "default": "mdi:water-thermometer-outline"
@@ -641,6 +653,12 @@
 			}
         },
         "button": {
+            "button_stopwatch_start_pause_resume": {
+                "default": "mdi:timer-play-outline"
+            },
+            "button_stopwatch_reset": {
+                "default": "mdi:timer-refresh-outline"
+            },
             "button_abort_program": {
                 "default": "mdi:stop"
             },
@@ -685,6 +703,12 @@
             }
         },
         "number": {
+            "number_cooking_button_tone_volume": {
+                "default": "mdi:volume-high"
+            },
+            "number_cooking_signal_volume": {
+                "default": "mdi:volume-high"
+            },
             "number_delay_start": {
                 "default": "mdi:timer-play-outline"
             },

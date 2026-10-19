@@ -566,6 +566,9 @@
       "binary_sensor_oven_turn_food_now": {
         "name": "Gargut jetzt wenden{group_name}"
       },
+      "binary_sensor_oven_preheat_finished": {
+        "name": "Vorheizen beendet"
+      },
       "binary_sensor_oven_regular_preheat_finished": {
         "name": "Vorheizen beendet{group_name}"
       },
@@ -673,6 +676,17 @@
           "spin_abort": "Schleudern abgebrochen",
           "supply_voltage_too_low": "Versorgungsspannung niedrig",
           "water_level_too_high": "Wasserstand zu hoch"
+        }
+      },
+      "sensor_stopwatch_time": {
+        "name": "Stoppuhr-Zeit"
+      },
+      "sensor_stopwatch_state": {
+        "name": "Stoppuhr-Status",
+        "state": {
+          "off": "Aus",
+          "running": "Läuft",
+          "paused": "Pausiert"
         }
       },
       "sensor_remaining_program_time": {
@@ -4639,6 +4653,14 @@
           "clockanddateandlogo": "Uhr, Datum und Logo"
         }
       },
+      "select_cooking_button_tone_type": {
+        "name": "Tastenton",
+        "state": {
+          "off": "Aus",
+          "tone01": "Ton 1",
+          "tone02": "Ton 2"
+        }
+      },
       "select_oven_clock_display": {
         "name": "Uhranzeige",
         "state": {
@@ -4672,6 +4694,12 @@
       }
     },
     "button": {
+      "button_stopwatch_start_pause_resume": {
+        "name": "Stoppuhr starten/pausieren/fortsetzen"
+      },
+      "button_stopwatch_reset": {
+        "name": "Stoppuhr zurücksetzen"
+      },
       "button_abort_program": {
         "name": "Abbrechen"
       },
@@ -4757,6 +4785,12 @@
       },
       "number_oven_weight": {
         "name": "Gewicht"
+      },
+      "number_cooking_button_tone_volume": {
+        "name": "Tastentonlautstärke"
+      },
+      "number_cooking_signal_volume": {
+        "name": "Signallautstärke"
       },
       "number_oven_sound_volume": {
         "name": "Lautstärke"

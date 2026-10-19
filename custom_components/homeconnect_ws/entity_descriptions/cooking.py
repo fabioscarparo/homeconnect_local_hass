@@ -613,6 +613,26 @@ COOKING_ENTITY_DESCRIPTIONS: _EntityDescriptionsDefinitionsType = {
             entity_category=EntityCategory.CONFIG,
             mode=NumberMode.AUTO,
         ),
+        # Gaggenau BO470112 and BS474112 report these as Cooking.Common.Setting.* (upstream #513)
+        HCNumberEntityDescription(
+            key="number_cooking_display_brightness",
+            translation_key="number_oven_display_brightness",
+            entity="Cooking.Common.Setting.DisplayBrightness",
+            entity_category=EntityCategory.CONFIG,
+            mode=NumberMode.AUTO,
+        ),
+        HCNumberEntityDescription(
+            key="number_cooking_button_tone_volume",
+            entity="Cooking.Common.Setting.ButtonToneVolume",
+            entity_category=EntityCategory.CONFIG,
+            mode=NumberMode.AUTO,
+        ),
+        HCNumberEntityDescription(
+            key="number_cooking_signal_volume",
+            entity="Cooking.Common.Setting.SignalVolume",
+            entity_category=EntityCategory.CONFIG,
+            mode=NumberMode.AUTO,
+        ),
         HCNumberEntityDescription(
             key="number_hob_automatic_timer",
             entity="Cooking.Hob.Setting.AutomaticTimer",
@@ -683,6 +703,12 @@ COOKING_ENTITY_DESCRIPTIONS: _EntityDescriptionsDefinitionsType = {
         HCSelectEntityDescription(
             key="select_oven_standby_display",
             entity="Cooking.Oven.Setting.StandbyDisplay",
+            has_state_translation=True,
+            entity_category=EntityCategory.CONFIG,
+        ),
+        HCSelectEntityDescription(
+            key="select_cooking_button_tone_type",
+            entity="Cooking.Common.Setting.ButtonToneType",
             has_state_translation=True,
             entity_category=EntityCategory.CONFIG,
         ),
@@ -862,6 +888,13 @@ COOKING_ENTITY_DESCRIPTIONS: _EntityDescriptionsDefinitionsType = {
             device_class=SwitchDeviceClass.SWITCH,
             entity_category=EntityCategory.CONFIG,
         ),
+        # Gaggenau BO470112 and BS474112 report it as a setting (upstream #513)
+        HCSwitchEntityDescription(
+            key="switch_oven_fast_pre_heat_setting",
+            translation_key="switch_oven_fast_pre_heat",
+            entity="Cooking.Oven.Setting.FastPreHeat",
+            device_class=SwitchDeviceClass.SWITCH,
+        ),
         HCSwitchEntityDescription(
             key="switch_oven_button_tones",
             entity="Cooking.Oven.Setting.ButtonTones",
@@ -944,5 +977,14 @@ COOKING_ENTITY_DESCRIPTIONS: _EntityDescriptionsDefinitionsType = {
             entity_category=EntityCategory.CONFIG,
         ),
     ],
-    "binary_sensor": [generate_meatprobe_plugged],
+    "binary_sensor": [
+        generate_meatprobe_plugged,
+        # Gaggenau BO470112 and BS474112 (upstream #513)
+        HCBinarySensorEntityDescription(
+            key="binary_sensor_oven_preheat_finished",
+            entity="Cooking.Common.Event.PreheatFinished",
+            value_on={"Present", "Confirmed"},
+            value_off={"Off"},
+        ),
+    ],
 }
