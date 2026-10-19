@@ -488,6 +488,8 @@ COMMON_ENTITY_DESCRIPTIONS: _EntityDescriptionsDefinitionsType = {
         HCButtonEntityDescription(
             key="button_sync_time",
             entity="BSH.Common.Setting.ApplianceDateTime",
+            # The clock on appliances without ApplianceDateTime (upstream #504)
+            alternate_entities=("BSH.Common.Setting.LocalTime",),
             entity_category=EntityCategory.CONFIG,
             # Only useful with "Synchronize time with server" off, which is
             # itself disabled by default, so follow it.
