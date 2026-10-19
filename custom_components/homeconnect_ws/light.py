@@ -6,6 +6,7 @@ import logging
 from typing import TYPE_CHECKING, Any, cast
 
 from home_disconnect import AccessError
+from home_disconnect.keys import SettingKey
 from homeassistant.components.light import LightEntity
 from homeassistant.components.light.const import (
     ATTR_BRIGHTNESS,
@@ -84,7 +85,7 @@ class HCLight(HCEntity, LightEntity):
             ]
             self._entities.append(self._color_temperature_entity)
             self._color_temp_presets_entity = self._runtime_data.appliance.entities.get(
-                "Cooking.Hood.Setting.ColorTemperature"
+                SettingKey.COOKING_HOOD_COLOR_TEMPERATURE
             )
 
         if entity_description.color_entity is not None:

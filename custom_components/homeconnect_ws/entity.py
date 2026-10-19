@@ -6,6 +6,7 @@ import logging
 from typing import TYPE_CHECKING, Any
 
 from home_disconnect.entities import Access
+from home_disconnect.keys import SettingKey
 from homeassistant.const import UnitOfTemperature
 from homeassistant.helpers.entity import Entity
 from homeassistant.helpers.update_coordinator import CoordinatorEntity
@@ -26,7 +27,7 @@ if TYPE_CHECKING:
 
 _LOGGER = logging.getLogger(__name__)
 
-TEMPERATURE_UNIT_ENTITY = "BSH.Common.Setting.TemperatureUnit"
+TEMPERATURE_UNIT_ENTITY = SettingKey.BSH_COMMON_TEMPERATURE_UNIT
 # BSH.Common.Setting.TemperatureUnit values
 _APPLIANCE_TEMPERATURE_UNITS = {
     "Celsius": UnitOfTemperature.CELSIUS,

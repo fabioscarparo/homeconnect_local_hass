@@ -4,6 +4,7 @@ from __future__ import annotations
 
 from typing import Any, Final, TypedDict
 
+from home_disconnect.keys import SettingKey
 from homeassistant.const import Platform
 
 
@@ -40,7 +41,7 @@ CONF_DEV_OVERRIDE_PSK: Final = "override_psk"
 # The PowerState range the appliance reported when setup last connected, or None. Profiles
 # don't always have it, and entities are created before the appliance connects (fork #202).
 CONF_POWER_STATE_RANGE: Final = "power_state_range"
-POWER_STATE: Final = "BSH.Common.Setting.PowerState"
+POWER_STATE: Final = SettingKey.BSH_COMMON_POWER_STATE
 
 # Matches upstream chris-mc1/homeconnect_local_hass's v2 config entry schema
 # exactly (same key strings, same storage_dir/{deviceID}/*.xml layout) so a

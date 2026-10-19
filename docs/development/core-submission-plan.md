@@ -66,12 +66,11 @@ As of 2026-10-12, with home-disconnect 2.0.0b3 and Home Connect Local 2.0.0b0 (b
 | Step | State |
 | --- | --- |
 | [1. License the library](#1-license-the-library-blocker) | **Done.** home-disconnect 2.0 is a new MIT-licensed library ([repository](https://github.com/vemboy200/home-disconnect)), with `PROVENANCE.md` and `THIRD_PARTY_NOTICES.md` (hcpy, code moved from this integration) and its own test suite. No code from `homeconnect_websocket` or home-disconnect 1.x. Home Connect Local 2.0.0b0 runs on it (#122). |
-| [2. Move protocol logic into the library](#2-move-protocol-logic-into-the-library) | **Done except the feature-name constants.** See the table below. |
+| [2. Move protocol logic into the library](#2-move-protocol-logic-into-the-library) | **Done.** See the table below. |
 | [3. Library release pipeline](#3-library-release-pipeline) | **Done except a stable release.** CI (lint, tests on 3.13 and 3.14, mypy, build), PyPI Trusted Publishing from GitHub releases (`publish.yml`), MIT license metadata, Renovate only. Releases so far are 2.0.0b0 to 2.0.0b3. |
 
 What's left before Phase 2:
 
-- **Feature-name constants.** The entity descriptions still name about 440 features as strings (`"BSH.Common.Status.DoorState"`). Not started.
 - **A stable home-disconnect 2.0.0** for core to pin. It waits on the Home Connect Local 2.0 betas being tested on real appliances (hoods, washers and dryers, program starts and delays, setup), and on the heartbeat change (home-disconnect #20).
 - **The entity description layout** from [Decisions to make first](#decisions-to-make-first) (descriptions per platform file). Planned for v2.0.0's entity cleanup, not done yet.
 
@@ -100,7 +99,7 @@ Core requires code that talks to a device or service to live in the library, not
 | `hc_cloud_api.py` and `hc_legacy_oauth.py` (account sign-in and profile fetch) | One library module, something like `home_disconnect.account` (drop the "legacy" name, it's the app's own sign-in) | Done: `home_disconnect.account` (#122). |
 | Profile ZIP reading and writing (`config_flow.py`, `export_profile.py`, `hc_cloud_api.py`) | One library profile loader and writer (the simulator can use it too) | Done: `home_disconnect.profile_files` (#122). |
 | Clock sync timestamp format | Something like `appliance.set_datetime()` | Done: `appliance.set_datetime()` (#122). |
-| Feature names written as strings in the entity descriptions (`"BSH.Common.Status.DoorState"`, about 440 of them) | Library constants the descriptions reference, the way core's `home_connect` uses `aiohomeconnect`'s `StatusKey` | Not started. |
+| Feature names written as strings in the entity descriptions (`"BSH.Common.Status.DoorState"`, 456 of them) | Library constants the descriptions reference, the way core's `home_connect` uses `aiohomeconnect`'s `StatusKey` | Done: `home_disconnect.keys`, one `StrEnum` per kind (`StatusKey`, `SettingKey`, `EventKey`, `OptionKey`, `ProgramKey`, `CommandKey`, `RootKey`), named like `aiohomeconnect`'s (home-disconnect #42). Names built per oven cavity or hob zone stay f-strings over `group_ids()`. |
 | Finding oven cavities, hob zones and favorites in the profile (`get_groups_from_regex` and the regexes in `cooking.py` and `common.py`) | A library call that lists them, for example an oven's cavity IDs | Done: `group_ids()` (#122). |
 
 Entities, entity descriptions, the config flow UI, storage paths, the error decorator and translations stay in the integration. The descriptions are Home Assistant code (they extend HA's `*EntityDescription` classes and use its device classes and units), and a library can't depend on Home Assistant. Core's `roborock` is the pattern: its descriptions live in the integration and point at the library for the value (`data.status.battery`), the options (`WaterLevelMapping`) and the command (`api.set_water_level`).

@@ -8,6 +8,7 @@ from typing import TYPE_CHECKING, Any, Never
 
 import probatio
 from home_disconnect import AccessError, Entity, RemoteStartNotAllowedError, ResponseError
+from home_disconnect.keys import OptionKey
 from homeassistant.config_entries import ConfigEntry
 from homeassistant.const import CONF_DESCRIPTION, EVENT_HOMEASSISTANT_STOP
 from homeassistant.exceptions import ConfigEntryError, ServiceValidationError
@@ -166,13 +167,13 @@ async def async_setup(hass: HomeAssistant, config: ConfigType) -> bool:
         appliance = config_entry.runtime_data.appliance
         if "start_in" in call.data:
             entity = _get_entity_or_raise(
-                appliance, "BSH.Common.Option.StartInRelative", "start_in_not_available"
+                appliance, OptionKey.BSH_COMMON_START_IN_RELATIVE, "start_in_not_available"
             )
             options[entity] = _duration_to_seconds(call.data["start_in"])
 
         if "finish_in" in call.data:
             entity = _get_entity_or_raise(
-                appliance, "BSH.Common.Option.FinishInRelative", "finish_in_not_available"
+                appliance, OptionKey.BSH_COMMON_FINISH_IN_RELATIVE, "finish_in_not_available"
             )
             options[entity] = _duration_to_seconds(call.data["finish_in"])
 
@@ -206,7 +207,7 @@ async def async_setup(hass: HomeAssistant, config: ConfigType) -> bool:
         appliance = config_entry.runtime_data.appliance
         await _set_value_or_raise(
             _get_entity_or_raise(
-                appliance, "BSH.Common.Option.StartInRelative", "start_in_not_available"
+                appliance, OptionKey.BSH_COMMON_START_IN_RELATIVE, "start_in_not_available"
             ),
             _duration_to_seconds(call.data["start_in"]),
         )
@@ -217,7 +218,7 @@ async def async_setup(hass: HomeAssistant, config: ConfigType) -> bool:
         config_entry = await get_config_entry_from_call(hass, call)
         appliance = config_entry.runtime_data.appliance
         _get_entity_or_raise(
-            appliance, "BSH.Common.Option.FinishInRelative", "finish_in_not_available"
+            appliance, OptionKey.BSH_COMMON_FINISH_IN_RELATIVE, "finish_in_not_available"
         )
         seconds = _duration_to_seconds(call.data["finish_in"])
         try:

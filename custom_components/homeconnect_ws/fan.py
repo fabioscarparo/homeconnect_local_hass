@@ -7,6 +7,7 @@ import math
 from typing import TYPE_CHECKING, Any, Final, NamedTuple, override
 
 from home_disconnect import AccessError
+from home_disconnect.keys import OptionKey, RootKey, StatusKey
 from homeassistant.components.fan import FanEntity
 from homeassistant.components.fan.const import FanEntityFeature
 from homeassistant.core import callback
@@ -70,12 +71,12 @@ async def async_setup_entry(
     async_add_entites(entities)
 
 
-_OPERATION_STATE_ENTITY = "BSH.Common.Status.OperationState"
-_VENTING_BOOST_ENTITY = "Cooking.Common.Option.Hood.Boost"  # D801 / 55297
+_OPERATION_STATE_ENTITY = StatusKey.BSH_COMMON_OPERATION_STATE
+_VENTING_BOOST_ENTITY = OptionKey.COOKING_COMMON_HOOD_BOOST  # D801 / 55297
 _INACTIVE_OPERATION_STATES = frozenset({"inactive", "ready"})
 
 _HOOD_FAN_STATE_ENTITIES = (
-    "BSH.Common.Root.ActiveProgram",
+    RootKey.BSH_COMMON_ACTIVE_PROGRAM,
     _OPERATION_STATE_ENTITY,
     _VENTING_BOOST_ENTITY,
 )

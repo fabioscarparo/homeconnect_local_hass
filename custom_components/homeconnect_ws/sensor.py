@@ -7,6 +7,7 @@ from datetime import timedelta
 from typing import TYPE_CHECKING, Any, ClassVar, cast
 
 from home_disconnect.entities import Access, Program
+from home_disconnect.keys import OptionKey, RootKey, SettingKey
 from homeassistant.components.binary_sensor.const import BinarySensorDeviceClass
 from homeassistant.components.sensor import SensorDeviceClass, SensorEntity
 
@@ -33,9 +34,9 @@ PARALLEL_UPDATES = 0
 # importing across the entity_descriptions/helpers boundary here risks a
 # circular import (entity_descriptions already imports from helpers).
 _POWER_OFF_STATE_NAMES = ("Off", "MainsOff")
-_POWER_STATE_ENTITY = "BSH.Common.Setting.PowerState"
-_ACTIVE_PROGRAM_ENTITY = "BSH.Common.Root.ActiveProgram"
-_REMAINING_PROGRAM_TIME_ENTITY = "BSH.Common.Option.RemainingProgramTime"
+_POWER_STATE_ENTITY = SettingKey.BSH_COMMON_POWER_STATE
+_ACTIVE_PROGRAM_ENTITY = RootKey.BSH_COMMON_ACTIVE_PROGRAM
+_REMAINING_PROGRAM_TIME_ENTITY = OptionKey.BSH_COMMON_REMAINING_PROGRAM_TIME
 _NO_ACTIVE_PROGRAM_TRIGGER_ENTITIES = (_ACTIVE_PROGRAM_ENTITY, _POWER_STATE_ENTITY)
 
 

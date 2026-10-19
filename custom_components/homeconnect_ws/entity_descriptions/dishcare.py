@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+from home_disconnect.keys import EventKey, OptionKey, SettingKey, StatusKey
 from homeassistant.components.binary_sensor.const import BinarySensorDeviceClass
 from homeassistant.components.sensor import (
     SensorDeviceClass,
@@ -22,12 +23,12 @@ DISHCARE_ENTITY_DESCRIPTIONS: _EntityDescriptionsDefinitionsType = {
     "binary_sensor": [
         HCBinarySensorEntityDescription(
             key="binary_sensor_eco_dry_active",
-            entity="Dishcare.Dishwasher.Status.EcoDryActive",
+            entity=StatusKey.DISHCARE_DISHWASHER_ECO_DRY_ACTIVE,
             entity_registry_enabled_default=False,
         ),
         HCBinarySensorEntityDescription(
             key="binary_sensor_machinecarereminder",
-            entity="Dishcare.Dishwasher.Event.MachineCareReminder",
+            entity=EventKey.DISHCARE_DISHWASHER_MACHINE_CARE_REMINDER,
             entity_category=EntityCategory.DIAGNOSTIC,
             device_class=BinarySensorDeviceClass.PROBLEM,
             in_problem_sensor=False,
@@ -36,7 +37,7 @@ DISHCARE_ENTITY_DESCRIPTIONS: _EntityDescriptionsDefinitionsType = {
         ),
         HCBinarySensorEntityDescription(
             key="binary_sensor_low_voltage",
-            entity="Dishcare.Dishwasher.Event.LowVoltage",
+            entity=EventKey.DISHCARE_DISHWASHER_LOW_VOLTAGE,
             entity_category=EntityCategory.DIAGNOSTIC,
             device_class=BinarySensorDeviceClass.PROBLEM,
             entity_registry_enabled_default=False,
@@ -45,7 +46,7 @@ DISHCARE_ENTITY_DESCRIPTIONS: _EntityDescriptionsDefinitionsType = {
         ),
         HCBinarySensorEntityDescription(
             key="binary_sensor_machinecareandfiltercleaningreminder",
-            entity="Dishcare.Dishwasher.Event.MachineCareAndFilterCleaningReminder",
+            entity=EventKey.DISHCARE_DISHWASHER_MACHINE_CARE_AND_FILTER_CLEANING_REMINDER,
             entity_category=EntityCategory.DIAGNOSTIC,
             device_class=BinarySensorDeviceClass.PROBLEM,
             in_problem_sensor=False,
@@ -54,7 +55,7 @@ DISHCARE_ENTITY_DESCRIPTIONS: _EntityDescriptionsDefinitionsType = {
         ),
         HCBinarySensorEntityDescription(
             key="binary_sensor_waterheatercalcified",
-            entity="Dishcare.Dishwasher.Event.WaterheaterCalcified",
+            entity=EventKey.DISHCARE_DISHWASHER_WATERHEATER_CALCIFIED,
             entity_category=EntityCategory.DIAGNOSTIC,
             device_class=BinarySensorDeviceClass.PROBLEM,
             in_problem_sensor=False,
@@ -63,7 +64,7 @@ DISHCARE_ENTITY_DESCRIPTIONS: _EntityDescriptionsDefinitionsType = {
         ),
         HCBinarySensorEntityDescription(
             key="binary_sensor_smartfiltercleaningreminder",
-            entity="Dishcare.Dishwasher.Event.SmartFilterCleaningReminder",
+            entity=EventKey.DISHCARE_DISHWASHER_SMART_FILTER_CLEANING_REMINDER,
             entity_category=EntityCategory.DIAGNOSTIC,
             device_class=BinarySensorDeviceClass.PROBLEM,
             in_problem_sensor=False,
@@ -72,7 +73,7 @@ DISHCARE_ENTITY_DESCRIPTIONS: _EntityDescriptionsDefinitionsType = {
         ),
         HCBinarySensorEntityDescription(
             key="binary_sensor_checkfiltersystem",
-            entity="Dishcare.Dishwasher.Event.CheckFilterSystem",
+            entity=EventKey.DISHCARE_DISHWASHER_CHECK_FILTER_SYSTEM,
             entity_category=EntityCategory.DIAGNOSTIC,
             device_class=BinarySensorDeviceClass.PROBLEM,
             in_problem_sensor=False,
@@ -82,7 +83,7 @@ DISHCARE_ENTITY_DESCRIPTIONS: _EntityDescriptionsDefinitionsType = {
         HCBinarySensorEntityDescription(
             key="binary_sensor_drainingnotpossible",
             translation_key="binary_sensor_draining_not_possible",
-            entity="Dishcare.Dishwasher.Event.DrainingNotPossible",
+            entity=EventKey.DISHCARE_DISHWASHER_DRAINING_NOT_POSSIBLE,
             entity_category=EntityCategory.DIAGNOSTIC,
             device_class=BinarySensorDeviceClass.PROBLEM,
             entity_registry_enabled_default=False,
@@ -92,7 +93,7 @@ DISHCARE_ENTITY_DESCRIPTIONS: _EntityDescriptionsDefinitionsType = {
         HCBinarySensorEntityDescription(
             key="binary_sensor_drainpumpblocked",
             translation_key="binary_sensor_drain_pump_blocked",
-            entity="Dishcare.Dishwasher.Event.DrainPumpBlocked",
+            entity=EventKey.DISHCARE_DISHWASHER_DRAIN_PUMP_BLOCKED,
             entity_category=EntityCategory.DIAGNOSTIC,
             device_class=BinarySensorDeviceClass.PROBLEM,
             entity_registry_enabled_default=False,
@@ -104,7 +105,7 @@ DISHCARE_ENTITY_DESCRIPTIONS: _EntityDescriptionsDefinitionsType = {
         # The protocol/API objects use the name "FlexSpray", which is kept here.
         HCBinarySensorEntityDescription(
             key="binary_sensor_flexspray_error_blocked",
-            entity="Dishcare.Dishwasher.Event.FlexSpray.Error.Blocked",
+            entity=EventKey.DISHCARE_DISHWASHER_FLEX_SPRAY_ERROR_BLOCKED,
             entity_category=EntityCategory.DIAGNOSTIC,
             device_class=BinarySensorDeviceClass.PROBLEM,
             entity_registry_enabled_default=False,
@@ -113,7 +114,7 @@ DISHCARE_ENTITY_DESCRIPTIONS: _EntityDescriptionsDefinitionsType = {
         ),
         HCBinarySensorEntityDescription(
             key="binary_sensor_flexspray_error_general",
-            entity="Dishcare.Dishwasher.Event.FlexSpray.Error.General",
+            entity=EventKey.DISHCARE_DISHWASHER_FLEX_SPRAY_ERROR_GENERAL,
             entity_category=EntityCategory.DIAGNOSTIC,
             device_class=BinarySensorDeviceClass.PROBLEM,
             entity_registry_enabled_default=False,
@@ -122,7 +123,7 @@ DISHCARE_ENTITY_DESCRIPTIONS: _EntityDescriptionsDefinitionsType = {
         ),
         HCBinarySensorEntityDescription(
             key="binary_sensor_flexspray_error_spray_arm_not_mounted",
-            entity="Dishcare.Dishwasher.Event.FlexSpray.Error.SprayArmNotMounted",
+            entity=EventKey.DISHCARE_DISHWASHER_FLEX_SPRAY_ERROR_SPRAY_ARM_NOT_MOUNTED,
             entity_category=EntityCategory.DIAGNOSTIC,
             device_class=BinarySensorDeviceClass.PROBLEM,
             entity_registry_enabled_default=False,
@@ -134,8 +135,8 @@ DISHCARE_ENTITY_DESCRIPTIONS: _EntityDescriptionsDefinitionsType = {
         HCSensorEntityDescription(
             key="sensor_rinse_aid",
             entities=[
-                "Dishcare.Dishwasher.Event.RinseAidLack",
-                "Dishcare.Dishwasher.Event.RinseAidNearlyEmpty",
+                EventKey.DISHCARE_DISHWASHER_RINSE_AID_LACK,
+                EventKey.DISHCARE_DISHWASHER_RINSE_AID_NEARLY_EMPTY,
             ],
             device_class=SensorDeviceClass.ENUM,
             options=["empty", "nearly_empty", "full"],
@@ -143,8 +144,8 @@ DISHCARE_ENTITY_DESCRIPTIONS: _EntityDescriptionsDefinitionsType = {
         HCSensorEntityDescription(
             key="sensor_salt",
             entities=[
-                "Dishcare.Dishwasher.Event.SaltLack",
-                "Dishcare.Dishwasher.Event.SaltNearlyEmpty",
+                EventKey.DISHCARE_DISHWASHER_SALT_LACK,
+                EventKey.DISHCARE_DISHWASHER_SALT_NEARLY_EMPTY,
             ],
             device_class=SensorDeviceClass.ENUM,
             options=["empty", "nearly_empty", "full"],
@@ -153,63 +154,63 @@ DISHCARE_ENTITY_DESCRIPTIONS: _EntityDescriptionsDefinitionsType = {
     "select": [
         HCSelectEntityDescription(
             key="select_drying_assistant_all_programs",
-            entity="Dishcare.Dishwasher.Setting.DryingAssistantAllPrograms",
+            entity=SettingKey.DISHCARE_DISHWASHER_DRYING_ASSISTANT_ALL_PROGRAMS,
             entity_category=EntityCategory.CONFIG,
             entity_registry_enabled_default=False,
             has_state_translation=True,
         ),
         HCSelectEntityDescription(
             key="select_hot_water",
-            entity="Dishcare.Dishwasher.Setting.HotWater",
+            entity=SettingKey.DISHCARE_DISHWASHER_HOT_WATER,
             entity_category=EntityCategory.CONFIG,
             entity_registry_enabled_default=False,
             has_state_translation=True,
         ),
         HCSelectEntityDescription(
             key="select_rinse_aid",
-            entity="Dishcare.Dishwasher.Setting.RinseAid",
+            entity=SettingKey.DISHCARE_DISHWASHER_RINSE_AID,
             entity_category=EntityCategory.CONFIG,
             entity_registry_enabled_default=False,
             has_state_translation=True,
         ),
         HCSelectEntityDescription(
             key="select_sound_level_signal",
-            entity="Dishcare.Dishwasher.Setting.SoundLevelSignal",
+            entity=SettingKey.DISHCARE_DISHWASHER_SOUND_LEVEL_SIGNAL,
             entity_category=EntityCategory.CONFIG,
             entity_registry_enabled_default=False,
             has_state_translation=True,
         ),
         HCSelectEntityDescription(
             key="select_sound_level_key",
-            entity="Dishcare.Dishwasher.Setting.SoundLevelKey",
+            entity=SettingKey.DISHCARE_DISHWASHER_SOUND_LEVEL_KEY,
             entity_category=EntityCategory.CONFIG,
             entity_registry_enabled_default=False,
             has_state_translation=True,
         ),
         HCSelectEntityDescription(
             key="select_water_hardness",
-            entity="Dishcare.Dishwasher.Setting.WaterHardness",
+            entity=SettingKey.DISHCARE_DISHWASHER_WATER_HARDNESS,
             entity_category=EntityCategory.CONFIG,
             entity_registry_enabled_default=False,
             has_state_translation=True,
         ),
         HCSelectEntityDescription(
             key="select_sensitivity_turbidity",
-            entity="Dishcare.Dishwasher.Setting.SensitivityTurbidity",
+            entity=SettingKey.DISHCARE_DISHWASHER_SENSITIVITY_TURBIDITY,
             entity_category=EntityCategory.CONFIG,
             entity_registry_enabled_default=False,
             has_state_translation=True,
         ),
         HCSelectEntityDescription(
             key="select_eco_as_default",
-            entity="Dishcare.Dishwasher.Setting.EcoAsDefault",
+            entity=SettingKey.DISHCARE_DISHWASHER_ECO_AS_DEFAULT,
             entity_category=EntityCategory.CONFIG,
             entity_registry_enabled_default=False,
             has_state_translation=True,
         ),
         HCSelectEntityDescription(
             key="select_dishwasher_auto_power_off",
-            entity="Dishcare.Dishwasher.Setting.AutoPowerOff",
+            entity=SettingKey.DISHCARE_DISHWASHER_AUTO_POWER_OFF,
             entity_category=EntityCategory.CONFIG,
             entity_registry_enabled_default=False,
             has_state_translation=True,
@@ -219,35 +220,35 @@ DISHCARE_ENTITY_DESCRIPTIONS: _EntityDescriptionsDefinitionsType = {
         # The protocol/API objects use the name "FlexSpray", which is kept here.
         HCSelectEntityDescription(
             key="select_flexspray_type",
-            entity="Dishcare.Dishwasher.Option.FlexSpray.Type",
+            entity=OptionKey.DISHCARE_DISHWASHER_FLEX_SPRAY_TYPE,
             entity_category=EntityCategory.CONFIG,
             entity_registry_enabled_default=False,
             has_state_translation=True,
         ),
         HCSelectEntityDescription(
             key="select_flexspray_front_left",
-            entity="Dishcare.Dishwasher.Option.FlexSpray.FrontLeft",
+            entity=OptionKey.DISHCARE_DISHWASHER_FLEX_SPRAY_FRONT_LEFT,
             entity_category=EntityCategory.CONFIG,
             entity_registry_enabled_default=False,
             has_state_translation=True,
         ),
         HCSelectEntityDescription(
             key="select_flexspray_back_left",
-            entity="Dishcare.Dishwasher.Option.FlexSpray.BackLeft",
+            entity=OptionKey.DISHCARE_DISHWASHER_FLEX_SPRAY_BACK_LEFT,
             entity_category=EntityCategory.CONFIG,
             entity_registry_enabled_default=False,
             has_state_translation=True,
         ),
         HCSelectEntityDescription(
             key="select_flexspray_back_right",
-            entity="Dishcare.Dishwasher.Option.FlexSpray.BackRight",
+            entity=OptionKey.DISHCARE_DISHWASHER_FLEX_SPRAY_BACK_RIGHT,
             entity_category=EntityCategory.CONFIG,
             entity_registry_enabled_default=False,
             has_state_translation=True,
         ),
         HCSelectEntityDescription(
             key="select_flexspray_front_right",
-            entity="Dishcare.Dishwasher.Option.FlexSpray.FrontRight",
+            entity=OptionKey.DISHCARE_DISHWASHER_FLEX_SPRAY_FRONT_RIGHT,
             entity_category=EntityCategory.CONFIG,
             entity_registry_enabled_default=False,
             has_state_translation=True,
@@ -255,28 +256,28 @@ DISHCARE_ENTITY_DESCRIPTIONS: _EntityDescriptionsDefinitionsType = {
         # FlexSpray custom settings
         HCSelectEntityDescription(
             key="select_flexspray_custom_front_left",
-            entity="Dishcare.Dishwasher.Setting.FlexSpray.Custom.FrontLeft",
+            entity=SettingKey.DISHCARE_DISHWASHER_FLEX_SPRAY_CUSTOM_FRONT_LEFT,
             entity_category=EntityCategory.CONFIG,
             entity_registry_enabled_default=False,
             has_state_translation=True,
         ),
         HCSelectEntityDescription(
             key="select_flexspray_custom_back_left",
-            entity="Dishcare.Dishwasher.Setting.FlexSpray.Custom.BackLeft",
+            entity=SettingKey.DISHCARE_DISHWASHER_FLEX_SPRAY_CUSTOM_BACK_LEFT,
             entity_category=EntityCategory.CONFIG,
             entity_registry_enabled_default=False,
             has_state_translation=True,
         ),
         HCSelectEntityDescription(
             key="select_flexspray_custom_back_right",
-            entity="Dishcare.Dishwasher.Setting.FlexSpray.Custom.BackRight",
+            entity=SettingKey.DISHCARE_DISHWASHER_FLEX_SPRAY_CUSTOM_BACK_RIGHT,
             entity_category=EntityCategory.CONFIG,
             entity_registry_enabled_default=False,
             has_state_translation=True,
         ),
         HCSelectEntityDescription(
             key="select_flexspray_custom_front_right",
-            entity="Dishcare.Dishwasher.Setting.FlexSpray.Custom.FrontRight",
+            entity=SettingKey.DISHCARE_DISHWASHER_FLEX_SPRAY_CUSTOM_FRONT_RIGHT,
             entity_category=EntityCategory.CONFIG,
             entity_registry_enabled_default=False,
             has_state_translation=True,
@@ -285,14 +286,14 @@ DISHCARE_ENTITY_DESCRIPTIONS: _EntityDescriptionsDefinitionsType = {
     "sensor": [
         HCSensorEntityDescription(
             key="sensor_program_phase",
-            entity="Dishcare.Dishwasher.Status.ProgramPhase",
+            entity=StatusKey.DISHCARE_DISHWASHER_PROGRAM_PHASE,
             device_class=SensorDeviceClass.ENUM,
             has_state_translation=True,
             force_value_when_no_active_program="none",
         ),
         HCSensorEntityDescription(
             key="sensor_machine_care_reminder",
-            entity="Dishcare.Dishwasher.Status.MachineCareReminder.RemainingProgramRuns",
+            entity=StatusKey.DISHCARE_DISHWASHER_MACHINE_CARE_REMINDER_REMAINING_PROGRAM_RUNS,
             entity_category=EntityCategory.DIAGNOSTIC,
             # The unit's text is in the translations (unit_of_measurement).
             state_class=SensorStateClass.MEASUREMENT,
@@ -301,38 +302,38 @@ DISHCARE_ENTITY_DESCRIPTIONS: _EntityDescriptionsDefinitionsType = {
     "switch": [
         HCSwitchEntityDescription(
             key="switch_extra_dry_option",
-            entity="Dishcare.Dishwasher.Option.ExtraDry",
+            entity=OptionKey.DISHCARE_DISHWASHER_EXTRA_DRY,
             device_class=SwitchDeviceClass.SWITCH,
         ),
         HCSwitchEntityDescription(
             key="switch_hygiene_plus",
-            entity="Dishcare.Dishwasher.Option.HygienePlus",
+            entity=OptionKey.DISHCARE_DISHWASHER_HYGIENE_PLUS,
             device_class=SwitchDeviceClass.SWITCH,
         ),
         HCSwitchEntityDescription(
             key="switch_intensiv_zone",
-            entity="Dishcare.Dishwasher.Option.IntensivZone",
+            entity=OptionKey.DISHCARE_DISHWASHER_INTENSIV_ZONE,
             device_class=SwitchDeviceClass.SWITCH,
         ),
         HCSwitchEntityDescription(
             key="switch_vario_speed_plus",
-            entity="Dishcare.Dishwasher.Option.VarioSpeedPlus",
+            entity=OptionKey.DISHCARE_DISHWASHER_VARIO_SPEED_PLUS,
             device_class=SwitchDeviceClass.SWITCH,
         ),
         HCSwitchEntityDescription(
             key="switch_silence_on_demand",
-            entity="Dishcare.Dishwasher.Option.SilenceOnDemand",
+            entity=OptionKey.DISHCARE_DISHWASHER_SILENCE_ON_DEMAND,
             device_class=SwitchDeviceClass.SWITCH,
         ),
         HCSwitchEntityDescription(
             key="switch_brilliance_dry",
-            entity="Dishcare.Dishwasher.Option.BrillianceDry",
+            entity=OptionKey.DISHCARE_DISHWASHER_BRILLIANCE_DRY,
             device_class=SwitchDeviceClass.SWITCH,
         ),
         # Also referred to as "CrystalDry"
         HCSwitchEntityDescription(
             key="switch_zeolite_dry",
-            entity="Dishcare.Dishwasher.Option.ZeoliteDry",
+            entity=OptionKey.DISHCARE_DISHWASHER_ZEOLITE_DRY,
             device_class=SwitchDeviceClass.SWITCH,
             entity_category=EntityCategory.CONFIG,
             entity_registry_enabled_default=False,
@@ -340,44 +341,44 @@ DISHCARE_ENTITY_DESCRIPTIONS: _EntityDescriptionsDefinitionsType = {
         # Also referred to as "EfficientDry"
         HCSwitchEntityDescription(
             key="switch_eco_dry_option",
-            entity="Dishcare.Dishwasher.Option.EcoDry",
+            entity=OptionKey.DISHCARE_DISHWASHER_ECO_DRY,
             device_class=SwitchDeviceClass.SWITCH,
         ),
         HCSwitchEntityDescription(
             key="switch_extra_dry",
-            entity="Dishcare.Dishwasher.Setting.ExtraDry",
+            entity=SettingKey.DISHCARE_DISHWASHER_EXTRA_DRY,
             device_class=SwitchDeviceClass.SWITCH,
             entity_category=EntityCategory.CONFIG,
             entity_registry_enabled_default=False,
         ),
         HCSwitchEntityDescription(
             key="switch_speed_on_demand",
-            entity="Dishcare.Dishwasher.Setting.SpeedOnDemand",
+            entity=SettingKey.DISHCARE_DISHWASHER_SPEED_ON_DEMAND,
             device_class=SwitchDeviceClass.SWITCH,
             entity_category=EntityCategory.CONFIG,
             entity_registry_enabled_default=False,
         ),
         HCSwitchEntityDescription(
             key="switch_info_light",
-            entity="Dishcare.Dishwasher.Setting.InfoLight",
+            entity=SettingKey.DISHCARE_DISHWASHER_INFO_LIGHT,
             device_class=SwitchDeviceClass.SWITCH,
             entity_category=EntityCategory.CONFIG,
             entity_registry_enabled_default=False,
         ),
         HCSwitchEntityDescription(
             key="switch_extra_rinse",
-            entity="Dishcare.Dishwasher.Option.ExtraRinse",
+            entity=OptionKey.DISHCARE_DISHWASHER_EXTRA_RINSE,
             device_class=SwitchDeviceClass.SWITCH,
         ),
         HCSwitchEntityDescription(
             key="switch_dishwasher_sanitation",
-            entity="Dishcare.Dishwasher.Option.SanitationUC",
+            entity=OptionKey.DISHCARE_DISHWASHER_SANITATION_UC,
             device_class=SwitchDeviceClass.SWITCH,
         ),
         # Bosch/Siemens call this "TimeLight" (projects remaining time on the floor).
         HCSwitchEntityDescription(
             key="switch_dishwasher_time_light",
-            entity="Dishcare.Dishwasher.Setting.TimeLight",
+            entity=SettingKey.DISHCARE_DISHWASHER_TIME_LIGHT,
             device_class=SwitchDeviceClass.SWITCH,
             value_mapping=("On", "Off"),
             entity_category=EntityCategory.CONFIG,
@@ -385,7 +386,7 @@ DISHCARE_ENTITY_DESCRIPTIONS: _EntityDescriptionsDefinitionsType = {
         ),
         HCSwitchEntityDescription(
             key="switch_pretreatment",
-            entity="Dishcare.Dishwasher.Option.Pretreatment",
+            entity=OptionKey.DISHCARE_DISHWASHER_PRETREATMENT,
             device_class=SwitchDeviceClass.SWITCH,
         ),
     ],
