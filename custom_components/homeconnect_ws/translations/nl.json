@@ -1077,6 +1077,14 @@
       }
     },
     "select": {
+      "select_cooking_button_tone_type": {
+        "name": "Toetstoon",
+        "state": {
+          "off": "Uit",
+          "tone01": "Toon 1",
+          "tone02": "Toon 2"
+        }
+      },
       "select_laundry_spin_speed": {
         "name": "Centrifugetoerental",
         "state": {
@@ -2066,6 +2074,12 @@
       }
     },
     "number": {
+      "number_cooking_button_tone_volume": {
+        "name": "Volume toetstoon"
+      },
+      "number_cooking_signal_volume": {
+        "name": "Signaalvolume"
+      },
       "number_fill_quantity": {
         "name": "Vul hoeveelheid"
       },
