@@ -574,6 +574,9 @@
       "binary_sensor_oven_turn_food_now": {
         "name": "Turn food now{group_name}"
       },
+      "binary_sensor_oven_preheat_finished": {
+        "name": "Preheating finished"
+      },
       "binary_sensor_oven_regular_preheat_finished": {
         "name": "Preheating finished{group_name}"
       },

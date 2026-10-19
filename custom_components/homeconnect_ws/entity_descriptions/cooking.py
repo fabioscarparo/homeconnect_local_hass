@@ -902,5 +902,14 @@ COOKING_ENTITY_DESCRIPTIONS: _EntityDescriptionsDefinitionsType = {
             entity_category=EntityCategory.CONFIG,
         ),
     ],
-    "binary_sensor": [generate_meatprobe_plugged],
+    "binary_sensor": [
+        generate_meatprobe_plugged,
+        # Gaggenau BO470112 and BS474112 (upstream #513)
+        HCBinarySensorEntityDescription(
+            key="binary_sensor_oven_preheat_finished",
+            entity="Cooking.Common.Event.PreheatFinished",
+            value_on={"Present", "Confirmed"},
+            value_off={"Off"},
+        ),
+    ],
 }

@@ -554,6 +554,9 @@
       "binary_sensor_oven_turn_food_now": {
         "name": "Gargut jetzt wenden{group_name}"
       },
+      "binary_sensor_oven_preheat_finished": {
+        "name": "Vorheizen beendet"
+      },
       "binary_sensor_oven_regular_preheat_finished": {
         "name": "Vorheizen beendet{group_name}"
       },

@@ -166,6 +166,9 @@
       }
     },
     "binary_sensor": {
+      "binary_sensor_oven_preheat_finished": {
+        "name": "Voorverwarmen gereed"
+      },
       "connection": {
         "name": "Verbinding"
       },
