@@ -263,6 +263,17 @@
           "program_aborted": "Programma afgebroken"
         }
       },
+      "sensor_stopwatch_time": {
+        "name": "Stopwatchtijd"
+      },
+      "sensor_stopwatch_state": {
+        "name": "Stopwatchstatus",
+        "state": {
+          "off": "Uit",
+          "running": "Loopt",
+          "paused": "Gepauzeerd"
+        }
+      },
       "sensor_remaining_program_time": {
         "name": "Resterende tijd"
       },
@@ -2035,6 +2046,12 @@
       }
     },
     "button": {
+      "button_stopwatch_start_pause_resume": {
+        "name": "Stopwatch starten/pauzeren/hervatten"
+      },
+      "button_stopwatch_reset": {
+        "name": "Stopwatch resetten"
+      },
       "button_abort_program": {
         "name": "Stop"
       },
