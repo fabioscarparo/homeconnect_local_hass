@@ -979,6 +979,99 @@ COOKING_ENTITY_DESCRIPTIONS: _EntityDescriptionsDefinitionsType = {
     ],
     "binary_sensor": [
         generate_meatprobe_plugged,
+        # Oven-wide events of Gaggenau BO470112 and BS474112 (upstream #513)
+        HCBinarySensorEntityDescription(
+            key="binary_sensor_oven_lock_while_cooling_down",
+            entity="Cooking.Oven.Event.OvenLockWhileCoolingDown",
+            value_on={"Present", "Confirmed"},
+            value_off={"Off"},
+        ),
+        HCBinarySensorEntityDescription(
+            key="binary_sensor_oven_cavity_temperature_too_high",
+            translation_placeholders={"group_name": ""},
+            entity="Cooking.Oven.Event.CavityTemperatureTooHigh",
+            device_class=BinarySensorDeviceClass.PROBLEM,
+            entity_category=EntityCategory.DIAGNOSTIC,
+            # Feeds the appliance's Problem sensor instead
+            entity_registry_enabled_default=False,
+            value_on={"Present", "Confirmed"},
+            value_off={"Off"},
+        ),
+        HCBinarySensorEntityDescription(
+            key="binary_sensor_oven_user_interaction_required",
+            entity="Cooking.Oven.Event.UserInteractionRequired",
+            value_on={"Present", "Confirmed"},
+            value_off={"Off"},
+        ),
+        HCBinarySensorEntityDescription(
+            key="binary_sensor_oven_cavity_heatup",
+            entity="Cooking.Oven.Event.CavityHeatup",
+            value_on={"Present", "Confirmed"},
+            value_off={"Off"},
+        ),
+        HCBinarySensorEntityDescription(
+            key="binary_sensor_oven_operating_time_limit_reached",
+            entity="Cooking.Oven.Event.OperatingTimeLimitReached",
+            value_on={"Present", "Confirmed"},
+            value_off={"Off"},
+        ),
+        HCBinarySensorEntityDescription(
+            key="binary_sensor_oven_cleaning_request",
+            entity="Cooking.Oven.Event.CleaningRequest",
+            device_class=BinarySensorDeviceClass.PROBLEM,
+            in_problem_sensor=False,
+            entity_category=EntityCategory.DIAGNOSTIC,
+            value_on={"Present", "Confirmed"},
+            value_off={"Off"},
+        ),
+        HCBinarySensorEntityDescription(
+            key="binary_sensor_oven_force_flushing",
+            entity="Cooking.Oven.Event.ForceFlushing",
+            device_class=BinarySensorDeviceClass.PROBLEM,
+            in_problem_sensor=False,
+            entity_category=EntityCategory.DIAGNOSTIC,
+            value_on={"Present", "Confirmed"},
+            value_off={"Off"},
+        ),
+        HCBinarySensorEntityDescription(
+            key="binary_sensor_oven_descaling_request",
+            entity="Cooking.Oven.Event.DescalingRequest",
+            device_class=BinarySensorDeviceClass.PROBLEM,
+            in_problem_sensor=False,
+            entity_category=EntityCategory.DIAGNOSTIC,
+            value_on={"Present", "Confirmed"},
+            value_off={"Off"},
+        ),
+        HCBinarySensorEntityDescription(
+            key="binary_sensor_oven_empty_water_container",
+            entity="Cooking.Oven.Event.EmptyWaterContainer",
+            device_class=BinarySensorDeviceClass.PROBLEM,
+            # A refill reminder, like a dishwasher's salt or rinse aid
+            in_problem_sensor=False,
+            entity_category=EntityCategory.DIAGNOSTIC,
+            value_on={"Present", "Confirmed"},
+            value_off={"Off"},
+        ),
+        HCBinarySensorEntityDescription(
+            key="binary_sensor_oven_water_supply_closed",
+            entity="Cooking.Oven.Event.WaterSupplyClosed",
+            device_class=BinarySensorDeviceClass.PROBLEM,
+            entity_category=EntityCategory.DIAGNOSTIC,
+            # Feeds the appliance's Problem sensor instead
+            entity_registry_enabled_default=False,
+            value_on={"Present", "Confirmed"},
+            value_off={"Off"},
+        ),
+        HCBinarySensorEntityDescription(
+            key="binary_sensor_cooking_appliance_module_error",
+            entity="Cooking.Common.Event.ApplianceModuleError",
+            device_class=BinarySensorDeviceClass.PROBLEM,
+            entity_category=EntityCategory.DIAGNOSTIC,
+            # Feeds the appliance's Problem sensor instead
+            entity_registry_enabled_default=False,
+            value_on={"Present", "Confirmed"},
+            value_off={"Off"},
+        ),
         # Gaggenau BO470112 and BS474112 (upstream #513)
         HCBinarySensorEntityDescription(
             key="binary_sensor_oven_preheat_finished",

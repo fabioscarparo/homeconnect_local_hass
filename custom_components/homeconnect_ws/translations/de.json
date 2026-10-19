@@ -566,6 +566,42 @@
       "binary_sensor_oven_turn_food_now": {
         "name": "Gargut jetzt wenden{group_name}"
       },
+      "binary_sensor_software_update_successful": {
+        "name": "Softwareupdate erfolgreich"
+      },
+      "binary_sensor_customer_service_request": {
+        "name": "Kundendienstanfrage"
+      },
+      "binary_sensor_oven_lock_while_cooling_down": {
+        "name": "Beim Abkühlen gesperrt"
+      },
+      "binary_sensor_oven_user_interaction_required": {
+        "name": "Bedienung erforderlich"
+      },
+      "binary_sensor_oven_cavity_heatup": {
+        "name": "Garraum heizt auf"
+      },
+      "binary_sensor_oven_operating_time_limit_reached": {
+        "name": "Maximale Betriebsdauer erreicht"
+      },
+      "binary_sensor_oven_cleaning_request": {
+        "name": "Reinigung angefordert"
+      },
+      "binary_sensor_oven_force_flushing": {
+        "name": "Spülen erforderlich"
+      },
+      "binary_sensor_oven_descaling_request": {
+        "name": "Entkalken angefordert"
+      },
+      "binary_sensor_oven_empty_water_container": {
+        "name": "Wassertank leer"
+      },
+      "binary_sensor_oven_water_supply_closed": {
+        "name": "Wasserzulauf geschlossen"
+      },
+      "binary_sensor_cooking_appliance_module_error": {
+        "name": "Fehler im Gerätemodul"
+      },
       "binary_sensor_oven_preheat_finished": {
         "name": "Vorheizen beendet"
       },
@@ -675,7 +711,10 @@
           "release_rinse_hold_pending": "Spülstopp freigeben ausstehend",
           "spin_abort": "Schleudern abgebrochen",
           "supply_voltage_too_low": "Versorgungsspannung niedrig",
-          "water_level_too_high": "Wasserstand zu hoch"
+          "water_level_too_high": "Wasserstand zu hoch",
+          "customer_service_request": "Kundendienstanfrage",
+          "oven_water_supply_closed": "Wasserzulauf geschlossen",
+          "cooking_appliance_module_error": "Fehler im Gerätemodul"
         }
       },
       "sensor_stopwatch_time": {
