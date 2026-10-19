@@ -15,6 +15,7 @@ ported:
   391: Hood start-only programs
   490: Connect retry backoff (the fork already backs off between reconnects)
   495: Backoff for unreachable appliances (the fork already backs off between reconnects)
+  498: Light switched on before brightness and color temperature (the fork does this since upstream #477)
   499: Select programs without the current option set (the fork's select_program does this)
   503: Missing washer and dryer entities (fork #176)
   505: Consumption and laundry load sensors (fork #175)
