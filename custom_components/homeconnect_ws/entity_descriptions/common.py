@@ -5,6 +5,15 @@ from __future__ import annotations
 from typing import TYPE_CHECKING
 
 from home_disconnect.entities import Access, Execution
+from home_disconnect.keys import (
+    CommandKey,
+    EventKey,
+    OptionKey,
+    ProgramKey,
+    RootKey,
+    SettingKey,
+    StatusKey,
+)
 from homeassistant.components.binary_sensor.const import BinarySensorDeviceClass
 from homeassistant.components.number import NumberDeviceClass, NumberMode
 from homeassistant.components.sensor import (
@@ -97,7 +106,7 @@ def generate_start_button(appliance: Appliance) -> HCButtonEntityDescription | N
     if len(programs) > 0:
         return HCButtonEntityDescription(
             key="button_start_program",
-            entity="BSH.Common.Root.ActiveProgram",
+            entity=RootKey.BSH_COMMON_ACTIVE_PROGRAM,
             # HCStartButton.available reads appliance.selected_program, which
             # resolves through SelectedProgram, not ActiveProgram - without
             # this, the button only re-renders when ActiveProgram itself
@@ -105,7 +114,7 @@ def generate_start_button(appliance: Appliance) -> HCButtonEntityDescription | N
             # SelectedProgram) can leave the displayed availability a step
             # stale until something else happens to touch ActiveProgram.
             # Confirmed live on fork issue #54.
-            entities=["BSH.Common.Root.SelectedProgram"],
+            entities=[RootKey.BSH_COMMON_SELECTED_PROGRAM],
         )
     return None
 
@@ -145,7 +154,7 @@ def generate_power_switch(appliance: Appliance) -> EntityDescriptions:
     way (fork issue #7's washer was turned off through it).
     """
     entity_descriptions = EntityDescriptions()
-    entity = appliance.entities.get("BSH.Common.Setting.PowerState")
+    entity = appliance.entities.get(SettingKey.BSH_COMMON_POWER_STATE)
     if entity is None:
         return entity_descriptions
 
@@ -164,7 +173,7 @@ def generate_power_switch(appliance: Appliance) -> EntityDescriptions:
             entity_descriptions["switch"] = [
                 HCSwitchEntityDescription(
                     key="switch_power_state",
-                    entity="BSH.Common.Setting.PowerState",
+                    entity=SettingKey.BSH_COMMON_POWER_STATE,
                     device_class=SwitchDeviceClass.SWITCH,
                     value_mapping=mapping,
                     # MainsOff, Standby (when "On" is the on side) and Off all
@@ -178,7 +187,7 @@ def generate_power_switch(appliance: Appliance) -> EntityDescriptions:
     entity_descriptions["select"] = [
         HCSelectEntityDescription(
             key="select_power_state",
-            entity="BSH.Common.Setting.PowerState",
+            entity=SettingKey.BSH_COMMON_POWER_STATE,
             options=[value.lower() for value in settable_states],
             has_state_translation=True,
             force_option_when_expected_offline=_power_off_option(settable_states),
@@ -208,14 +217,14 @@ def generate_door_state(appliance: Appliance) -> EntityDescriptions:
     tell apart.
     """
     entity_descriptions = EntityDescriptions()
-    entity = appliance.entities.get("BSH.Common.Status.DoorState")
+    entity = appliance.entities.get(StatusKey.BSH_COMMON_DOOR_STATE)
     if entity is None:
         return entity_descriptions
     if len(entity.enum or {}) > 2:
         entity_descriptions["sensor"] = [
             HCSensorEntityDescription(
                 key="sensor_door_state",
-                entity="BSH.Common.Status.DoorState",
+                entity=StatusKey.BSH_COMMON_DOOR_STATE,
                 device_class=SensorDeviceClass.ENUM,
                 has_state_translation=True,
             )
@@ -224,7 +233,7 @@ def generate_door_state(appliance: Appliance) -> EntityDescriptions:
         entity_descriptions["binary_sensor"] = [
             HCBinarySensorEntityDescription(
                 key="binary_sensor_door_state",
-                entity="BSH.Common.Status.DoorState",
+                entity=StatusKey.BSH_COMMON_DOOR_STATE,
                 device_class=BinarySensorDeviceClass.DOOR,
                 value_on={"Open", "Ajar"},
                 value_off={"Closed", "Locked"},
@@ -237,7 +246,7 @@ def generate_program(appliance: Appliance) -> EntityDescriptions:
     """Get Door program select and sensor description."""
     favorites = {
         f"BSH.Common.Program.Favorite.{favorite}": favorite
-        for favorite in appliance.group_ids("BSH.Common.Program.Favorite")
+        for favorite in appliance.group_ids(ProgramKey.BSH_COMMON_FAVORITE)
     }
 
     programs = {}
@@ -266,7 +275,7 @@ def generate_program(appliance: Appliance) -> EntityDescriptions:
         descriptions["active_program"] = [
             HCSensorEntityDescription(
                 key="sensor_active_program",
-                entity="BSH.Common.Root.ActiveProgram",
+                entity=RootKey.BSH_COMMON_ACTIVE_PROGRAM,
                 device_class=SensorDeviceClass.ENUM,
                 has_state_translation=False,
                 mapping=sorted_programs,
@@ -276,7 +285,7 @@ def generate_program(appliance: Appliance) -> EntityDescriptions:
         descriptions["program"] = [
             HCSelectEntityDescription(
                 key="select_program",
-                entity="BSH.Common.Root.SelectedProgram",
+                entity=RootKey.BSH_COMMON_SELECTED_PROGRAM,
                 has_state_translation=False,
                 mapping=sorted_programs,
             )
@@ -285,9 +294,9 @@ def generate_program(appliance: Appliance) -> EntityDescriptions:
     return descriptions
 
 
-PROGRAM_SESSION_SUMMARY = "BSH.Common.Status.ProgramSessionSummary.Latest"
-ENERGY_CONSUMED_LAST = "BSH.Common.Status.Program.Last.Energy.Consumed"
-WATER_CONSUMED_LAST = "BSH.Common.Status.Program.Last.Water.Consumed"
+PROGRAM_SESSION_SUMMARY = StatusKey.BSH_COMMON_PROGRAM_SESSION_SUMMARY_LATEST
+ENERGY_CONSUMED_LAST = StatusKey.BSH_COMMON_PROGRAM_LAST_ENERGY_CONSUMED
+WATER_CONSUMED_LAST = StatusKey.BSH_COMMON_PROGRAM_LAST_WATER_CONSUMED
 
 
 def session_summary_detail(appliance: Appliance, uid: int) -> object:
@@ -406,11 +415,11 @@ def generate_temperature_unit(appliance: Appliance) -> HCSelectEntityDescription
     ovens), where the select could never be changed. Temperature entities still
     follow the unit either way (see HCEntity).
     """
-    entity = appliance.entities.get("BSH.Common.Setting.TemperatureUnit")
+    entity = appliance.entities.get(SettingKey.BSH_COMMON_TEMPERATURE_UNIT)
     if entity and entity.access is not Access.READ_STATIC and len(entity.enum or {}) >= 2:
         return HCSelectEntityDescription(
             key="select_temperature_unit",
-            entity="BSH.Common.Setting.TemperatureUnit",
+            entity=SettingKey.BSH_COMMON_TEMPERATURE_UNIT,
             device_class=SensorDeviceClass.ENUM,
             entity_category=EntityCategory.CONFIG,
             entity_registry_enabled_default=False,
@@ -424,13 +433,13 @@ def generate_software_download_update(
 ) -> HCUpdateEntityDescription | None:
     """Get Software Download update description, if a separate download stage exists."""
     if (
-        "BSH.Common.Event.SoftwareDownloadAvailable" in appliance.entities
-        and "BSH.Common.Command.AllowSoftwareDownload" in appliance.entities
+        EventKey.BSH_COMMON_SOFTWARE_DOWNLOAD_AVAILABLE in appliance.entities
+        and CommandKey.BSH_COMMON_ALLOW_SOFTWARE_DOWNLOAD in appliance.entities
     ):
         return HCUpdateEntityDescription(
             key="update_software_download",
-            entity="BSH.Common.Event.SoftwareDownloadAvailable",
-            command_entity="BSH.Common.Command.AllowSoftwareDownload",
+            entity=EventKey.BSH_COMMON_SOFTWARE_DOWNLOAD_AVAILABLE,
+            command_entity=CommandKey.BSH_COMMON_ALLOW_SOFTWARE_DOWNLOAD,
             device_class=UpdateDeviceClass.FIRMWARE,
             entity_category=EntityCategory.CONFIG,
         )
@@ -440,13 +449,13 @@ def generate_software_download_update(
 def generate_software_update(appliance: Appliance) -> HCUpdateEntityDescription | None:
     """Get Software Update (install) description."""
     if (
-        "BSH.Common.Event.SoftwareUpdateAvailable" in appliance.entities
-        and "BSH.Common.Command.AllowSoftwareUpdateLocalWiFi" in appliance.entities
+        EventKey.BSH_COMMON_SOFTWARE_UPDATE_AVAILABLE in appliance.entities
+        and CommandKey.BSH_COMMON_ALLOW_SOFTWARE_UPDATE_LOCAL_WI_FI in appliance.entities
     ):
         return HCUpdateEntityDescription(
             key="update_software_update",
-            entity="BSH.Common.Event.SoftwareUpdateAvailable",
-            command_entity="BSH.Common.Command.AllowSoftwareUpdateLocalWiFi",
+            entity=EventKey.BSH_COMMON_SOFTWARE_UPDATE_AVAILABLE,
+            command_entity=CommandKey.BSH_COMMON_ALLOW_SOFTWARE_UPDATE_LOCAL_WI_FI,
             device_class=UpdateDeviceClass.FIRMWARE,
             entity_category=EntityCategory.CONFIG,
         )
@@ -457,39 +466,39 @@ COMMON_ENTITY_DESCRIPTIONS: _EntityDescriptionsDefinitionsType = {
     "button": [
         HCButtonEntityDescription(
             key="button_abort_program",
-            entity="BSH.Common.Command.AbortProgram",
+            entity=CommandKey.BSH_COMMON_ABORT_PROGRAM,
         ),
         HCButtonEntityDescription(
             key="button_pause_program",
-            entity="BSH.Common.Command.PauseProgram",
+            entity=CommandKey.BSH_COMMON_PAUSE_PROGRAM,
         ),
         HCButtonEntityDescription(
             key="button_resume_program",
-            entity="BSH.Common.Command.ResumeProgram",
+            entity=CommandKey.BSH_COMMON_RESUME_PROGRAM,
         ),
         HCButtonEntityDescription(
             key="button_mains_power_off",
-            entity="BSH.Common.Command.MainsPowerOff",
+            entity=CommandKey.BSH_COMMON_MAINS_POWER_OFF,
         ),
         HCButtonEntityDescription(
             key="button_deactivate_remote_control",
-            entity="BSH.Common.Command.DeactivateRemoteControl",
+            entity=CommandKey.BSH_COMMON_DEACTIVATE_REMOTE_CONTROL,
             entity_category=EntityCategory.CONFIG,
             # One press locks Home Assistant out until it's turned on at the appliance
             entity_registry_enabled_default=False,
         ),
         HCButtonEntityDescription(
             key="button_deactivate_remote_control_start",
-            entity="BSH.Common.Command.DeactivateRemoteControlStart",
+            entity=CommandKey.BSH_COMMON_DEACTIVATE_REMOTE_CONTROL_START,
             entity_category=EntityCategory.CONFIG,
             # One press locks Home Assistant out until it's turned on at the appliance
             entity_registry_enabled_default=False,
         ),
         HCButtonEntityDescription(
             key="button_sync_time",
-            entity="BSH.Common.Setting.ApplianceDateTime",
+            entity=SettingKey.BSH_COMMON_APPLIANCE_DATE_TIME,
             # The clock on appliances without ApplianceDateTime (upstream #504)
-            alternate_entities=("BSH.Common.Setting.LocalTime",),
+            alternate_entities=(SettingKey.BSH_COMMON_LOCAL_TIME,),
             entity_category=EntityCategory.CONFIG,
             # Only useful with "Synchronize time with server" off, which is
             # itself disabled by default, so follow it.
@@ -498,18 +507,18 @@ COMMON_ENTITY_DESCRIPTIONS: _EntityDescriptionsDefinitionsType = {
         ),
         HCButtonEntityDescription(
             key="button_stopwatch_start_pause_resume",
-            entity="BSH.Common.Command.StopWatchStartPauseResume",
+            entity=CommandKey.BSH_COMMON_STOP_WATCH_START_PAUSE_RESUME,
         ),
         HCButtonEntityDescription(
             key="button_stopwatch_reset",
-            entity="BSH.Common.Command.StopWatchReset",
+            entity=CommandKey.BSH_COMMON_STOP_WATCH_RESET,
         ),
     ],
     "binary_sensor": [
         HCBinarySensorEntityDescription(
             key="binary_sensor_aqua_stop",
             device_class=BinarySensorDeviceClass.PROBLEM,
-            entity="BSH.Common.Event.AquaStopOccured",
+            entity=EventKey.BSH_COMMON_AQUA_STOP_OCCURED,
             entity_registry_enabled_default=False,
             value_on={"Present"},
             value_off={"Off", "Confirmed"},
@@ -518,7 +527,7 @@ COMMON_ENTITY_DESCRIPTIONS: _EntityDescriptionsDefinitionsType = {
         HCBinarySensorEntityDescription(
             key="binary_sensor_low_water_pressure",
             device_class=BinarySensorDeviceClass.PROBLEM,
-            entity="BSH.Common.Event.LowWaterPressure",
+            entity=EventKey.BSH_COMMON_LOW_WATER_PRESSURE,
             entity_registry_enabled_default=False,
             value_on={"Present"},
             value_off={"Off", "Confirmed"},
@@ -526,19 +535,19 @@ COMMON_ENTITY_DESCRIPTIONS: _EntityDescriptionsDefinitionsType = {
         ),
         HCBinarySensorEntityDescription(
             key="binary_remote_start_allowed",
-            entity="BSH.Common.Status.RemoteControlStartAllowed",
+            entity=StatusKey.BSH_COMMON_REMOTE_CONTROL_START_ALLOWED,
             entity_category=EntityCategory.DIAGNOSTIC,
         ),
         HCBinarySensorEntityDescription(
             key="binary_sensor_confirm_permanent_remote_start",
-            entity="BSH.Common.Event.ConfirmPermanentRemoteStart",
+            entity=EventKey.BSH_COMMON_CONFIRM_PERMANENT_REMOTE_START,
             entity_category=EntityCategory.DIAGNOSTIC,
             value_on={"Present", "Confirmed"},
             value_off={"Off"},
         ),
         HCBinarySensorEntityDescription(
             key="binary_sensor_program_aborted",
-            entity="BSH.Common.Event.ProgramAborted",
+            entity=EventKey.BSH_COMMON_PROGRAM_ABORTED,
             entity_category=EntityCategory.DIAGNOSTIC,
             device_class=BinarySensorDeviceClass.PROBLEM,
             entity_registry_enabled_default=False,
@@ -547,56 +556,56 @@ COMMON_ENTITY_DESCRIPTIONS: _EntityDescriptionsDefinitionsType = {
         ),
         HCBinarySensorEntityDescription(
             key="binary_sensor_program_finished",
-            entity="BSH.Common.Event.ProgramFinished",
+            entity=EventKey.BSH_COMMON_PROGRAM_FINISHED,
             entity_category=EntityCategory.DIAGNOSTIC,
             value_on={"Present", "Confirmed"},
             value_off={"Off"},
         ),
         HCBinarySensorEntityDescription(
             key="binary_sensor_interior_illumination",
-            entity="BSH.Common.Status.InteriorIlluminationActive",
+            entity=StatusKey.BSH_COMMON_INTERIOR_ILLUMINATION_ACTIVE,
             entity_category=EntityCategory.DIAGNOSTIC,
         ),
         HCBinarySensorEntityDescription(
             key="binary_sensor_alarm_clock_elapsed",
-            entity="BSH.Common.Event.AlarmClockElapsed",
+            entity=EventKey.BSH_COMMON_ALARM_CLOCK_ELAPSED,
             value_on={"Present", "Confirmed"},
             value_off={"Off"},
         ),
         HCBinarySensorEntityDescription(
             key="binary_sensor_favorite_001",
-            entity="BSH.Common.Event.Favorite.001.ExternalTrigger",
+            entity=EventKey.BSH_COMMON_FAVORITE_001_EXTERNAL_TRIGGER,
             value_on={"Present", "Confirmed"},
             value_off={"Off"},
         ),
         HCBinarySensorEntityDescription(
             key="binary_sensor_favorite_002",
-            entity="BSH.Common.Event.Favorite.002.ExternalTrigger",
+            entity=EventKey.BSH_COMMON_FAVORITE_002_EXTERNAL_TRIGGER,
             value_on={"Present", "Confirmed"},
             value_off={"Off"},
         ),
         HCBinarySensorEntityDescription(
             key="binary_sensor_local_control_active",
-            entity="BSH.Common.Status.LocalControlActive",
+            entity=StatusKey.BSH_COMMON_LOCAL_CONTROL_ACTIVE,
             entity_category=EntityCategory.DIAGNOSTIC,
             entity_registry_enabled_default=False,
         ),
         HCBinarySensorEntityDescription(
             key="binary_sensor_remote_control_active",
-            entity="BSH.Common.Status.RemoteControlActive",
+            entity=StatusKey.BSH_COMMON_REMOTE_CONTROL_ACTIVE,
             entity_category=EntityCategory.DIAGNOSTIC,
             entity_registry_enabled_default=False,
         ),
         HCBinarySensorEntityDescription(
             key="binary_sensor_backend_connected",
-            entity="BSH.Common.Status.BackendConnected",
+            entity=StatusKey.BSH_COMMON_BACKEND_CONNECTED,
             device_class=BinarySensorDeviceClass.CONNECTIVITY,
             entity_category=EntityCategory.DIAGNOSTIC,
             entity_registry_enabled_default=False,
         ),
         HCBinarySensorEntityDescription(
             key="binary_sensor_software_update_successful",
-            entity="BSH.Common.Event.SoftwareUpdateSuccessful",
+            entity=EventKey.BSH_COMMON_SOFTWARE_UPDATE_SUCCESSFUL,
             entity_category=EntityCategory.DIAGNOSTIC,
             entity_registry_enabled_default=False,
             value_on={"Present", "Confirmed"},
@@ -604,7 +613,7 @@ COMMON_ENTITY_DESCRIPTIONS: _EntityDescriptionsDefinitionsType = {
         ),
         HCBinarySensorEntityDescription(
             key="binary_sensor_customer_service_request",
-            entity="BSH.Common.Event.CustomerServiceRequest",
+            entity=EventKey.BSH_COMMON_CUSTOMER_SERVICE_REQUEST,
             device_class=BinarySensorDeviceClass.PROBLEM,
             entity_category=EntityCategory.DIAGNOSTIC,
             # Feeds the appliance's Problem sensor instead
@@ -616,28 +625,28 @@ COMMON_ENTITY_DESCRIPTIONS: _EntityDescriptionsDefinitionsType = {
     "select": [
         HCSelectEntityDescription(
             key="select_remote_control_level",
-            entity="BSH.Common.Setting.RemoteControlLevel",
+            entity=SettingKey.BSH_COMMON_REMOTE_CONTROL_LEVEL,
             entity_category=EntityCategory.CONFIG,
             has_state_translation=True,
         ),
         # cleanup: duplicate select_remote_control_level entry removed
         HCSelectEntityDescription(
             key="select_time_format",
-            entity="BSH.Common.Setting.TimeFormat",
+            entity=SettingKey.BSH_COMMON_TIME_FORMAT,
             entity_category=EntityCategory.CONFIG,
             entity_registry_enabled_default=False,
             has_state_translation=True,
         ),
         HCSelectEntityDescription(
             key="select_date_format",
-            entity="BSH.Common.Setting.DateFormat",
+            entity=SettingKey.BSH_COMMON_DATE_FORMAT,
             entity_category=EntityCategory.CONFIG,
             entity_registry_enabled_default=False,
             has_state_translation=True,
         ),
         HCSelectEntityDescription(
             key="select_weight_unit",
-            entity="BSH.Common.Setting.WeightUnit",
+            entity=SettingKey.BSH_COMMON_WEIGHT_UNIT,
             entity_category=EntityCategory.CONFIG,
             entity_registry_enabled_default=False,
             has_state_translation=True,
@@ -645,7 +654,7 @@ COMMON_ENTITY_DESCRIPTIONS: _EntityDescriptionsDefinitionsType = {
         # The languages differ per appliance, so their names are shown as the appliance reports them
         HCSelectEntityDescription(
             key="select_language",
-            entity="BSH.Common.Setting.Language",
+            entity=SettingKey.BSH_COMMON_LANGUAGE,
             entity_category=EntityCategory.CONFIG,
             entity_registry_enabled_default=False,
         ),
@@ -655,33 +664,33 @@ COMMON_ENTITY_DESCRIPTIONS: _EntityDescriptionsDefinitionsType = {
         # Gaggenau BO470112 and BS474112 (upstream #513)
         HCSensorEntityDescription(
             key="sensor_stopwatch_time",
-            entity="BSH.Common.Status.StopWatchTime",
+            entity=StatusKey.BSH_COMMON_STOP_WATCH_TIME,
             device_class=SensorDeviceClass.DURATION,
             native_unit_of_measurement=UnitOfTime.SECONDS,
         ),
         HCSensorEntityDescription(
             key="sensor_stopwatch_state",
-            entity="BSH.Common.Status.StopWatchState",
+            entity=StatusKey.BSH_COMMON_STOP_WATCH_STATE,
             device_class=SensorDeviceClass.ENUM,
             has_state_translation=True,
         ),
         HCSensorEntityDescription(
             key="sensor_remaining_program_time",
-            entity="BSH.Common.Option.RemainingProgramTime",
+            entity=OptionKey.BSH_COMMON_REMAINING_PROGRAM_TIME,
             device_class=SensorDeviceClass.DURATION,
             native_unit_of_measurement=UnitOfTime.SECONDS,
             suggested_unit_of_measurement=UnitOfTime.HOURS,
             extra_attributes=[
                 {
                     "name": "Is Estimated",
-                    "entity": "BSH.Common.Option.RemainingProgramTimeIsEstimated",
+                    "entity": OptionKey.BSH_COMMON_REMAINING_PROGRAM_TIME_IS_ESTIMATED,
                 }
             ],
             clear_on_expected_offline=True,
         ),
         HCSensorEntityDescription(
             key="sensor_elapsed_program_time",
-            entity="BSH.Common.Option.ElapsedProgramTime",
+            entity=OptionKey.BSH_COMMON_ELAPSED_PROGRAM_TIME,
             device_class=SensorDeviceClass.DURATION,
             native_unit_of_measurement=UnitOfTime.SECONDS,
             suggested_unit_of_measurement=UnitOfTime.HOURS,
@@ -690,7 +699,7 @@ COMMON_ENTITY_DESCRIPTIONS: _EntityDescriptionsDefinitionsType = {
         ),
         HCSensorEntityDescription(
             key="sensor_program_progress",
-            entity="BSH.Common.Option.ProgramProgress",
+            entity=OptionKey.BSH_COMMON_PROGRAM_PROGRESS,
             native_unit_of_measurement=PERCENTAGE,
             clear_on_expected_offline=True,
             unavailable_when_no_active_program=True,
@@ -698,53 +707,53 @@ COMMON_ENTITY_DESCRIPTIONS: _EntityDescriptionsDefinitionsType = {
         ),
         HCSensorEntityDescription(
             key="sensor_water_forecast",
-            entity="BSH.Common.Option.WaterForecast",
+            entity=OptionKey.BSH_COMMON_WATER_FORECAST,
             native_unit_of_measurement=PERCENTAGE,
             entity_category=EntityCategory.DIAGNOSTIC,
         ),
         HCSensorEntityDescription(
             key="sensor_energy_forecast",
-            entity="BSH.Common.Option.EnergyForecast",
+            entity=OptionKey.BSH_COMMON_ENERGY_FORECAST,
             native_unit_of_measurement=PERCENTAGE,
             entity_category=EntityCategory.DIAGNOSTIC,
         ),
         HCSensorEntityDescription(
             key="sensor_operation_state",
-            entity="BSH.Common.Status.OperationState",
+            entity=StatusKey.BSH_COMMON_OPERATION_STATE,
             device_class=SensorDeviceClass.ENUM,
             has_state_translation=True,
         ),
         HCSensorEntityDescription(
             key="sensor_start_in",
-            entity="BSH.Common.Option.StartInRelative",
+            entity=OptionKey.BSH_COMMON_START_IN_RELATIVE,
             device_class=SensorDeviceClass.DURATION,
             native_unit_of_measurement=UnitOfTime.SECONDS,
             suggested_unit_of_measurement=UnitOfTime.HOURS,
         ),
         HCSensorEntityDescription(
             key="sensor_finish_in",
-            entity="BSH.Common.Option.FinishInRelative",
+            entity=OptionKey.BSH_COMMON_FINISH_IN_RELATIVE,
             device_class=SensorDeviceClass.DURATION,
             native_unit_of_measurement=UnitOfTime.SECONDS,
             suggested_unit_of_measurement=UnitOfTime.HOURS,
         ),
         HCSensorEntityDescription(
             key="sensor_count_started",
-            entity="BSH.Common.Status.Program.All.Count.Started",
+            entity=StatusKey.BSH_COMMON_PROGRAM_ALL_COUNT_STARTED,
             entity_category=EntityCategory.DIAGNOSTIC,
             entity_registry_enabled_default=False,
             state_class=SensorStateClass.TOTAL_INCREASING,
             extra_attributes=[
                 {
                     "name": "Last Start",
-                    "entity": "BSH.Common.Status.ProgramSessionSummary.Latest",
+                    "entity": StatusKey.BSH_COMMON_PROGRAM_SESSION_SUMMARY_LATEST,
                     "value_fn": lambda entity: (
                         entity.value["start"] if entity.value is not None else None
                     ),
                 },
                 {
                     "name": "Last End",
-                    "entity": "BSH.Common.Status.ProgramSessionSummary.Latest",
+                    "entity": StatusKey.BSH_COMMON_PROGRAM_SESSION_SUMMARY_LATEST,
                     "value_fn": lambda entity: (
                         entity.value["end"] if entity.value is not None else None
                     ),
@@ -753,14 +762,14 @@ COMMON_ENTITY_DESCRIPTIONS: _EntityDescriptionsDefinitionsType = {
         ),
         HCSensorEntityDescription(
             key="sensor_count_completed",
-            entity="BSH.Common.Status.Program.All.Count.Completed",
+            entity=StatusKey.BSH_COMMON_PROGRAM_ALL_COUNT_COMPLETED,
             entity_category=EntityCategory.DIAGNOSTIC,
             entity_registry_enabled_default=False,
             state_class=SensorStateClass.TOTAL_INCREASING,
         ),
         HCSensorEntityDescription(
             key="sensor_energy_consumed",
-            entity="BSH.Common.Status.Program.All.Energy.Consumed",
+            entity=StatusKey.BSH_COMMON_PROGRAM_ALL_ENERGY_CONSUMED,
             device_class=SensorDeviceClass.ENERGY,
             state_class=SensorStateClass.TOTAL_INCREASING,
             native_unit_of_measurement=UnitOfEnergy.WATT_HOUR,
@@ -768,7 +777,7 @@ COMMON_ENTITY_DESCRIPTIONS: _EntityDescriptionsDefinitionsType = {
         ),
         HCSensorEntityDescription(
             key="sensor_water_consumed",
-            entity="BSH.Common.Status.Program.All.Water.Consumed",
+            entity=StatusKey.BSH_COMMON_PROGRAM_ALL_WATER_CONSUMED,
             device_class=SensorDeviceClass.WATER,
             state_class=SensorStateClass.TOTAL_INCREASING,
             native_unit_of_measurement=UnitOfVolume.LITERS,
@@ -777,7 +786,7 @@ COMMON_ENTITY_DESCRIPTIONS: _EntityDescriptionsDefinitionsType = {
         ),
         HCSensorEntityDescription(
             key="sensor_end_trigger",
-            entity="BSH.Common.Status.ProgramRunDetail.EndTrigger",
+            entity=StatusKey.BSH_COMMON_PROGRAM_RUN_DETAIL_END_TRIGGER,
             device_class=SensorDeviceClass.ENUM,
             entity_category=EntityCategory.DIAGNOSTIC,
             entity_registry_enabled_default=False,
@@ -785,13 +794,13 @@ COMMON_ENTITY_DESCRIPTIONS: _EntityDescriptionsDefinitionsType = {
         ),
         HCSensorEntityDescription(
             key="sensor_flex_start",
-            entity="BSH.Common.Status.FlexStart",
+            entity=StatusKey.BSH_COMMON_FLEX_START,
             device_class=SensorDeviceClass.ENUM,
             has_state_translation=True,
         ),
         HCSensorEntityDescription(
             key="sensor_estimated_remaining_program_time",
-            entity="BSH.Common.Option.EstimatedTotalProgramTime",
+            entity=OptionKey.BSH_COMMON_ESTIMATED_TOTAL_PROGRAM_TIME,
             device_class=SensorDeviceClass.DURATION,
             native_unit_of_measurement=UnitOfTime.SECONDS,
             suggested_unit_of_measurement=UnitOfTime.HOURS,
@@ -805,32 +814,32 @@ COMMON_ENTITY_DESCRIPTIONS: _EntityDescriptionsDefinitionsType = {
         # Dishwashers and dryers both have Half load, under their own names
         HCSwitchEntityDescription(
             key="switch_half_load",
-            entity="Dishcare.Dishwasher.Option.HalfLoad",
-            alternate_entities=("LaundryCare.Dryer.Option.HalfLoad",),
+            entity=OptionKey.DISHCARE_DISHWASHER_HALF_LOAD,
+            alternate_entities=(OptionKey.LAUNDRY_CARE_DRYER_HALF_LOAD,),
             device_class=SwitchDeviceClass.SWITCH,
         ),
         HCSwitchEntityDescription(
             key="switch_child_lock",
-            entity="BSH.Common.Setting.ChildLock",
+            entity=SettingKey.BSH_COMMON_CHILD_LOCK,
             device_class=SwitchDeviceClass.SWITCH,
         ),
         HCSwitchEntityDescription(
             key="switch_allow_backend_connection",
-            entity="BSH.Common.Setting.AllowBackendConnection",
+            entity=SettingKey.BSH_COMMON_ALLOW_BACKEND_CONNECTION,
             device_class=SwitchDeviceClass.SWITCH,
             entity_category=EntityCategory.CONFIG,
             entity_registry_enabled_default=False,
         ),
         HCSwitchEntityDescription(
             key="switch_allow_consumer_insights",
-            entity="BSH.Common.Setting.AllowConsumerInsights",
+            entity=SettingKey.BSH_COMMON_ALLOW_CONSUMER_INSIGHTS,
             device_class=SwitchDeviceClass.SWITCH,
             entity_category=EntityCategory.CONFIG,
             entity_registry_enabled_default=False,
         ),
         HCSwitchEntityDescription(
             key="switch_synchronize_with_time_server",
-            entity="BSH.Common.Setting.SynchronizeWithTimeServer",
+            entity=SettingKey.BSH_COMMON_SYNCHRONIZE_WITH_TIME_SERVER,
             device_class=SwitchDeviceClass.SWITCH,
             entity_category=EntityCategory.CONFIG,
             entity_registry_enabled_default=False,
@@ -839,7 +848,7 @@ COMMON_ENTITY_DESCRIPTIONS: _EntityDescriptionsDefinitionsType = {
     "number": [
         HCNumberEntityDescription(
             key="number_duration",
-            entity="BSH.Common.Option.Duration",
+            entity=OptionKey.BSH_COMMON_DURATION,
             device_class=NumberDeviceClass.DURATION,
             native_unit_of_measurement=UnitOfTime.SECONDS,
             mode=NumberMode.AUTO,
@@ -848,7 +857,7 @@ COMMON_ENTITY_DESCRIPTIONS: _EntityDescriptionsDefinitionsType = {
         HCNumberEntityDescription(
             key="number_setting_alarm_clock",
             translation_key="number_setting_alarm_clock",
-            entity="BSH.Common.Setting.AlarmClock",
+            entity=SettingKey.BSH_COMMON_ALARM_CLOCK,
             device_class=NumberDeviceClass.DURATION,
             native_unit_of_measurement=UnitOfTime.SECONDS,
             native_max_value=86400,  # 24 hours, matching the Home Connect App's limit

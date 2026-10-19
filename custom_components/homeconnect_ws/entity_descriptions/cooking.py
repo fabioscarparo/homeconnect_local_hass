@@ -5,6 +5,7 @@ from __future__ import annotations
 from typing import TYPE_CHECKING
 
 from home_disconnect.entities import Access
+from home_disconnect.keys import CommandKey, EventKey, OptionKey, ProgramKey, SettingKey, StatusKey
 from homeassistant.components.binary_sensor.const import BinarySensorDeviceClass
 from homeassistant.components.number import NumberDeviceClass, NumberMode
 from homeassistant.components.sensor import SensorDeviceClass
@@ -34,7 +35,7 @@ from .descriptions_definitions import (
 if TYPE_CHECKING:
     from home_disconnect import Appliance
 
-_VENTING_PROGRAM = "Cooking.Common.Program.Hood.Venting"
+_VENTING_PROGRAM = ProgramKey.COOKING_COMMON_HOOD_VENTING
 
 
 def _temperature_entity(
@@ -92,7 +93,7 @@ def _is_layout_only_cavity(appliance: Appliance, cavity: str) -> bool:
 
 def generate_oven_status(appliance: Appliance) -> EntityDescriptions:
     """Get Oven status descriptions."""
-    groups = appliance.group_ids("Cooking.Oven.Status.Cavity")
+    groups = appliance.group_ids(StatusKey.COOKING_OVEN_CAVITY)
     # Only cavities with something to show need telling apart - a layout-only
     # cavity creates no entities, so it mustn't add a "340" suffix to the
     # names of the one real cavity.
@@ -187,7 +188,7 @@ _OVEN_COOKING_EVENTS = (
 
 def generate_oven_event(appliance: Appliance) -> EntityDescriptions:
     """Get Oven event descriptions."""
-    groups = appliance.group_ids("Cooking.Oven.Event.Cavity")
+    groups = appliance.group_ids(EventKey.COOKING_OVEN_CAVITY)
     descriptions = EntityDescriptions(binary_sensor=[])
     for group in groups:
         group_name = f" {int(group)}"
@@ -230,7 +231,7 @@ def generate_oven_event(appliance: Appliance) -> EntityDescriptions:
 
 def generate_oven_settings(appliance: Appliance) -> EntityDescriptions:
     """Get Oven status descriptions."""
-    groups = appliance.group_ids("Cooking.Oven.Setting.Cavity")
+    groups = appliance.group_ids(SettingKey.COOKING_OVEN_CAVITY)
     descriptions = EntityDescriptions(number=[])
     for group in groups:
         group_name = f" {int(group)}"
@@ -264,22 +265,22 @@ def generate_meatprobe_plugged(appliance: Appliance) -> HCBinarySensorEntityDesc
     adds those), which some ovens (e.g. the Thermador PRG486WDH) do for the
     same probe.
     """
-    if "Cooking.Oven.Status.MeatprobePlugged" not in appliance.entities or any(
+    if StatusKey.COOKING_OVEN_MEATPROBE_PLUGGED not in appliance.entities or any(
         f"Cooking.Oven.Status.Cavity.{group}.MeatprobePlugged" in appliance.entities
-        for group in appliance.group_ids("Cooking.Oven.Status.Cavity")
+        for group in appliance.group_ids(StatusKey.COOKING_OVEN_CAVITY)
     ):
         return None
     return HCBinarySensorEntityDescription(
         key="binary_sensor_oven_meatprobe_plugged",
-        entity="Cooking.Oven.Status.MeatprobePlugged",
+        entity=StatusKey.COOKING_OVEN_MEATPROBE_PLUGGED,
         device_class=BinarySensorDeviceClass.PLUG,
         entity_category=EntityCategory.DIAGNOSTIC,
     )
 
 
 HOOD_FAN_ENTITIES = [
-    "Cooking.Common.Option.Hood.VentingLevel",
-    "Cooking.Common.Option.Hood.IntensiveLevel",
+    OptionKey.COOKING_COMMON_HOOD_VENTING_LEVEL,
+    OptionKey.COOKING_COMMON_HOOD_INTENSIVE_LEVEL,
 ]
 
 
@@ -305,7 +306,7 @@ def generate_hood_fan(appliance: Appliance) -> HCFanEntityDescription | None:
 
 def generate_hob_zones(appliance: Appliance) -> EntityDescriptions:
     """Get Oven status descriptions."""
-    groups = appliance.group_ids("Cooking.Hob.Status.Zone")
+    groups = appliance.group_ids(StatusKey.COOKING_HOB_ZONE)
     descriptions = EntityDescriptions(sensor=[])
     for group in groups:
         group_name = f" {int(group)}"
@@ -478,20 +479,20 @@ def generate_hood_light(appliance: Appliance) -> HCLightEntityDescription | None
     def available(name: str) -> bool:
         return bool(getattr(appliance.entities.get(name), "available", False))
 
-    color_temperature = available("Cooking.Hood.Setting.ColorTemperaturePercent")
+    color_temperature = available(SettingKey.COOKING_HOOD_COLOR_TEMPERATURE_PERCENT)
     brightness = (
         color_temperature
-        or available("Cooking.Hood.Setting.LightingBrightness")
-        or available("Cooking.Common.Setting.LightingBrightness")
+        or available(SettingKey.COOKING_HOOD_LIGHTING_BRIGHTNESS)
+        or available(SettingKey.COOKING_COMMON_LIGHTING_BRIGHTNESS)
     )
-    if not brightness and not available("Cooking.Common.Setting.Lighting"):
+    if not brightness and not available(SettingKey.COOKING_COMMON_LIGHTING):
         return None
     return HCLightEntityDescription(
         key="light_cooking_lighting",
-        entity="Cooking.Common.Setting.Lighting",
-        brightness_entity="Cooking.Common.Setting.LightingBrightness" if brightness else None,
+        entity=SettingKey.COOKING_COMMON_LIGHTING,
+        brightness_entity=SettingKey.COOKING_COMMON_LIGHTING_BRIGHTNESS if brightness else None,
         color_temperature_entity=(
-            "Cooking.Hood.Setting.ColorTemperaturePercent" if color_temperature else None
+            SettingKey.COOKING_HOOD_COLOR_TEMPERATURE_PERCENT if color_temperature else None
         ),
     )
 
@@ -499,29 +500,29 @@ def generate_hood_light(appliance: Appliance) -> HCLightEntityDescription | None
 def generate_hood_ambient_light(appliance: Appliance) -> HCLightEntityDescription | None:
     """Get Hood ambient light description."""
     color = (
-        "BSH.Common.Setting.AmbientLightCustomColor" in appliance.entities
-        and "BSH.Common.Setting.AmbientLightColor" in appliance.entities
+        SettingKey.BSH_COMMON_AMBIENT_LIGHT_CUSTOM_COLOR in appliance.entities
+        and SettingKey.BSH_COMMON_AMBIENT_LIGHT_COLOR in appliance.entities
     )
-    brightness = color or "BSH.Common.Setting.AmbientLightBrightness" in appliance.entities
-    if not brightness and "BSH.Common.Setting.AmbientLightEnabled" not in appliance.entities:
+    brightness = color or SettingKey.BSH_COMMON_AMBIENT_LIGHT_BRIGHTNESS in appliance.entities
+    if not brightness and SettingKey.BSH_COMMON_AMBIENT_LIGHT_ENABLED not in appliance.entities:
         return None
     return HCLightEntityDescription(
         key="light_cooking_ambient_lighting",
-        entity="BSH.Common.Setting.AmbientLightEnabled",
-        brightness_entity="BSH.Common.Setting.AmbientLightBrightness" if brightness else None,
-        color_entity="BSH.Common.Setting.AmbientLightCustomColor" if color else None,
-        color_mode_entity="BSH.Common.Setting.AmbientLightColor" if color else None,
+        entity=SettingKey.BSH_COMMON_AMBIENT_LIGHT_ENABLED,
+        brightness_entity=SettingKey.BSH_COMMON_AMBIENT_LIGHT_BRIGHTNESS if brightness else None,
+        color_entity=SettingKey.BSH_COMMON_AMBIENT_LIGHT_CUSTOM_COLOR if color else None,
+        color_mode_entity=SettingKey.BSH_COMMON_AMBIENT_LIGHT_COLOR if color else None,
     )
 
 
 def generate_oven_cavity_light(appliance: Appliance) -> HCLightEntityDescription | None:
     """Get oven cavity light description."""
-    if "Cooking.Oven.Setting.Light.Cavity.001.Power" not in appliance.entities:
+    if SettingKey.COOKING_OVEN_LIGHT_CAVITY_001_POWER not in appliance.entities:
         return None
-    brightness = "Cooking.Oven.Setting.Light.Cavity.001.Brightness"
+    brightness = SettingKey.COOKING_OVEN_LIGHT_CAVITY_001_BRIGHTNESS
     return HCLightEntityDescription(
         key="light_oven_cavity",
-        entity="Cooking.Oven.Setting.Light.Cavity.001.Power",
+        entity=SettingKey.COOKING_OVEN_LIGHT_CAVITY_001_POWER,
         brightness_entity=brightness if brightness in appliance.entities else None,
     )
 
@@ -530,44 +531,44 @@ COOKING_ENTITY_DESCRIPTIONS: _EntityDescriptionsDefinitionsType = {
     "sensor": [
         HCSensorEntityDescription(
             key="sensor_heatup_progress",
-            entity="Cooking.Oven.Option.HeatupProgress",
+            entity=OptionKey.COOKING_OVEN_HEATUP_PROGRESS,
             native_unit_of_measurement=PERCENTAGE,
         ),
         HCSensorEntityDescription(
             key="sensor_grease_filter_saturation",
-            entity="Cooking.Hood.Status.GreaseFilterSaturation",
+            entity=StatusKey.COOKING_HOOD_GREASE_FILTER_SATURATION,
             native_unit_of_measurement=PERCENTAGE,
         ),
         HCSensorEntityDescription(
             key="sensor_carbon_filter_saturation",
-            entity="Cooking.Hood.Status.CarbonFilterSaturation",
+            entity=StatusKey.COOKING_HOOD_CARBON_FILTER_SATURATION,
             native_unit_of_measurement=PERCENTAGE,
         ),
         HCSensorEntityDescription(
             key="sensor_oven_water_tank",
             entities=[
-                "Cooking.Oven.Status.WaterTankUnplugged",
-                "Cooking.Oven.Status.WaterTankEmpty",
+                StatusKey.COOKING_OVEN_WATER_TANK_UNPLUGGED,
+                StatusKey.COOKING_OVEN_WATER_TANK_EMPTY,
             ],
             device_class=SensorDeviceClass.ENUM,
             options=["unplugged", "empty", "ok"],
         ),
         HCSensorEntityDescription(
             key="sensor_oven_current_temperature",
-            entity="Cooking.Oven.Status.CurrentCavityTemperature",
+            entity=StatusKey.COOKING_OVEN_CURRENT_CAVITY_TEMPERATURE,
             device_class=SensorDeviceClass.TEMPERATURE,
             native_unit_of_measurement=UnitOfTemperature.CELSIUS,
         ),
         HCSensorEntityDescription(
             key="sensor_oven_current_meatprobe_temperature",
-            entity="Cooking.Oven.Status.CurrentMeatprobeTemperature",
+            entity=StatusKey.COOKING_OVEN_CURRENT_MEATPROBE_TEMPERATURE,
             device_class=SensorDeviceClass.TEMPERATURE,
             native_unit_of_measurement=UnitOfTemperature.CELSIUS,
         ),
         HCSensorEntityDescription(
             key="sensor_oven_current_meatprobe_temperature_fahrenheit",
             translation_key="sensor_oven_current_meatprobe_temperature",
-            entity="Cooking.Oven.Status.CurrentMeatprobeTemperatureFahrenheit",
+            entity=StatusKey.COOKING_OVEN_CURRENT_MEATPROBE_TEMPERATURE_FAHRENHEIT,
             device_class=SensorDeviceClass.TEMPERATURE,
             native_unit_of_measurement=UnitOfTemperature.FAHRENHEIT,
         ),
@@ -581,7 +582,7 @@ COOKING_ENTITY_DESCRIPTIONS: _EntityDescriptionsDefinitionsType = {
     "number": [
         HCNumberEntityDescription(
             key="number_oven_setpoint_temperature",
-            entity="Cooking.Oven.Option.SetpointTemperature",
+            entity=OptionKey.COOKING_OVEN_SETPOINT_TEMPERATURE,
             device_class=NumberDeviceClass.TEMPERATURE,
             native_unit_of_measurement=UnitOfTemperature.CELSIUS,
             mode=NumberMode.AUTO,
@@ -589,27 +590,27 @@ COOKING_ENTITY_DESCRIPTIONS: _EntityDescriptionsDefinitionsType = {
         HCNumberEntityDescription(
             key="number_oven_setpoint_temperature_fahrenheit",
             translation_key="number_oven_setpoint_temperature",
-            entity="Cooking.Oven.Option.SetpointTemperatureFahrenheit",
+            entity=OptionKey.COOKING_OVEN_SETPOINT_TEMPERATURE_FAHRENHEIT,
             device_class=NumberDeviceClass.TEMPERATURE,
             native_unit_of_measurement=UnitOfTemperature.FAHRENHEIT,
             mode=NumberMode.AUTO,
         ),
         HCNumberEntityDescription(
             key="number_oven_weight",
-            entity="Cooking.Oven.Option.Weight",
+            entity=OptionKey.COOKING_OVEN_WEIGHT,
             device_class=NumberDeviceClass.WEIGHT,
             native_unit_of_measurement=UnitOfMass.GRAMS,
             mode=NumberMode.BOX,
         ),
         HCNumberEntityDescription(
             key="number_oven_display_brightness",
-            entity="Cooking.Oven.Setting.DisplayBrightness",
+            entity=SettingKey.COOKING_OVEN_DISPLAY_BRIGHTNESS,
             entity_category=EntityCategory.CONFIG,
             mode=NumberMode.AUTO,
         ),
         HCNumberEntityDescription(
             key="number_oven_sound_volume",
-            entity="Cooking.Oven.Setting.SoundVolume",
+            entity=SettingKey.COOKING_OVEN_SOUND_VOLUME,
             entity_category=EntityCategory.CONFIG,
             mode=NumberMode.AUTO,
         ),
@@ -617,58 +618,58 @@ COOKING_ENTITY_DESCRIPTIONS: _EntityDescriptionsDefinitionsType = {
         HCNumberEntityDescription(
             key="number_cooking_display_brightness",
             translation_key="number_oven_display_brightness",
-            entity="Cooking.Common.Setting.DisplayBrightness",
+            entity=SettingKey.COOKING_COMMON_DISPLAY_BRIGHTNESS,
             entity_category=EntityCategory.CONFIG,
             mode=NumberMode.AUTO,
         ),
         HCNumberEntityDescription(
             key="number_cooking_button_tone_volume",
-            entity="Cooking.Common.Setting.ButtonToneVolume",
+            entity=SettingKey.COOKING_COMMON_BUTTON_TONE_VOLUME,
             entity_category=EntityCategory.CONFIG,
             mode=NumberMode.AUTO,
         ),
         HCNumberEntityDescription(
             key="number_cooking_signal_volume",
-            entity="Cooking.Common.Setting.SignalVolume",
+            entity=SettingKey.COOKING_COMMON_SIGNAL_VOLUME,
             entity_category=EntityCategory.CONFIG,
             mode=NumberMode.AUTO,
         ),
         HCNumberEntityDescription(
             key="number_hob_automatic_timer",
-            entity="Cooking.Hob.Setting.AutomaticTimer",
+            entity=SettingKey.COOKING_HOB_AUTOMATIC_TIMER,
             entity_category=EntityCategory.CONFIG,
             native_max_value=99,  # matching the Home Connect App's limit
             mode=NumberMode.AUTO,
         ),
         HCNumberEntityDescription(
             key="number_hood_interval_off",
-            entity="Cooking.Hood.Setting.IntervalTimeOff",
+            entity=SettingKey.COOKING_HOOD_INTERVAL_TIME_OFF,
             native_unit_of_measurement=UnitOfTime.SECONDS,
             entity_category=EntityCategory.CONFIG,
             mode=NumberMode.AUTO,
         ),
         HCNumberEntityDescription(
             key="number_hood_interval_on",
-            entity="Cooking.Hood.Setting.IntervalTimeOn",
+            entity=SettingKey.COOKING_HOOD_INTERVAL_TIME_ON,
             native_unit_of_measurement=UnitOfTime.SECONDS,
             entity_category=EntityCategory.CONFIG,
             mode=NumberMode.AUTO,
         ),
         HCNumberEntityDescription(
             key="number_hood_delayed_shutoff_time",
-            entity="Cooking.Hood.Setting.DelayedShutOffTime",
+            entity=SettingKey.COOKING_HOOD_DELAYED_SHUT_OFF_TIME,
             native_unit_of_measurement=UnitOfTime.SECONDS,
             entity_category=EntityCategory.CONFIG,
             mode=NumberMode.AUTO,
         ),
         HCNumberEntityDescription(
             key="number_hood_sensor_sensitivity",
-            entity="Cooking.Hood.Setting.SensorSensitivity",
+            entity=SettingKey.COOKING_HOOD_SENSOR_SENSITIVITY,
             mode=NumberMode.AUTO,
         ),
         HCNumberEntityDescription(
             key="number_hood_boost_time",
-            entity="Cooking.Hood.Setting.BoostTime",
+            entity=SettingKey.COOKING_HOOD_BOOST_TIME,
             native_unit_of_measurement=UnitOfTime.SECONDS,
             entity_category=EntityCategory.CONFIG,
             mode=NumberMode.AUTO,
@@ -677,12 +678,12 @@ COOKING_ENTITY_DESCRIPTIONS: _EntityDescriptionsDefinitionsType = {
     "select": [
         HCSelectEntityDescription(
             key="select_oven_level",
-            entity="Cooking.Oven.Option.Level",
+            entity=OptionKey.COOKING_OVEN_LEVEL,
             has_state_translation=True,
         ),
         HCSelectEntityDescription(
             key="select_oven_clock_display",
-            entity="Cooking.Oven.Setting.ClockDisplay",
+            entity=SettingKey.COOKING_OVEN_CLOCK_DISPLAY,
             has_state_translation=True,
             entity_category=EntityCategory.CONFIG,
             entity_registry_enabled_default=False,
@@ -690,76 +691,76 @@ COOKING_ENTITY_DESCRIPTIONS: _EntityDescriptionsDefinitionsType = {
         # Display settings of Gaggenau BO470112 and BS474112 (upstream #513)
         HCSelectEntityDescription(
             key="select_oven_idle_screen",
-            entity="Cooking.Oven.Setting.IdleScreen",
+            entity=SettingKey.COOKING_OVEN_IDLE_SCREEN,
             has_state_translation=True,
             entity_category=EntityCategory.CONFIG,
         ),
         HCSelectEntityDescription(
             key="select_oven_touchkey_color",
-            entity="Cooking.Oven.Setting.TouchkeyColor",
+            entity=SettingKey.COOKING_OVEN_TOUCHKEY_COLOR,
             has_state_translation=True,
             entity_category=EntityCategory.CONFIG,
         ),
         HCSelectEntityDescription(
             key="select_oven_standby_display",
-            entity="Cooking.Oven.Setting.StandbyDisplay",
+            entity=SettingKey.COOKING_OVEN_STANDBY_DISPLAY,
             has_state_translation=True,
             entity_category=EntityCategory.CONFIG,
         ),
         HCSelectEntityDescription(
             key="select_cooking_button_tone_type",
-            entity="Cooking.Common.Setting.ButtonToneType",
+            entity=SettingKey.COOKING_COMMON_BUTTON_TONE_TYPE,
             has_state_translation=True,
             entity_category=EntityCategory.CONFIG,
         ),
         HCSelectEntityDescription(
             key="select_oven_used_heating_mode",
-            entity="Cooking.Oven.Option.UsedHeatingMode",
+            entity=OptionKey.COOKING_OVEN_USED_HEATING_MODE,
             has_state_translation=True,
         ),
         HCSelectEntityDescription(
             key="select_oven_meat_probe_temperature",
-            entity="Cooking.Oven.Option.MeatProbeTemperatureV2",
+            entity=OptionKey.COOKING_OVEN_MEAT_PROBE_TEMPERATURE_V_2,
             has_state_translation=True,
         ),
         HCSelectEntityDescription(
             key="select_pyrolysis_level",
-            entity="Cooking.Oven.Option.PyrolysisLevel",
+            entity=OptionKey.COOKING_OVEN_PYROLYSIS_LEVEL,
             has_state_translation=True,
         ),
         HCSelectEntityDescription(
             key="select_oven_child_lock_setting",
-            entity="Cooking.Oven.Setting.ConfigureChildLock",
+            entity=SettingKey.COOKING_OVEN_CONFIGURE_CHILD_LOCK,
             has_state_translation=True,
             entity_category=EntityCategory.CONFIG,
         ),
         HCSelectEntityDescription(
             key="select_oven_switch_on_delay",
-            entity="Cooking.Oven.Setting.SwitchOnDelay",
+            entity=SettingKey.COOKING_OVEN_SWITCH_ON_DELAY,
             has_state_translation=True,
             entity_category=EntityCategory.CONFIG,
         ),
         HCSelectEntityDescription(
             key="select_oven_cooling_fan_runtime",
-            entity="Cooking.Oven.Setting.CoolingFanRunOnTime",
+            entity=SettingKey.COOKING_OVEN_COOLING_FAN_RUN_ON_TIME,
             has_state_translation=True,
             entity_category=EntityCategory.CONFIG,
         ),
         HCSelectEntityDescription(
             key="select_oven_signal_duration",
-            entity="Cooking.Oven.Setting.SignalDuration",
+            entity=SettingKey.COOKING_OVEN_SIGNAL_DURATION,
             has_state_translation=True,
             entity_category=EntityCategory.CONFIG,
         ),
         HCSelectEntityDescription(
             key="select_hob_automatic_keylock",
-            entity="Cooking.Hob.Setting.AutomaticKeyLock",
+            entity=SettingKey.COOKING_HOB_AUTOMATIC_KEY_LOCK,
             has_state_translation=True,
             entity_category=EntityCategory.CONFIG,
         ),
         HCSelectEntityDescription(
             key="select_hob_bridge_zone_mode",
-            entity="Cooking.Hob.Setting.BridgeZoneMode",
+            entity=SettingKey.COOKING_HOB_BRIDGE_ZONE_MODE,
             has_state_translation=True,
             entity_category=EntityCategory.CONFIG,
         ),
@@ -767,73 +768,73 @@ COOKING_ENTITY_DESCRIPTIONS: _EntityDescriptionsDefinitionsType = {
         # returns 'Error response from Appliance: ReadRequest NotAvailable'.
         HCSelectEntityDescription(
             key="select_hob_hood_automatic_start",
-            entity="Cooking.Hob.Setting.HoodAutomaticStart",
+            entity=SettingKey.COOKING_HOB_HOOD_AUTOMATIC_START,
             has_state_translation=True,
             entity_category=EntityCategory.CONFIG,
         ),
         HCSelectEntityDescription(
             key="select_hob_hood_after_run",
-            entity="Cooking.Hob.Setting.HoodAfterRun",
+            entity=SettingKey.COOKING_HOB_HOOD_AFTER_RUN,
             has_state_translation=True,
             entity_category=EntityCategory.CONFIG,
         ),
         HCSelectEntityDescription(
             key="select_hob_ventilation",
-            entity="Cooking.Hob.Setting.Ventilation",
+            entity=SettingKey.COOKING_HOB_VENTILATION,
             has_state_translation=True,
             entity_category=EntityCategory.CONFIG,
         ),
         HCSelectEntityDescription(
             key="select_hob_delaye_shutoff_stage",
-            entity="Cooking.Hood.Setting.DelayedShutOffStage",
+            entity=SettingKey.COOKING_HOOD_DELAYED_SHUT_OFF_STAGE,
             has_state_translation=True,
             entity_category=EntityCategory.CONFIG,
         ),
         HCSelectEntityDescription(
             key="select_hob_power_management",
-            entity="Cooking.Hob.Setting.PowerManagement",
+            entity=SettingKey.COOKING_HOB_POWER_MANAGEMENT,
             has_state_translation=True,
             entity_category=EntityCategory.CONFIG,
         ),
         HCSelectEntityDescription(
             key="select_hob_buzzer_beep_level",
-            entity="Cooking.Hob.Setting.BuzzerBeepLevel",
+            entity=SettingKey.COOKING_HOB_BUZZER_BEEP_LEVEL,
             has_state_translation=True,
             entity_category=EntityCategory.CONFIG,
         ),
         HCSelectEntityDescription(
             key="select_hob_end_timer_signal_duration",
-            entity="Cooking.Hob.Setting.EndTimerSignalduration",
+            entity=SettingKey.COOKING_HOB_END_TIMER_SIGNALDURATION,
             has_state_translation=True,
             entity_category=EntityCategory.CONFIG,
         ),
         HCSelectEntityDescription(
             key="select_hood_interval_stage",
-            entity="Cooking.Hood.Setting.IntervalStage",
+            entity=SettingKey.COOKING_HOOD_INTERVAL_STAGE,
             has_state_translation=True,
             entity_category=EntityCategory.CONFIG,
         ),
         HCSelectEntityDescription(
             key="select_hood_carbon_filter_type",
-            entity="Cooking.Hood.Setting.CarbonFilterType",
+            entity=SettingKey.COOKING_HOOD_CARBON_FILTER_TYPE,
             has_state_translation=True,
             entity_category=EntityCategory.CONFIG,
         ),
         HCSelectEntityDescription(
             key="select_hood_color_temperature_mode",
-            entity="Cooking.Hood.Setting.ColorTemperature",
+            entity=SettingKey.COOKING_HOOD_COLOR_TEMPERATURE,
             has_state_translation=True,
             entity_category=EntityCategory.CONFIG,
         ),
         HCSelectEntityDescription(
             key="select_hood_light_startup",
-            entity="Cooking.Hood.Setting.WorkingLightStartupSetting",
+            entity=SettingKey.COOKING_HOOD_WORKING_LIGHT_STARTUP_SETTING,
             has_state_translation=True,
             entity_category=EntityCategory.CONFIG,
         ),
         HCSelectEntityDescription(
             key="select_hood_light_shutdown",
-            entity="Cooking.Hood.Setting.WorkingLightShutdownSetting",
+            entity=SettingKey.COOKING_HOOD_WORKING_LIGHT_SHUTDOWN_SETTING,
             has_state_translation=True,
             entity_category=EntityCategory.CONFIG,
         ),
@@ -841,50 +842,50 @@ COOKING_ENTITY_DESCRIPTIONS: _EntityDescriptionsDefinitionsType = {
     "switch": [
         HCSwitchEntityDescription(
             key="switch_hob_energy_consumption_indication",
-            entity="Cooking.Hob.Setting.EnergyConsumptionIndication",
+            entity=SettingKey.COOKING_HOB_ENERGY_CONSUMPTION_INDICATION,
             device_class=SwitchDeviceClass.SWITCH,
             value_mapping=("IndicationOn", "IndicationOff"),
             entity_category=EntityCategory.CONFIG,
         ),
         HCSwitchEntityDescription(
             key="switch_hob_hood_automatic_light_off",
-            entity="Cooking.Hob.Setting.HoodAutomaticLightOff",
+            entity=SettingKey.COOKING_HOB_HOOD_AUTOMATIC_LIGHT_OFF,
             device_class=SwitchDeviceClass.SWITCH,
             value_mapping=("On", "Off"),
             entity_category=EntityCategory.CONFIG,
         ),
         HCSwitchEntityDescription(
             key="switch_hob_hood_automatic_light_on",
-            entity="Cooking.Hob.Setting.HoodAutomaticLightOn",
+            entity=SettingKey.COOKING_HOB_HOOD_AUTOMATIC_LIGHT_ON,
             device_class=SwitchDeviceClass.SWITCH,
             value_mapping=("On", "Off"),
             entity_category=EntityCategory.CONFIG,
         ),
         HCSwitchEntityDescription(
             key="switch_oven_fast_pre_heat",
-            entity="Cooking.Oven.Option.FastPreHeat",
+            entity=OptionKey.COOKING_OVEN_FAST_PRE_HEAT,
             device_class=SwitchDeviceClass.SWITCH,
         ),
         # Gaggenau BO470112 and BS474112 (upstream #513)
         HCSwitchEntityDescription(
             key="switch_oven_rotary_spit",
-            entity="Cooking.Oven.Option.RotarySpit",
+            entity=OptionKey.COOKING_OVEN_ROTARY_SPIT,
             device_class=SwitchDeviceClass.SWITCH,
         ),
         HCSwitchEntityDescription(
             key="switch_oven_quick_roast",
-            entity="Cooking.Oven.Option.QuickRoast",
+            entity=OptionKey.COOKING_OVEN_QUICK_ROAST,
             device_class=SwitchDeviceClass.SWITCH,
         ),
         HCSwitchEntityDescription(
             key="switch_oven_heating_signal",
-            entity="Cooking.Oven.Setting.HeatingSignal",
+            entity=SettingKey.COOKING_OVEN_HEATING_SIGNAL,
             device_class=SwitchDeviceClass.SWITCH,
             entity_category=EntityCategory.CONFIG,
         ),
         HCSwitchEntityDescription(
             key="switch_oven_door_opener_delay",
-            entity="Cooking.Oven.Setting.DoorOpenerDelay",
+            entity=SettingKey.COOKING_OVEN_DOOR_OPENER_DELAY,
             device_class=SwitchDeviceClass.SWITCH,
             entity_category=EntityCategory.CONFIG,
         ),
@@ -892,64 +893,64 @@ COOKING_ENTITY_DESCRIPTIONS: _EntityDescriptionsDefinitionsType = {
         HCSwitchEntityDescription(
             key="switch_oven_fast_pre_heat_setting",
             translation_key="switch_oven_fast_pre_heat",
-            entity="Cooking.Oven.Setting.FastPreHeat",
+            entity=SettingKey.COOKING_OVEN_FAST_PRE_HEAT,
             device_class=SwitchDeviceClass.SWITCH,
         ),
         HCSwitchEntityDescription(
             key="switch_oven_button_tones",
-            entity="Cooking.Oven.Setting.ButtonTones",
+            entity=SettingKey.COOKING_OVEN_BUTTON_TONES,
             device_class=SwitchDeviceClass.SWITCH,
             entity_category=EntityCategory.CONFIG,
         ),
         HCSwitchEntityDescription(
             key="switch_oven_light_during_operation",
-            entity="Cooking.Oven.Setting.OvenLightDuringOperation",
+            entity=SettingKey.COOKING_OVEN_OVEN_LIGHT_DURING_OPERATION,
             device_class=SwitchDeviceClass.SWITCH,
             entity_category=EntityCategory.CONFIG,
         ),
         HCSwitchEntityDescription(
             key="switch_oven_night_dimout",
-            entity="Cooking.Oven.Setting.NightDimout",
+            entity=SettingKey.COOKING_OVEN_NIGHT_DIMOUT,
             device_class=SwitchDeviceClass.SWITCH,
             entity_category=EntityCategory.CONFIG,
         ),
         HCSwitchEntityDescription(
             key="switch_oven_sabbath_mode",
-            entity="Cooking.Oven.Setting.SabbathMode",
+            entity=SettingKey.COOKING_OVEN_SABBATH_MODE,
             device_class=SwitchDeviceClass.SWITCH,
             entity_category=EntityCategory.CONFIG,
         ),
         HCSwitchEntityDescription(
             key="switch_oven_convection_conversion",
-            entity="Cooking.Oven.Setting.ConvectionConversion",
+            entity=SettingKey.COOKING_OVEN_CONVECTION_CONVERSION,
             device_class=SwitchDeviceClass.SWITCH,
             entity_category=EntityCategory.CONFIG,
             entity_registry_enabled_default=False,
         ),
         HCSwitchEntityDescription(
             key="switch_oven_display_standby_dimmed",
-            entity="Cooking.Oven.Setting.DisplayStandbyDimmed",
+            entity=SettingKey.COOKING_OVEN_DISPLAY_STANDBY_DIMMED,
             device_class=SwitchDeviceClass.SWITCH,
             entity_category=EntityCategory.CONFIG,
             entity_registry_enabled_default=False,
         ),
         HCSwitchEntityDescription(
             key="switch_oven_teloscopic_slide_out_refited",
-            entity="Cooking.Oven.Setting.TeloscopicSlideOutRefited",
+            entity=SettingKey.COOKING_OVEN_TELOSCOPIC_SLIDE_OUT_REFITED,
             device_class=SwitchDeviceClass.SWITCH,
             entity_category=EntityCategory.CONFIG,
             entity_registry_enabled_default=False,
         ),
         HCSwitchEntityDescription(
             key="switch_oven_display_brand_logo",
-            entity="Cooking.Oven.Setting.DisplayBrandLogo",
+            entity=SettingKey.COOKING_OVEN_DISPLAY_BRAND_LOGO,
             device_class=SwitchDeviceClass.SWITCH,
             entity_category=EntityCategory.CONFIG,
             entity_registry_enabled_default=False,
         ),
         HCSwitchEntityDescription(
             key="switch_hood_silence_mode",
-            entity="Cooking.Hood.Setting.NoiseReduction",
+            entity=SettingKey.COOKING_HOOD_NOISE_REDUCTION,
             device_class=SwitchDeviceClass.SWITCH,
         ),
     ],
@@ -958,22 +959,22 @@ COOKING_ENTITY_DESCRIPTIONS: _EntityDescriptionsDefinitionsType = {
     "button": [
         HCButtonEntityDescription(
             key="button_hood_carbon_filter_reset",
-            entity="Cooking.Common.Command.Hood.CarbonFilterReset",
+            entity=CommandKey.COOKING_COMMON_HOOD_CARBON_FILTER_RESET,
             entity_category=EntityCategory.CONFIG,
         ),
         HCButtonEntityDescription(
             key="button_hood_grease_filter_reset",
-            entity="Cooking.Common.Command.Hood.GreaseFilterReset",
+            entity=CommandKey.COOKING_COMMON_HOOD_GREASE_FILTER_RESET,
             entity_category=EntityCategory.CONFIG,
         ),
         HCButtonEntityDescription(
             key="button_hood_regenerative_carbon_filter_reset",
-            entity="Cooking.Common.Command.Hood.RegenerativeCarbonFilterReset",
+            entity=CommandKey.COOKING_COMMON_HOOD_REGENERATIVE_CARBON_FILTER_RESET,
             entity_category=EntityCategory.CONFIG,
         ),
         HCButtonEntityDescription(
             key="button_hood_regenerative_carbon_filter_lifetime_reset",
-            entity="Cooking.Common.Command.Hood.RegenerativeCarbonFilterLifeTimeReset",
+            entity=CommandKey.COOKING_COMMON_HOOD_REGENERATIVE_CARBON_FILTER_LIFE_TIME_RESET,
             entity_category=EntityCategory.CONFIG,
         ),
     ],
@@ -982,14 +983,14 @@ COOKING_ENTITY_DESCRIPTIONS: _EntityDescriptionsDefinitionsType = {
         # Oven-wide events of Gaggenau BO470112 and BS474112 (upstream #513)
         HCBinarySensorEntityDescription(
             key="binary_sensor_oven_lock_while_cooling_down",
-            entity="Cooking.Oven.Event.OvenLockWhileCoolingDown",
+            entity=EventKey.COOKING_OVEN_OVEN_LOCK_WHILE_COOLING_DOWN,
             value_on={"Present", "Confirmed"},
             value_off={"Off"},
         ),
         HCBinarySensorEntityDescription(
             key="binary_sensor_oven_cavity_temperature_too_high",
             translation_placeholders={"group_name": ""},
-            entity="Cooking.Oven.Event.CavityTemperatureTooHigh",
+            entity=EventKey.COOKING_OVEN_CAVITY_TEMPERATURE_TOO_HIGH,
             device_class=BinarySensorDeviceClass.PROBLEM,
             entity_category=EntityCategory.DIAGNOSTIC,
             # Feeds the appliance's Problem sensor instead
@@ -999,25 +1000,25 @@ COOKING_ENTITY_DESCRIPTIONS: _EntityDescriptionsDefinitionsType = {
         ),
         HCBinarySensorEntityDescription(
             key="binary_sensor_oven_user_interaction_required",
-            entity="Cooking.Oven.Event.UserInteractionRequired",
+            entity=EventKey.COOKING_OVEN_USER_INTERACTION_REQUIRED,
             value_on={"Present", "Confirmed"},
             value_off={"Off"},
         ),
         HCBinarySensorEntityDescription(
             key="binary_sensor_oven_cavity_heatup",
-            entity="Cooking.Oven.Event.CavityHeatup",
+            entity=EventKey.COOKING_OVEN_CAVITY_HEATUP,
             value_on={"Present", "Confirmed"},
             value_off={"Off"},
         ),
         HCBinarySensorEntityDescription(
             key="binary_sensor_oven_operating_time_limit_reached",
-            entity="Cooking.Oven.Event.OperatingTimeLimitReached",
+            entity=EventKey.COOKING_OVEN_OPERATING_TIME_LIMIT_REACHED,
             value_on={"Present", "Confirmed"},
             value_off={"Off"},
         ),
         HCBinarySensorEntityDescription(
             key="binary_sensor_oven_cleaning_request",
-            entity="Cooking.Oven.Event.CleaningRequest",
+            entity=EventKey.COOKING_OVEN_CLEANING_REQUEST,
             device_class=BinarySensorDeviceClass.PROBLEM,
             in_problem_sensor=False,
             entity_category=EntityCategory.DIAGNOSTIC,
@@ -1026,7 +1027,7 @@ COOKING_ENTITY_DESCRIPTIONS: _EntityDescriptionsDefinitionsType = {
         ),
         HCBinarySensorEntityDescription(
             key="binary_sensor_oven_force_flushing",
-            entity="Cooking.Oven.Event.ForceFlushing",
+            entity=EventKey.COOKING_OVEN_FORCE_FLUSHING,
             device_class=BinarySensorDeviceClass.PROBLEM,
             in_problem_sensor=False,
             entity_category=EntityCategory.DIAGNOSTIC,
@@ -1035,7 +1036,7 @@ COOKING_ENTITY_DESCRIPTIONS: _EntityDescriptionsDefinitionsType = {
         ),
         HCBinarySensorEntityDescription(
             key="binary_sensor_oven_descaling_request",
-            entity="Cooking.Oven.Event.DescalingRequest",
+            entity=EventKey.COOKING_OVEN_DESCALING_REQUEST,
             device_class=BinarySensorDeviceClass.PROBLEM,
             in_problem_sensor=False,
             entity_category=EntityCategory.DIAGNOSTIC,
@@ -1044,7 +1045,7 @@ COOKING_ENTITY_DESCRIPTIONS: _EntityDescriptionsDefinitionsType = {
         ),
         HCBinarySensorEntityDescription(
             key="binary_sensor_oven_empty_water_container",
-            entity="Cooking.Oven.Event.EmptyWaterContainer",
+            entity=EventKey.COOKING_OVEN_EMPTY_WATER_CONTAINER,
             device_class=BinarySensorDeviceClass.PROBLEM,
             # A refill reminder, like a dishwasher's salt or rinse aid
             in_problem_sensor=False,
@@ -1054,7 +1055,7 @@ COOKING_ENTITY_DESCRIPTIONS: _EntityDescriptionsDefinitionsType = {
         ),
         HCBinarySensorEntityDescription(
             key="binary_sensor_oven_water_supply_closed",
-            entity="Cooking.Oven.Event.WaterSupplyClosed",
+            entity=EventKey.COOKING_OVEN_WATER_SUPPLY_CLOSED,
             device_class=BinarySensorDeviceClass.PROBLEM,
             entity_category=EntityCategory.DIAGNOSTIC,
             # Feeds the appliance's Problem sensor instead
@@ -1064,7 +1065,7 @@ COOKING_ENTITY_DESCRIPTIONS: _EntityDescriptionsDefinitionsType = {
         ),
         HCBinarySensorEntityDescription(
             key="binary_sensor_cooking_appliance_module_error",
-            entity="Cooking.Common.Event.ApplianceModuleError",
+            entity=EventKey.COOKING_COMMON_APPLIANCE_MODULE_ERROR,
             device_class=BinarySensorDeviceClass.PROBLEM,
             entity_category=EntityCategory.DIAGNOSTIC,
             # Feeds the appliance's Problem sensor instead
@@ -1075,7 +1076,7 @@ COOKING_ENTITY_DESCRIPTIONS: _EntityDescriptionsDefinitionsType = {
         # Gaggenau BO470112 and BS474112 (upstream #513)
         HCBinarySensorEntityDescription(
             key="binary_sensor_oven_preheat_finished",
-            entity="Cooking.Common.Event.PreheatFinished",
+            entity=EventKey.COOKING_COMMON_PREHEAT_FINISHED,
             value_on={"Present", "Confirmed"},
             value_off={"Off"},
         ),

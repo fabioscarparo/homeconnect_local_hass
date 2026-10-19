@@ -13,6 +13,7 @@ from home_disconnect import (
     InvalidValueError,
     ResponseError,
 )
+from home_disconnect.keys import OptionKey
 from homeassistant.exceptions import HomeAssistantError, ServiceValidationError
 from homeassistant.helpers.service import async_extract_config_entry_ids
 
@@ -195,8 +196,8 @@ def error_decorator[T](
     return wrap
 
 
-START_IN_RELATIVE = "BSH.Common.Option.StartInRelative"
-FINISH_IN_RELATIVE = "BSH.Common.Option.FinishInRelative"
+START_IN_RELATIVE = OptionKey.BSH_COMMON_START_IN_RELATIVE
+FINISH_IN_RELATIVE = OptionKey.BSH_COMMON_FINISH_IN_RELATIVE
 
 
 @dataclass

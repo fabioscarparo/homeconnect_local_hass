@@ -5,6 +5,7 @@ from __future__ import annotations
 from typing import TYPE_CHECKING
 
 from home_disconnect.entities import Access
+from home_disconnect.keys import CommandKey, EventKey, SettingKey, StatusKey
 from homeassistant.components.binary_sensor.const import BinarySensorDeviceClass
 from homeassistant.components.number import NumberDeviceClass, NumberMode
 from homeassistant.components.sensor import SensorDeviceClass, SensorStateClass
@@ -28,8 +29,8 @@ if TYPE_CHECKING:
     from home_disconnect import Appliance
 
 
-_INTERNAL_LIGHT_POWER = "Refrigeration.Common.Setting.Light.Internal.Power"
-_INTERNAL_LIGHT_BRIGHTNESS = "Refrigeration.Common.Setting.Light.Internal.Brightness"
+_INTERNAL_LIGHT_POWER = SettingKey.REFRIGERATION_COMMON_LIGHT_INTERNAL_POWER
+_INTERNAL_LIGHT_BRIGHTNESS = SettingKey.REFRIGERATION_COMMON_LIGHT_INTERNAL_BRIGHTNESS
 
 
 def _has_internal_light(appliance: Appliance) -> bool:
@@ -78,12 +79,12 @@ def generate_internal_light_brightness(
 # Per-compartment door sensors, in both naming schemes. The chiller's count
 # as a compartment here, but always get their (disabled by default) entity.
 _COMPARTMENT_DOORS = (
-    "Refrigeration.Common.Status.Door.Freezer",
-    "Refrigeration.Common.Status.Door.Refrigerator",
-    "Refrigeration.Common.Status.Door.ChillerCommon",
-    "Refrigeration.FridgeFreezer.Status.DoorFreezer",
-    "Refrigeration.FridgeFreezer.Status.DoorRefrigerator",
-    "Refrigeration.FridgeFreezer.Status.ChillerCommon",
+    StatusKey.REFRIGERATION_COMMON_DOOR_FREEZER,
+    StatusKey.REFRIGERATION_COMMON_DOOR_REFRIGERATOR,
+    StatusKey.REFRIGERATION_COMMON_DOOR_CHILLER_COMMON,
+    StatusKey.REFRIGERATION_FRIDGE_FREEZER_DOOR_FREEZER,
+    StatusKey.REFRIGERATION_FRIDGE_FREEZER_DOOR_REFRIGERATOR,
+    StatusKey.REFRIGERATION_FRIDGE_FREEZER_CHILLER_COMMON,
 )
 
 
@@ -101,7 +102,7 @@ def compartment_door(
 
     def generate(appliance: Appliance) -> HCBinarySensorEntityDescription | None:
         compartments = [door for door in _COMPARTMENT_DOORS if door in appliance.entities]
-        if compartments == [entity] and "BSH.Common.Status.DoorState" in appliance.entities:
+        if compartments == [entity] and StatusKey.BSH_COMMON_DOOR_STATE in appliance.entities:
             return None
         return HCBinarySensorEntityDescription(
             key=key,
@@ -118,29 +119,30 @@ REFRIGERATION_ENTITY_DESCRIPTIONS: _EntityDescriptionsDefinitionsType = {
     "binary_sensor": [
         HCBinarySensorEntityDescription(
             key="binary_sensor_chiller_common_door_state",
-            entity="Refrigeration.Common.Status.Door.ChillerCommon",
-            alternate_entities=("Refrigeration.FridgeFreezer.Status.ChillerCommon",),
+            entity=StatusKey.REFRIGERATION_COMMON_DOOR_CHILLER_COMMON,
+            alternate_entities=(StatusKey.REFRIGERATION_FRIDGE_FREEZER_CHILLER_COMMON,),
             device_class=BinarySensorDeviceClass.DOOR,
             entity_registry_enabled_default=False,
             value_on={"Open"},
             value_off={"Closed"},
         ),
         compartment_door(
-            "binary_sensor_freezer_door_state", "Refrigeration.Common.Status.Door.Freezer"
+            "binary_sensor_freezer_door_state", StatusKey.REFRIGERATION_COMMON_DOOR_FREEZER
         ),
         compartment_door(
-            "binary_sensor_fridge_door_state", "Refrigeration.Common.Status.Door.Refrigerator"
+            "binary_sensor_fridge_door_state", StatusKey.REFRIGERATION_COMMON_DOOR_REFRIGERATOR
         ),
         compartment_door(
-            "binary_sensor_freezer_door_state", "Refrigeration.FridgeFreezer.Status.DoorFreezer"
+            "binary_sensor_freezer_door_state", StatusKey.REFRIGERATION_FRIDGE_FREEZER_DOOR_FREEZER
         ),
         compartment_door(
-            "binary_sensor_fridge_door_state", "Refrigeration.FridgeFreezer.Status.DoorRefrigerator"
+            "binary_sensor_fridge_door_state",
+            StatusKey.REFRIGERATION_FRIDGE_FREEZER_DOOR_REFRIGERATOR,
         ),
         HCBinarySensorEntityDescription(
             key="binary_sensor_door_alarm_chiller_common",
-            entity="Refrigeration.FridgeFreezer.Event.DoorAlarmChillerCommon",
-            alternate_entities=("Refrigeration.Common.Event.Door.AlarmChillerCommon",),
+            entity=EventKey.REFRIGERATION_FRIDGE_FREEZER_DOOR_ALARM_CHILLER_COMMON,
+            alternate_entities=(EventKey.REFRIGERATION_COMMON_DOOR_ALARM_CHILLER_COMMON,),
             entity_category=EntityCategory.DIAGNOSTIC,
             device_class=BinarySensorDeviceClass.PROBLEM,
             in_problem_sensor=False,
@@ -149,8 +151,8 @@ REFRIGERATION_ENTITY_DESCRIPTIONS: _EntityDescriptionsDefinitionsType = {
         ),
         HCBinarySensorEntityDescription(
             key="binary_sensor_door_alarm_freezer",
-            entity="Refrigeration.FridgeFreezer.Event.DoorAlarmFreezer",
-            alternate_entities=("Refrigeration.Common.Event.Door.AlarmFreezer",),
+            entity=EventKey.REFRIGERATION_FRIDGE_FREEZER_DOOR_ALARM_FREEZER,
+            alternate_entities=(EventKey.REFRIGERATION_COMMON_DOOR_ALARM_FREEZER,),
             entity_category=EntityCategory.DIAGNOSTIC,
             device_class=BinarySensorDeviceClass.PROBLEM,
             in_problem_sensor=False,
@@ -159,8 +161,8 @@ REFRIGERATION_ENTITY_DESCRIPTIONS: _EntityDescriptionsDefinitionsType = {
         ),
         HCBinarySensorEntityDescription(
             key="binary_sensor_door_alarm_fridge",
-            entity="Refrigeration.FridgeFreezer.Event.DoorAlarmRefrigerator",
-            alternate_entities=("Refrigeration.Common.Event.Door.AlarmRefrigerator",),
+            entity=EventKey.REFRIGERATION_FRIDGE_FREEZER_DOOR_ALARM_REFRIGERATOR,
+            alternate_entities=(EventKey.REFRIGERATION_COMMON_DOOR_ALARM_REFRIGERATOR,),
             entity_category=EntityCategory.DIAGNOSTIC,
             device_class=BinarySensorDeviceClass.PROBLEM,
             in_problem_sensor=False,
@@ -169,8 +171,8 @@ REFRIGERATION_ENTITY_DESCRIPTIONS: _EntityDescriptionsDefinitionsType = {
         ),
         HCBinarySensorEntityDescription(
             key="binary_sensor_temperature_alarm_freezer",
-            entity="Refrigeration.FridgeFreezer.Event.TemperatureAlarmFreezer",
-            alternate_entities=("Refrigeration.Common.Event.Freezer.TemperatureAlarm",),
+            entity=EventKey.REFRIGERATION_FRIDGE_FREEZER_TEMPERATURE_ALARM_FREEZER,
+            alternate_entities=(EventKey.REFRIGERATION_COMMON_FREEZER_TEMPERATURE_ALARM,),
             entity_category=EntityCategory.DIAGNOSTIC,
             device_class=BinarySensorDeviceClass.PROBLEM,
             in_problem_sensor=False,
@@ -179,12 +181,12 @@ REFRIGERATION_ENTITY_DESCRIPTIONS: _EntityDescriptionsDefinitionsType = {
         ),
         HCBinarySensorEntityDescription(
             key="binary_sensor_refrigerator_defrost",
-            entity="Refrigeration.Common.Status.Freezer.Defrost",
-            alternate_entities=("Refrigeration.FridgeFreezer.Status.DefrostFreezer",),
+            entity=StatusKey.REFRIGERATION_COMMON_FREEZER_DEFROST,
+            alternate_entities=(StatusKey.REFRIGERATION_FRIDGE_FREEZER_DEFROST_FREEZER,),
         ),
         HCBinarySensorEntityDescription(
             key="binary_sensor_water_filter_full",
-            entity="Refrigeration.Common.Event.Dispenser.WaterFilterFull",
+            entity=EventKey.REFRIGERATION_COMMON_DISPENSER_WATER_FILTER_FULL,
             entity_category=EntityCategory.DIAGNOSTIC,
             device_class=BinarySensorDeviceClass.PROBLEM,
             in_problem_sensor=False,
@@ -193,8 +195,8 @@ REFRIGERATION_ENTITY_DESCRIPTIONS: _EntityDescriptionsDefinitionsType = {
         ),
         HCBinarySensorEntityDescription(
             key="binary_sensor_freezer_appliance_error",
-            entity="Refrigeration.FridgeFreezer.Event.ApplianceError",
-            alternate_entities=("Refrigeration.Common.Event.ApplianceError",),
+            entity=EventKey.REFRIGERATION_FRIDGE_FREEZER_APPLIANCE_ERROR,
+            alternate_entities=(EventKey.REFRIGERATION_COMMON_APPLIANCE_ERROR,),
             entity_category=EntityCategory.DIAGNOSTIC,
             device_class=BinarySensorDeviceClass.PROBLEM,
             entity_registry_enabled_default=False,
@@ -203,8 +205,8 @@ REFRIGERATION_ENTITY_DESCRIPTIONS: _EntityDescriptionsDefinitionsType = {
         ),
         HCBinarySensorEntityDescription(
             key="binary_sensor_freezer_low_voltage",
-            entity="Refrigeration.FridgeFreezer.Event.LowVoltageHint",
-            alternate_entities=("Refrigeration.Common.Event.LowVoltageHint",),
+            entity=EventKey.REFRIGERATION_FRIDGE_FREEZER_LOW_VOLTAGE_HINT,
+            alternate_entities=(EventKey.REFRIGERATION_COMMON_LOW_VOLTAGE_HINT,),
             entity_category=EntityCategory.DIAGNOSTIC,
             device_class=BinarySensorDeviceClass.PROBLEM,
             in_problem_sensor=False,
@@ -213,7 +215,7 @@ REFRIGERATION_ENTITY_DESCRIPTIONS: _EntityDescriptionsDefinitionsType = {
         ),
         HCBinarySensorEntityDescription(
             key="binary_sensor_temperature_alarm_chiller_common",
-            entity="Refrigeration.Common.Event.ChillerCommon.TemperatureAlarm",
+            entity=EventKey.REFRIGERATION_COMMON_CHILLER_COMMON_TEMPERATURE_ALARM,
             entity_category=EntityCategory.DIAGNOSTIC,
             device_class=BinarySensorDeviceClass.PROBLEM,
             in_problem_sensor=False,
@@ -222,11 +224,11 @@ REFRIGERATION_ENTITY_DESCRIPTIONS: _EntityDescriptionsDefinitionsType = {
         ),
         HCBinarySensorEntityDescription(
             key="binary_sensor_ice_hopper_full",
-            entity="Refrigeration.Common.Status.Dispenser.IceHopperFull",
+            entity=StatusKey.REFRIGERATION_COMMON_DISPENSER_ICE_HOPPER_FULL,
         ),
         HCBinarySensorEntityDescription(
             key="binary_sensor_water_filter_almost_full",
-            entity="Refrigeration.Common.Event.Dispenser.WaterFilterAlmostFull",
+            entity=EventKey.REFRIGERATION_COMMON_DISPENSER_WATER_FILTER_ALMOST_FULL,
             entity_category=EntityCategory.DIAGNOSTIC,
             device_class=BinarySensorDeviceClass.PROBLEM,
             in_problem_sensor=False,
@@ -235,7 +237,7 @@ REFRIGERATION_ENTITY_DESCRIPTIONS: _EntityDescriptionsDefinitionsType = {
         ),
         HCBinarySensorEntityDescription(
             key="binary_sensor_ice_expired",
-            entity="Refrigeration.Common.Event.Dispenser.IceExpired",
+            entity=EventKey.REFRIGERATION_COMMON_DISPENSER_ICE_EXPIRED,
             entity_category=EntityCategory.DIAGNOSTIC,
             device_class=BinarySensorDeviceClass.PROBLEM,
             in_problem_sensor=False,
@@ -244,7 +246,7 @@ REFRIGERATION_ENTITY_DESCRIPTIONS: _EntityDescriptionsDefinitionsType = {
         ),
         HCBinarySensorEntityDescription(
             key="binary_sensor_water_expired",
-            entity="Refrigeration.Common.Event.WaterExpired",
+            entity=EventKey.REFRIGERATION_COMMON_WATER_EXPIRED,
             entity_category=EntityCategory.DIAGNOSTIC,
             device_class=BinarySensorDeviceClass.PROBLEM,
             in_problem_sensor=False,
@@ -253,7 +255,7 @@ REFRIGERATION_ENTITY_DESCRIPTIONS: _EntityDescriptionsDefinitionsType = {
         ),
         HCBinarySensorEntityDescription(
             key="binary_sensor_party_mode_empty_ice_hopper",
-            entity="Refrigeration.Common.Event.Dispenser.PartyModeEmptyIceHopper",
+            entity=EventKey.REFRIGERATION_COMMON_DISPENSER_PARTY_MODE_EMPTY_ICE_HOPPER,
             entity_category=EntityCategory.DIAGNOSTIC,
             device_class=BinarySensorDeviceClass.PROBLEM,
             in_problem_sensor=False,
@@ -264,32 +266,32 @@ REFRIGERATION_ENTITY_DESCRIPTIONS: _EntityDescriptionsDefinitionsType = {
     "button": [
         HCButtonEntityDescription(
             key="button_water_filter_reset",
-            entity="Refrigeration.Common.Command.Dispenser.WaterFilterReset",
+            entity=CommandKey.REFRIGERATION_COMMON_DISPENSER_WATER_FILTER_RESET,
             entity_category=EntityCategory.CONFIG,
         ),
         HCButtonEntityDescription(
             key="button_refrigerator_open_door",
-            entity="BSH.Common.Command.OpenDoor",
+            entity=CommandKey.BSH_COMMON_OPEN_DOOR,
             entity_registry_enabled_default=False,
         ),
     ],
     "sensor": [
         HCSensorEntityDescription(
             key="sensor_water_filter_saturation",
-            entity="Refrigeration.Common.Status.Dispenser.WaterFilterSaturation",
+            entity=StatusKey.REFRIGERATION_COMMON_DISPENSER_WATER_FILTER_SATURATION,
             native_unit_of_measurement=PERCENTAGE,
             state_class=SensorStateClass.MEASUREMENT,
         ),
         HCSensorEntityDescription(
             key="sensor_temperature_ambient",
-            entity="Refrigeration.FridgeFreezer.Status.TemperatureAmbient",
-            alternate_entities=("Refrigeration.Common.Status.TemperatureAmbient",),
+            entity=StatusKey.REFRIGERATION_FRIDGE_FREEZER_TEMPERATURE_AMBIENT,
+            alternate_entities=(StatusKey.REFRIGERATION_COMMON_TEMPERATURE_AMBIENT,),
             device_class=SensorDeviceClass.TEMPERATURE,
             native_unit_of_measurement=UnitOfTemperature.CELSIUS,
         ),
         HCSensorEntityDescription(
             key="sensor_temperature_memory_freezer",
-            entity="Refrigeration.Common.Status.Freezer.MemoryTemperature",
+            entity=StatusKey.REFRIGERATION_COMMON_FREEZER_MEMORY_TEMPERATURE,
             device_class=SensorDeviceClass.TEMPERATURE,
             native_unit_of_measurement=UnitOfTemperature.CELSIUS,
             entity_registry_enabled_default=False,
@@ -298,8 +300,8 @@ REFRIGERATION_ENTITY_DESCRIPTIONS: _EntityDescriptionsDefinitionsType = {
     "number": [
         HCNumberEntityDescription(
             key="number_setpoint_freezer",
-            entity="Refrigeration.FridgeFreezer.Setting.SetpointTemperatureFreezer",
-            alternate_entities=("Refrigeration.Common.Setting.Freezer.SetpointTemperature",),
+            entity=SettingKey.REFRIGERATION_FRIDGE_FREEZER_SETPOINT_TEMPERATURE_FREEZER,
+            alternate_entities=(SettingKey.REFRIGERATION_COMMON_FREEZER_SETPOINT_TEMPERATURE,),
             native_unit_of_measurement=UnitOfTemperature.CELSIUS,
             device_class=NumberDeviceClass.TEMPERATURE,
             mode=NumberMode.AUTO,
@@ -307,8 +309,8 @@ REFRIGERATION_ENTITY_DESCRIPTIONS: _EntityDescriptionsDefinitionsType = {
         ),
         HCNumberEntityDescription(
             key="number_setpoint_refrigerator",
-            entity="Refrigeration.FridgeFreezer.Setting.SetpointTemperatureRefrigerator",
-            alternate_entities=("Refrigeration.Common.Setting.Refrigerator.SetpointTemperature",),
+            entity=SettingKey.REFRIGERATION_FRIDGE_FREEZER_SETPOINT_TEMPERATURE_REFRIGERATOR,
+            alternate_entities=(SettingKey.REFRIGERATION_COMMON_REFRIGERATOR_SETPOINT_TEMPERATURE,),
             native_unit_of_measurement=UnitOfTemperature.CELSIUS,
             device_class=NumberDeviceClass.TEMPERATURE,
             mode=NumberMode.AUTO,
@@ -317,7 +319,7 @@ REFRIGERATION_ENTITY_DESCRIPTIONS: _EntityDescriptionsDefinitionsType = {
         HCNumberEntityDescription(
             key="number_setpoint_freezer_fahrenheit",
             translation_key="number_setpoint_freezer",
-            entity="Refrigeration.Common.Setting.Freezer.SetpointTemperatureFahrenheit",
+            entity=SettingKey.REFRIGERATION_COMMON_FREEZER_SETPOINT_TEMPERATURE_FAHRENHEIT,
             native_unit_of_measurement=UnitOfTemperature.FAHRENHEIT,
             device_class=NumberDeviceClass.TEMPERATURE,
             mode=NumberMode.AUTO,
@@ -326,7 +328,7 @@ REFRIGERATION_ENTITY_DESCRIPTIONS: _EntityDescriptionsDefinitionsType = {
         HCNumberEntityDescription(
             key="number_setpoint_refrigerator_fahrenheit",
             translation_key="number_setpoint_refrigerator",
-            entity="Refrigeration.Common.Setting.Refrigerator.SetpointTemperatureFahrenheit",
+            entity=SettingKey.REFRIGERATION_COMMON_REFRIGERATOR_SETPOINT_TEMPERATURE_FAHRENHEIT,
             native_unit_of_measurement=UnitOfTemperature.FAHRENHEIT,
             device_class=NumberDeviceClass.TEMPERATURE,
             mode=NumberMode.AUTO,
@@ -335,7 +337,7 @@ REFRIGERATION_ENTITY_DESCRIPTIONS: _EntityDescriptionsDefinitionsType = {
         # This is only available when the `ChillerCommon.Preset` is `custom`.
         HCNumberEntityDescription(
             key="number_setpoint_chiller_common",
-            entity="Refrigeration.Common.Setting.ChillerCommon.SetpointTemperature",
+            entity=SettingKey.REFRIGERATION_COMMON_CHILLER_COMMON_SETPOINT_TEMPERATURE,
             native_unit_of_measurement=UnitOfTemperature.CELSIUS,
             device_class=NumberDeviceClass.TEMPERATURE,
             entity_registry_enabled_default=False,
@@ -346,7 +348,7 @@ REFRIGERATION_ENTITY_DESCRIPTIONS: _EntityDescriptionsDefinitionsType = {
         HCNumberEntityDescription(
             key="number_setpoint_chiller_common_fahrenheit",
             translation_key="number_setpoint_chiller_common",
-            entity="Refrigeration.Common.Setting.ChillerCommon.SetpointTemperatureFahrenheit",
+            entity=SettingKey.REFRIGERATION_COMMON_CHILLER_COMMON_SETPOINT_TEMPERATURE_FAHRENHEIT,
             native_unit_of_measurement=UnitOfTemperature.FAHRENHEIT,
             device_class=NumberDeviceClass.TEMPERATURE,
             entity_registry_enabled_default=False,
@@ -356,21 +358,21 @@ REFRIGERATION_ENTITY_DESCRIPTIONS: _EntityDescriptionsDefinitionsType = {
         generate_internal_light_brightness,
         HCNumberEntityDescription(
             key="number_refrigerator_door_assistant_freezer_timeout",
-            entity="Refrigeration.Common.Setting.Door.AssistantTimeoutFreezer",
+            entity=SettingKey.REFRIGERATION_COMMON_DOOR_ASSISTANT_TIMEOUT_FREEZER,
             device_class=NumberDeviceClass.DURATION,
             native_unit_of_measurement=UnitOfTime.SECONDS,
             mode=NumberMode.AUTO,
         ),
         HCNumberEntityDescription(
             key="number_refrigerator_door_assistant_fridge_timeout",
-            entity="Refrigeration.Common.Setting.Door.AssistantTimeoutFridge",
+            entity=SettingKey.REFRIGERATION_COMMON_DOOR_ASSISTANT_TIMEOUT_FRIDGE,
             device_class=NumberDeviceClass.DURATION,
             native_unit_of_measurement=UnitOfTime.SECONDS,
             mode=NumberMode.AUTO,
         ),
         HCNumberEntityDescription(
             key="number_refrigerator_sabbath_mode_duration",
-            entity="Refrigeration.Common.Setting.SabbathModeDuration",
+            entity=SettingKey.REFRIGERATION_COMMON_SABBATH_MODE_DURATION,
             device_class=NumberDeviceClass.DURATION,
             native_unit_of_measurement=UnitOfTime.SECONDS,
             entity_category=EntityCategory.CONFIG,
@@ -380,97 +382,97 @@ REFRIGERATION_ENTITY_DESCRIPTIONS: _EntityDescriptionsDefinitionsType = {
     "switch": [
         HCSwitchEntityDescription(
             key="switch_super_freezer",
-            entity="Refrigeration.FridgeFreezer.Setting.SuperModeFreezer",
-            alternate_entities=("Refrigeration.Common.Setting.Freezer.SuperMode",),
+            entity=SettingKey.REFRIGERATION_FRIDGE_FREEZER_SUPER_MODE_FREEZER,
+            alternate_entities=(SettingKey.REFRIGERATION_COMMON_FREEZER_SUPER_MODE,),
             device_class=SwitchDeviceClass.SWITCH,
         ),
         HCSwitchEntityDescription(
             key="switch_super_refrigerator",
-            entity="Refrigeration.FridgeFreezer.Setting.SuperModeRefrigerator",
-            alternate_entities=("Refrigeration.Common.Setting.Refrigerator.SuperMode",),
+            entity=SettingKey.REFRIGERATION_FRIDGE_FREEZER_SUPER_MODE_REFRIGERATOR,
+            alternate_entities=(SettingKey.REFRIGERATION_COMMON_REFRIGERATOR_SUPER_MODE,),
             device_class=SwitchDeviceClass.SWITCH,
         ),
         HCSwitchEntityDescription(
             key="switch_refrigerator_eco",
-            entity="Refrigeration.FridgeFreezer.Setting.EcoMode",
-            alternate_entities=("Refrigeration.Common.Setting.EcoMode",),
+            entity=SettingKey.REFRIGERATION_FRIDGE_FREEZER_ECO_MODE,
+            alternate_entities=(SettingKey.REFRIGERATION_COMMON_ECO_MODE,),
             device_class=SwitchDeviceClass.SWITCH,
         ),
         HCSwitchEntityDescription(
             key="switch_refrigerator_vacation",
-            entity="Refrigeration.FridgeFreezer.Setting.VacationMode",
-            alternate_entities=("Refrigeration.Common.Setting.VacationMode",),
+            entity=SettingKey.REFRIGERATION_FRIDGE_FREEZER_VACATION_MODE,
+            alternate_entities=(SettingKey.REFRIGERATION_COMMON_VACATION_MODE,),
             device_class=SwitchDeviceClass.SWITCH,
         ),
         HCSwitchEntityDescription(
             key="switch_refrigerator_dispenser_enabled",
-            entity="Refrigeration.Common.Setting.Dispenser.Enabled",
+            entity=SettingKey.REFRIGERATION_COMMON_DISPENSER_ENABLED,
             device_class=SwitchDeviceClass.SWITCH,
         ),
         HCSwitchEntityDescription(
             key="switch_refrigerator_dispenser_party_mode",
-            entity="Refrigeration.Common.Setting.Dispenser.PartyMode",
+            entity=SettingKey.REFRIGERATION_COMMON_DISPENSER_PARTY_MODE,
             device_class=SwitchDeviceClass.SWITCH,
         ),
         HCSwitchEntityDescription(
             key="switch_refrigerator_sabbath_mode",
-            entity="Refrigeration.Common.Setting.SabbathMode",
-            alternate_entities=("Refrigeration.FridgeFreezer.Setting.SabbathMode",),
+            entity=SettingKey.REFRIGERATION_COMMON_SABBATH_MODE,
+            alternate_entities=(SettingKey.REFRIGERATION_FRIDGE_FREEZER_SABBATH_MODE,),
             device_class=SwitchDeviceClass.SWITCH,
             entity_category=EntityCategory.CONFIG,
         ),
         HCSwitchEntityDescription(
             key="switch_refrigerator_door_assistant_freezer",
-            entity="Refrigeration.Common.Setting.Door.AssistantFreezer",
+            entity=SettingKey.REFRIGERATION_COMMON_DOOR_ASSISTANT_FREEZER,
             device_class=SwitchDeviceClass.SWITCH,
             entity_category=EntityCategory.CONFIG,
         ),
         HCSwitchEntityDescription(
             key="switch_refrigerator_door_assistant_fridge",
-            entity="Refrigeration.Common.Setting.Door.AssistantFridge",
+            entity=SettingKey.REFRIGERATION_COMMON_DOOR_ASSISTANT_FRIDGE,
             device_class=SwitchDeviceClass.SWITCH,
             entity_category=EntityCategory.CONFIG,
         ),
         HCSwitchEntityDescription(
             key="switch_refrigeration_light_theater_mode",
-            entity="Refrigeration.Common.Setting.Light.Internal.EnableTheaterMode",
+            entity=SettingKey.REFRIGERATION_COMMON_LIGHT_INTERNAL_ENABLE_THEATER_MODE,
             device_class=SwitchDeviceClass.SWITCH,
         ),
         HCSwitchEntityDescription(
             key="switch_refrigerator_fresh_mode",
-            entity="Refrigeration.FridgeFreezer.Setting.FreshMode",
-            alternate_entities=("Refrigeration.Common.Setting.FreshMode",),
+            entity=SettingKey.REFRIGERATION_FRIDGE_FREEZER_FRESH_MODE,
+            alternate_entities=(SettingKey.REFRIGERATION_COMMON_FRESH_MODE,),
             device_class=SwitchDeviceClass.SWITCH,
         ),
     ],
     "select": [
         HCSelectEntityDescription(
             key="select_refrigerator_door_assistant_freezer_trigger",
-            entity="Refrigeration.Common.Setting.Door.AssistantTriggerFreezer",
+            entity=SettingKey.REFRIGERATION_COMMON_DOOR_ASSISTANT_TRIGGER_FREEZER,
             device_class=SensorDeviceClass.ENUM,
             has_state_translation=True,
         ),
         HCSelectEntityDescription(
             key="select_refrigerator_door_assistant_freezer_force",
-            entity="Refrigeration.Common.Setting.Door.AssistantForceFreezer",
+            entity=SettingKey.REFRIGERATION_COMMON_DOOR_ASSISTANT_FORCE_FREEZER,
             device_class=SensorDeviceClass.ENUM,
             has_state_translation=True,
         ),
         HCSelectEntityDescription(
             key="select_refrigerator_door_assistant_fridge_trigger",
-            entity="Refrigeration.Common.Setting.Door.AssistantTriggerFridge",
+            entity=SettingKey.REFRIGERATION_COMMON_DOOR_ASSISTANT_TRIGGER_FRIDGE,
             device_class=SensorDeviceClass.ENUM,
             has_state_translation=True,
         ),
         HCSelectEntityDescription(
             key="select_refrigerator_door_assistant_fridge_force",
-            entity="Refrigeration.Common.Setting.Door.AssistantForceFridge",
+            entity=SettingKey.REFRIGERATION_COMMON_DOOR_ASSISTANT_FORCE_FRIDGE,
             device_class=SensorDeviceClass.ENUM,
             has_state_translation=True,
         ),
         HCSelectEntityDescription(
             key="select_chiller_common_preset",
-            entity="Refrigeration.Common.Setting.ChillerCommon.Preset",
+            entity=SettingKey.REFRIGERATION_COMMON_CHILLER_COMMON_PRESET,
             device_class=SensorDeviceClass.ENUM,
             entity_registry_enabled_default=False,
             has_state_translation=True,
@@ -478,7 +480,7 @@ REFRIGERATION_ENTITY_DESCRIPTIONS: _EntityDescriptionsDefinitionsType = {
         # This is only available when the `ChillerCommon.Preset` is `custom`.
         HCSelectEntityDescription(
             key="select_chiller_left_humidity",
-            entity="Refrigeration.Common.Setting.ChillerLeft.Humidity",
+            entity=SettingKey.REFRIGERATION_COMMON_CHILLER_LEFT_HUMIDITY,
             device_class=SensorDeviceClass.ENUM,
             entity_registry_enabled_default=False,
             has_state_translation=True,
@@ -486,7 +488,7 @@ REFRIGERATION_ENTITY_DESCRIPTIONS: _EntityDescriptionsDefinitionsType = {
         # This is only available when the `ChillerCommon.Preset` is `custom`.
         HCSelectEntityDescription(
             key="select_chiller_right_humidity",
-            entity="Refrigeration.Common.Setting.ChillerRight.Humidity",
+            entity=SettingKey.REFRIGERATION_COMMON_CHILLER_RIGHT_HUMIDITY,
             device_class=SensorDeviceClass.ENUM,
             entity_registry_enabled_default=False,
             has_state_translation=True,
@@ -496,7 +498,7 @@ REFRIGERATION_ENTITY_DESCRIPTIONS: _EntityDescriptionsDefinitionsType = {
         generate_internal_light,
         HCLightEntityDescription(
             key="light_logo",
-            entity="Refrigeration.Common.Setting.Light.Logo.Power",
+            entity=SettingKey.REFRIGERATION_COMMON_LIGHT_LOGO_POWER,
             entity_category=EntityCategory.CONFIG,
         ),
     ],
