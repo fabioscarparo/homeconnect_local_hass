@@ -320,6 +320,12 @@
             "binary_sensor_coffee_close_door": {}
         },
         "sensor": {
+            "sensor_stopwatch_time": {
+                "default": "mdi:timer-outline"
+            },
+            "sensor_stopwatch_state": {
+                "default": "mdi:timer-outline"
+            },
             "sensor_problem": {
                 "default": "mdi:alert-circle-outline",
                 "state": {
@@ -614,6 +620,12 @@
 			}
         },
         "button": {
+            "button_stopwatch_start_pause_resume": {
+                "default": "mdi:timer-play-outline"
+            },
+            "button_stopwatch_reset": {
+                "default": "mdi:timer-refresh-outline"
+            },
             "button_abort_program": {
                 "default": "mdi:stop"
             },

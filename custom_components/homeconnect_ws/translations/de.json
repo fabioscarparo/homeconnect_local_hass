@@ -663,6 +663,17 @@
           "water_level_too_high": "Wasserstand zu hoch"
         }
       },
+      "sensor_stopwatch_time": {
+        "name": "Stoppuhr-Zeit"
+      },
+      "sensor_stopwatch_state": {
+        "name": "Stoppuhr-Status",
+        "state": {
+          "off": "Aus",
+          "running": "Läuft",
+          "paused": "Pausiert"
+        }
+      },
       "sensor_remaining_program_time": {
         "name": "Verbleibende Programmlaufzeit"
       },
@@ -4624,6 +4635,12 @@
       }
     },
     "button": {
+      "button_stopwatch_start_pause_resume": {
+        "name": "Stoppuhr starten/pausieren/fortsetzen"
+      },
+      "button_stopwatch_reset": {
+        "name": "Stoppuhr zurücksetzen"
+      },
       "button_abort_program": {
         "name": "Abbrechen"
       },
