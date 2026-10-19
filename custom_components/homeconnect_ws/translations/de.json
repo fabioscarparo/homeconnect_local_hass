@@ -4949,7 +4949,7 @@
   "services": {
     "start_program": {
       "name": "Programm starten",
-      "description": "Startet das ausgewählte Programm",
+      "description": "Startet das ausgewählte Programm oder ein genanntes",
       "fields": {
         "device_id": {
           "name": "Gerät",
@@ -4962,6 +4962,14 @@
         "finish_in": {
           "name": "Fertig in",
           "description": "Zeit, in der das Programm fertig sein soll"
+        },
+        "program": {
+          "name": "Programm",
+          "description": "Startet dieses Programm statt des ausgewählten, nur mit den angegebenen Optionen. Startet auch Programme, die sich nicht auswählen lassen, wie das Lüften einer Dunstabzugshaube"
+        },
+        "options": {
+          "name": "Optionen",
+          "description": "Programmoptionen für den Start, nach Name, zum Beispiel Cooking.Common.Option.Hood.VentingLevel: 3"
         }
       }
     },
@@ -5019,6 +5027,12 @@
     },
     "finish_in_not_available": {
       "message": "'Fertig in' ist an diesem Gerät nicht verfügbar"
+    },
+    "program_not_available": {
+      "message": "Dieses Programm ist an diesem Gerät nicht verfügbar"
+    },
+    "option_not_available": {
+      "message": "Diese Option ist an diesem Gerät nicht verfügbar"
     },
     "finish_in_not_writable": {
       "message": "Das Gerät hat 'Fertig in' nicht rechtzeitig zum Schreiben freigegeben - bitte erneut versuchen"

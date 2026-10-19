@@ -6,7 +6,7 @@ import copy
 from copy import deepcopy
 from ipaddress import ip_address
 from pathlib import Path
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, Any
 from unittest.mock import ANY, AsyncMock, PropertyMock, patch
 
 import pytest
@@ -691,6 +691,57 @@ async def test_start_program_remote_start_not_allowed(
             DOMAIN, "start_program", {"device_id": device_id}, blocking=True
         )
     assert exc_info.value.translation_key == "remote_start_not_allowed"
+
+
+async def test_start_program_named_with_options(
+    hass: HomeAssistant, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    """A named program starts with only the given options, also when none is selected."""
+    device_id = await _setup_with_finish_in(hass, monkeypatch)
+    with patch("home_disconnect.Appliance.start_program", AsyncMock()) as start_program:
+        await hass.services.async_call(
+            DOMAIN,
+            "start_program",
+            {
+                "device_id": device_id,
+                "program": "Test.Program.Program1",
+                "options": {"BSH.Common.Option.FinishInRelative": 3600},
+            },
+            blocking=True,
+        )
+    (program,) = start_program.await_args.args
+    assert program.name == "Test.Program.Program1"
+    options = start_program.await_args.kwargs["options"]
+    assert {entity.name: value for entity, value in options.items()} == {
+        "BSH.Common.Option.FinishInRelative": 3600
+    }
+    assert start_program.await_args.kwargs["include_current_options"] is False
+
+
+@pytest.mark.parametrize(
+    ("data", "translation_key"),
+    [
+        ({"program": "Test.Program.Missing"}, "program_not_available"),
+        ({"options": {"Test.Option.Missing": 1}}, "option_not_available"),
+    ],
+)
+async def test_start_program_unknown_name(
+    hass: HomeAssistant,
+    monkeypatch: pytest.MonkeyPatch,
+    data: dict[str, Any],
+    translation_key: str,
+) -> None:
+    """An unknown program or option name is a translated error, and nothing is sent."""
+    device_id = await _setup_with_finish_in(hass, monkeypatch)
+    with (
+        patch("home_disconnect.Appliance.start_program", AsyncMock()) as start_program,
+        pytest.raises(ServiceValidationError) as exc_info,
+    ):
+        await hass.services.async_call(
+            DOMAIN, "start_program", {"device_id": device_id, **data}, blocking=True
+        )
+    assert exc_info.value.translation_key == translation_key
+    start_program.assert_not_awaited()
 
 
 @pytest.mark.parametrize(

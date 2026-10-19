@@ -27,7 +27,7 @@ The one exception is the Wi-Fi Signal Strength sensor. The entity can only be po
 
 This integration provides the following actions:
 
-- `homeconnect_ws.start_program`: Start the currently selected program. Optionally set a start delay and/or a target finish time.
+- `homeconnect_ws.start_program`: Start the currently selected program. Optionally set a start delay and/or a target finish time. Or name a `program` to start it directly with only the `options` you give, keyed by option name. This also starts programs that can't be selected, like a hood's venting, at a given fan level (`Cooking.Common.Option.Hood.VentingLevel: 3`).
 - `homeconnect_ws.set_start_in`: Set the start delay of the currently selected program.
 - `homeconnect_ws.set_finish_in`: Set the target finish time of the currently selected program.
 
