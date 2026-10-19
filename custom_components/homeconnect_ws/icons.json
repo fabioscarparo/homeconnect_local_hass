@@ -134,7 +134,10 @@
         },
         "binary_sensor": {
             "binary_sensor_software_update_successful": {
-                "default": "mdi:update"
+                "default": "mdi:update",
+                "state": {
+                    "on": "mdi:progress-check"
+                }
             },
             "binary_sensor_oven_lock_while_cooling_down": {
                 "default": "mdi:lock-clock"

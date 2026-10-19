@@ -693,7 +693,7 @@
           "spin_abort": "Spin aborted",
           "supply_voltage_too_low": "Supply voltage low",
           "water_level_too_high": "Water level too high",
-          "oven_empty_water_container": "Water container empty",
+          "customer_service_request": "Customer service request",
           "oven_water_supply_closed": "Water supply closed",
           "cooking_appliance_module_error": "Appliance module error"
         }

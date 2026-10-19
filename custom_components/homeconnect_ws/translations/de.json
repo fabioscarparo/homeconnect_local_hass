@@ -697,7 +697,7 @@
           "spin_abort": "Schleudern abgebrochen",
           "supply_voltage_too_low": "Versorgungsspannung niedrig",
           "water_level_too_high": "Wasserstand zu hoch",
-          "oven_empty_water_container": "Wassertank leer",
+          "customer_service_request": "Kundendienstanfrage",
           "oven_water_supply_closed": "Wasserzulauf geschlossen",
           "cooking_appliance_module_error": "Fehler im Gerätemodul"
         }

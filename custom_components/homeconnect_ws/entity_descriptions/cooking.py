@@ -971,9 +971,9 @@ COOKING_ENTITY_DESCRIPTIONS: _EntityDescriptionsDefinitionsType = {
             key="binary_sensor_oven_empty_water_container",
             entity="Cooking.Oven.Event.EmptyWaterContainer",
             device_class=BinarySensorDeviceClass.PROBLEM,
+            # A refill reminder, like a dishwasher's salt or rinse aid
+            in_problem_sensor=False,
             entity_category=EntityCategory.DIAGNOSTIC,
-            # Feeds the appliance's Problem sensor instead
-            entity_registry_enabled_default=False,
             value_on={"Present", "Confirmed"},
             value_off={"Off"},
         ),

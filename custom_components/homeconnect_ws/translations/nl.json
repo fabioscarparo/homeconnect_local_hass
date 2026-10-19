@@ -297,7 +297,7 @@
           "bean_container_empty": "Bonenreservoir leeg",
           "low_water_pressure": "Lage waterdruk",
           "program_aborted": "Programma afgebroken",
-          "oven_empty_water_container": "Watertank leeg",
+          "customer_service_request": "Verzoek klantenservice",
           "oven_water_supply_closed": "Watertoevoer afgesloten",
           "cooking_appliance_module_error": "Fout in apparaatmodule"
         }
