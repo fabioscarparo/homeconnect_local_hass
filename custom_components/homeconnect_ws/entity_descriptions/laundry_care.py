@@ -168,14 +168,14 @@ LAUNDRY_ENTITY_DESCRIPTIONS: _EntityDescriptionsDefinitionsType = {
         ),
         HCBinarySensorEntityDescription(
             key="binary_sensor_drying_process_finished",
-            entity="LaundryCare.Dryer.Event.DryingProcessFinished",
+            entity=EventKey.LAUNDRY_CARE_DRYER_DRYING_PROCESS_FINISHED,
             entity_category=EntityCategory.DIAGNOSTIC,
             value_on={"Present", "Confirmed"},
             value_off={"Off"},
         ),
         HCBinarySensorEntityDescription(
             key="binary_sensor_cool_down_phase_running",
-            entity="LaundryCare.Dryer.Event.CoolDownPhaseRunning",
+            entity=EventKey.LAUNDRY_CARE_DRYER_COOL_DOWN_PHASE_RUNNING,
             entity_category=EntityCategory.DIAGNOSTIC,
             device_class=BinarySensorDeviceClass.RUNNING,
             value_on={"Present", "Confirmed"},
@@ -183,7 +183,7 @@ LAUNDRY_ENTITY_DESCRIPTIONS: _EntityDescriptionsDefinitionsType = {
         ),
         HCBinarySensorEntityDescription(
             key="binary_sensor_refresher_container_empty",
-            entity="LaundryCare.Dryer.Event.RefresherContainerEmpty",
+            entity=EventKey.LAUNDRY_CARE_DRYER_REFRESHER_CONTAINER_EMPTY,
             entity_category=EntityCategory.DIAGNOSTIC,
             device_class=BinarySensorDeviceClass.PROBLEM,
             in_problem_sensor=False,
@@ -192,7 +192,7 @@ LAUNDRY_ENTITY_DESCRIPTIONS: _EntityDescriptionsDefinitionsType = {
         ),
         HCBinarySensorEntityDescription(
             key="binary_sensor_clean_lint_filter",
-            entity="LaundryCare.Dryer.Event.DryerSelfCleaning.CleanLintFilter",
+            entity=EventKey.LAUNDRY_CARE_DRYER_DRYER_SELF_CLEANING_CLEAN_LINT_FILTER,
             entity_category=EntityCategory.DIAGNOSTIC,
             device_class=BinarySensorDeviceClass.PROBLEM,
             in_problem_sensor=False,
@@ -201,7 +201,7 @@ LAUNDRY_ENTITY_DESCRIPTIONS: _EntityDescriptionsDefinitionsType = {
         ),
         HCBinarySensorEntityDescription(
             key="binary_sensor_clean_self_cleaning_module",
-            entity="LaundryCare.Dryer.Event.DryerSelfCleaning.CleanSelfCleaningModule",
+            entity=EventKey.LAUNDRY_CARE_DRYER_DRYER_SELF_CLEANING_CLEAN_SELF_CLEANING_MODULE,
             entity_category=EntityCategory.DIAGNOSTIC,
             device_class=BinarySensorDeviceClass.PROBLEM,
             in_problem_sensor=False,
@@ -210,7 +210,7 @@ LAUNDRY_ENTITY_DESCRIPTIONS: _EntityDescriptionsDefinitionsType = {
         ),
         HCBinarySensorEntityDescription(
             key="binary_sensor_easyclean_filter_reminder",
-            entity="LaundryCare.Dryer.Event.EasyClean.Filter.RemindCleaning",
+            entity=EventKey.LAUNDRY_CARE_DRYER_EASY_CLEAN_FILTER_REMIND_CLEANING,
             entity_category=EntityCategory.DIAGNOSTIC,
             device_class=BinarySensorDeviceClass.PROBLEM,
             in_problem_sensor=False,
@@ -219,7 +219,7 @@ LAUNDRY_ENTITY_DESCRIPTIONS: _EntityDescriptionsDefinitionsType = {
         ),
         HCBinarySensorEntityDescription(
             key="binary_sensor_evaporator_frozen",
-            entity="LaundryCare.Dryer.Event.EvaporatorFrozen",
+            entity=EventKey.LAUNDRY_CARE_DRYER_EVAPORATOR_FROZEN,
             entity_category=EntityCategory.DIAGNOSTIC,
             device_class=BinarySensorDeviceClass.PROBLEM,
             entity_registry_enabled_default=False,
